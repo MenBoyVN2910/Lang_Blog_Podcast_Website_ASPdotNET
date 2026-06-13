@@ -1,0 +1,378 @@
+html {
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+/* ==========================================================================
+   1. CẤU HÌNH GỐC TOÀN TRANG (GLOBAL LAYOUT SETTINGS)
+   ========================================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --font-serif-header: 'Playfair Display', serif;
+    --font-sans: 'Montserrat', sans-serif;
+    --color-cream: #F5F1EE;
+    --color-dark: #1A1817;
+    --border-color: #DCD7D2;
+}
+
+html {
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--color-cream);
+    color: var(--color-dark);
+    padding-top: 80px; /* Khoảng trống vừa đủ để Header không đè lên nội dung */
+    margin-bottom: 60px;
+}
+
+/* Kiểu dáng vùng nội dung chính ở giữa trang nơi @RenderBody chạy */
+.main-content {
+    position: relative;
+    width: 100%;
+}
+
+
+/* ==========================================================================
+   2. THANH ĐIỀU HƯỚNG TRÊN CÙNG (HEADER & NAVIGATION)
+   ========================================================================== */
+.main-header {
+    background-color: var(--color-cream);
+    border-bottom: 1px solid var(--border-color);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 18px 40px;
+}
+
+.logo-text {
+    font-family: var(--font-serif-header);
+    font-size: 26px;
+    color: var(--color-dark);
+    text-decoration: none;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.main-nav {
+    display: flex;
+    gap: 30px;
+}
+
+    .main-nav a {
+        font-size: 13px;
+        color: var(--color-dark);
+        text-decoration: none;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        padding-bottom: 4px;
+    }
+
+        /* Hiệu ứng gạch chân khi hover các mục menu */
+        .main-nav a.active::after,
+        .main-nav a:hover::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background-color: var(--color-dark);
+        }
+
+.header-right {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.search-input {
+    border: 1px solid var(--border-color);
+    padding: 8px 12px;
+    font-size: 13px;
+    background-color: transparent;
+    outline: none;
+    font-family: var(--font-sans);
+}
+
+a.btn-join,
+.btn-join,
+button.btn-join {
+    background-color: var(--color-dark);
+    color: #FFFFFF;
+    padding: 10px 25px;
+    font-size: 13px;
+    text-decoration: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: var(--font-sans);
+}
+
+/* User menu dropdown styles */
+.header-user {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.user-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--color-dark);
+    text-decoration: none;
+}
+
+.user-menu-btn svg { display: block; }
+
+.user-menu-btn .user-name { color: var(--color-dark); }
+
+.user-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    min-width: 200px;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    padding: 6px 0;
+    display: none;
+    z-index: 9999;
+}
+
+.header-right .header-user .user-dropdown[aria-hidden="false"] { display: block; }
+
+.header-right .header-user .dropdown-item {
+    display: block !important;
+    padding: 8px 14px !important;
+    color: var(--color-dark) !important;
+    text-decoration: none !important;
+    font-size: 14px !important;
+}
+
+.header-right .header-user .dropdown-item:hover { background: #f5f5f5; }
+
+.header-right .header-user .dropdown-separator { height: 1px; background: #eee; margin: 6px 0; }
+
+.header-right .header-user .logout {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    padding: 8px 14px;
+    font: inherit;
+    cursor: pointer;
+}
+
+/* override link defaults for dropdown links */
+.header-right .header-user .user-dropdown a { color: var(--color-dark) !important; text-decoration: none !important; }
+
+.header-right .header-user .dropdown-list { list-style: none; margin: 0; padding: 0; }
+.header-right .header-user .dropdown-list li { margin: 0; }
+.header-right .header-user .dropdown-list li.dropdown-separator { height: 1px; background: #eee; margin: 6px 0; }
+
+/* Ensure user menu uses project's fonts and spacing */
+.user-menu-btn, .user-menu-btn .user-name { font-family: var(--font-sans); font-size: 14px; }
+
+/* Manage account page styles */
+.manage-account {
+    max-width: 900px;
+    margin: 20px auto;
+    background: transparent;
+}
+
+.manage-account .card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 22px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+.manage-account .card:hover { transform: translateY(-4px); box-shadow: 0 14px 40px rgba(0,0,0,0.08); }
+
+.manage-account h1 { font-family: var(--font-serif-header); font-size: 34px; margin-bottom: 6px; }
+.manage-account h2 { font-family: var(--font-sans); color: #6b6b6b; font-size: 20px; margin-bottom: 18px; }
+
+.manage-account .form-control { border: 1px solid var(--border-color); padding: 12px 14px; border-radius: 6px; }
+.manage-account .btn-primary { background: var(--color-dark); border-color: var(--color-dark); }
+
+/* tidy up Manage links (left nav) */
+.manage-nav a { display: block; padding: 10px 0; color: var(--color-dark); text-decoration: none; }
+.manage-nav a.active { font-weight: 700; }
+
+/* Manage layout specific spacing when used with Manage _Layout */
+.manage-layout .row { display:flex; gap:24px; align-items:flex-start; }
+.manage-layout .col-md-3 { width:220px; }
+.manage-layout .col-md-9 { flex:1; }
+
+/* ensure nav inherits project font and removes blue links */
+.manage-layout .nav { font-family: var(--font-sans); }
+.manage-layout a { color: var(--color-dark); text-decoration: none; }
+
+@media (max-width: 768px) {
+    .manage-layout .row { flex-direction: column; }
+    .manage-layout .col-md-3 { width: 100%; }
+}
+
+
+/* ==========================================================================
+   3. CHÂN TRANG HỆ THỐNG (SITE FOOTER)
+   ========================================================================== */
+.site-footer {
+    background-color: #FFFFFF;
+    margin-top: 100px;
+    padding: 60px 40px 30px 40px;
+}
+
+.footer-top-border {
+    border-top: 1px solid var(--border-color);
+    margin-bottom: 60px;
+}
+
+.footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr; /* Cột thương hiệu rộng gấp đôi 2 cột liên kết */
+    gap: 50px;
+}
+
+.logo-text-footer {
+    font-family: var(--font-serif-header);
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--color-dark);
+    margin-bottom: 20px;
+}
+
+.footer-slogan {
+    font-family: var(--font-serif-header);
+    font-size: 16px;
+    font-style: italic;
+    color: #9A9187;
+    line-height: 1.6;
+    max-width: 300px;
+    margin-bottom: 30px;
+}
+
+.social-links {
+    display: flex;
+    gap: 15px;
+}
+
+    .social-links a {
+        font-size: 10px;
+        font-weight: 700;
+        color: #BDB5AE;
+        text-decoration: none;
+        letter-spacing: 1px;
+    }
+
+.footer-heading {
+    font-size: 11px;
+    font-weight: 700;
+    color: #BDB5AE;
+    letter-spacing: 2px;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+}
+
+.footer-links ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 15px;
+}
+
+.footer-links a {
+    font-family: var(--font-serif-header);
+    font-style: italic;
+    font-size: 15px;
+    color: var(--color-dark);
+    text-decoration: none;
+}
+
+.footer-links .email-link a {
+    font-family: var(--font-sans);
+    font-style: normal;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #BDB5AE;
+}
+
+
+
+.footer-bottom {
+    max-width: 1400px;
+    margin: 80px auto 0 auto;
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: #BDB5AE;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.back-to-top {
+    color: var(--color-dark);
+    text-decoration: none;
+}
+

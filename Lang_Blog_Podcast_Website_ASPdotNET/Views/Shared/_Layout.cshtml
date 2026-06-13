@@ -1,0 +1,164 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @* Thiết lập tiêu đề động kết hợp với tên thương hiệu LẶNG. *@
+    <title>@ViewData["Title"] LẶNG.</title>
+
+    @* Tối ưu hóa tốc độ tải font từ Google Fonts bằng cách kết nối sớm (Preconnect) *@
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Playfair+Display+SC&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+
+    @* Nhúng file CSS chính của trang web, tự động tạo chuỗi định danh phiên bản (v=...) để tránh lỗi bộ nhớ đệm (Cache) *@
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    @* Cấu hình ảnh biểu tượng thu nhỏ (Favicon) hiển thị trên tab trình duyệt *@
+    <link rel="icon"
+          type="image/png"
+          href="~/images/Logo/logo_website.png" />
+</head>
+<body>
+
+    @* =================================HEADER==============================================(Phần Đầu Trang) *@
+    <header class="main-header">
+        <div class="header-container">
+            @* Logo dạng chữ, khi bấm vào sẽ dẫn về trang chủ *@
+            <a class="logo-text" asp-area="" asp-controller="Home" asp-action="Index">LẶNG.</a>
+
+            @* Thanh điều hướng chính của website kết nối tới các Controller tương ứng *@
+            <nav class="main-nav">
+                <a asp-controller="Home" asp-action="Index">TRANG CHỦ</a>
+                <a asp-controller="Story" asp-action="Index">CÂU CHUYỆN</a>
+                <a asp-controller="Magazine" asp-action="Index">TẠP CHÍ</a>
+                <a asp-controller="Podcast" asp-action="Index">PODCAST</a>
+                <a asp-controller="Home" asp-action="About">VỀ LẶNG</a>
+
+                @* Kiểm tra bảo mật: Nếu Người dùng đã đăng nhập VÀ tài khoản thuộc nhóm quyền "Admin" thì mới hiển thị lối tắt *@
+                @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Admin" asp-action="Index">BAN BIÊN TẬP</a>
+                }
+            </nav>
+
+            @* Góc bên phải của thanh Header: Nơi chứa khu vực tài khoản thành viên *@
+            <div class="header-right">
+                @* Nhúng View thành phần chứa logic Đăng nhập/Đăng xuất/Hồ sơ người dùng *@
+                <partial name="_LoginPartial" />
+            </div>
+        </div>
+    </header>
+
+    @* =================================MAIN==============================================(Phần Giữa Trang) *@
+    @* Nơi các View con của từng trang cụ thể (Index, About,...) sẽ được lồng vào và render tại đây *@
+    <main role="main" class="main-content">
+        @RenderBody()
+    </main>
+
+    @* =================================FOOTER==============================================(Phần Đuôi Trang) *@
+    <footer class="site-footer">
+        <div class="footer-top-border"></div>
+        <div class="footer-container">
+
+            @* Cột 1: Thông tin thương hiệu, Slogan và mạng xã hội *@
+            <div class="footer-brand">
+                <h2 class="logo-text-footer">LẶNG.</h2>
+                <p class="footer-slogan">"Nơi những tâm hồn tìm thấy nhau trong sự tĩnh lặng của ngôn từ."</p>
+                <div class="social-links">
+                    <a href="#">FB</a>
+                    <a href="#">IG</a>
+                    <a href="#">TW</a>
+                    <a href="#">BE</a>
+                </div>
+            </div>
+
+            @* Cột 2: Các liên kết khám phá nhanh nội dung *@
+            <div class="footer-links">
+                <h4 class="footer-heading">KHÁM PHÁ</h4>
+                <ul>
+                    <li><a href="#">Câu chuyện</a></li>
+                    <li><a href="#">Tạp chí</a></li>
+                    <li><a href="#">Podcast</a></li>
+                </ul>
+            </div>
+
+            @* Cột 3: Các liên kết liên hệ và tương tác hành động *@
+            <div class="footer-links">
+                <h4 class="footer-heading">KẾT NỐI</h4>
+                <ul>
+                    <li><a href="#">Về chúng tôi</a></li>
+                    <li><a href="#">Tham gia</a></li>
+                    <li class="email-link"><a href="#">HELLO@LANGMAGAZINE.VN</a></li>
+                </ul>
+            </div>
+
+        </div>
+
+        @* Bản quyền và nút cuộn lên đầu trang *@
+        <div class="footer-bottom">
+            <span class="copyright">&copy; 2024 LẶNG. MEDIA - BẢO LƯU MỌI QUYỀN</span>
+            <a href="#" class="back-to-top">VỀ ĐẦU TRANG &uarr;</a>
+        </div>
+    </footer>
+
+    @* =================================JAVASCRIPT=========================================== *@
+    <script>
+            (function () {
+                // Lắng nghe sự kiện click chuột trên toàn bộ tài liệu (Document)
+                document.addEventListener('click', function (e) {
+                    // Kiểm tra xem vị trí click có thuộc nút menu người dùng (.user-menu-btn) hay không
+                    var btn = e.target.closest('.user-menu-btn');
+                    // Tìm kiếm menu dropdown nào hiện tại đang được mở (aria-hidden="false")
+                    var open = document.querySelector('.user-dropdown[aria-hidden="false"]');
+
+                    // Trường hợp 1: Người dùng nhấn trực tiếp vào nút mở menu tài khoản
+                    if (btn) {
+                        var container = btn.closest('.header-user');
+                        if (!container) return;
+                        var menu = container.querySelector('.user-dropdown');
+                        var expanded = btn.getAttribute('aria-expanded') === 'true';
+
+                        // Đảo ngược trạng thái thuộc tính aria-expanded (true <-> false) để phục vụ hỗ trợ đọc màn hình
+                        btn.setAttribute('aria-expanded', (!expanded).toString());
+
+                        if (expanded) {
+                            // Nếu menu đang mở thì ẩn đi
+                            menu.setAttribute('aria-hidden', 'true');
+                        } else {
+                            // Nếu đang có một menu khác mở trên màn hình thì tự động đóng menu cũ lại trước
+                            if (open && open !== menu) {
+                                open.setAttribute('aria-hidden', 'true');
+                                if (open.previousElementSibling) open.previousElementSibling.setAttribute('aria-expanded', 'false');
+                            }
+                            // Hiển thị menu dropdown hiện tại lên
+                            menu.setAttribute('aria-hidden', 'false');
+                        }
+                        return;
+                    }
+
+                    // Trường hợp 2: Người dùng nhấn chuột ra vùng ngoài (không thuộc khối .header-user), tự động đóng menu đang mở
+                    if (open && !e.target.closest('.header-user')) {
+                        open.setAttribute('aria-hidden', 'true');
+                        if (open.previousElementSibling) open.previousElementSibling.setAttribute('aria-expanded', 'false');
+                    }
+                });
+
+                // Lắng nghe sự kiện nhấn phím trên bàn phím
+                document.addEventListener('keydown', function (e) {
+                    // Nếu người dùng nhấn phím Escape (ESC) trên bàn phím, tiến hành đóng menu dropdown lập tức
+                    if (e.key === 'Escape' || e.key === 'Esc') {
+                        var open = document.querySelector('.user-dropdown[aria-hidden="false"]');
+                        if (open) {
+                            open.setAttribute('aria-hidden', 'true');
+                            if (open.previousElementSibling) open.previousElementSibling.setAttribute('aria-expanded', 'false');
+                        }
+                    }
+                });
+            })();
+    </script>
+
+    @* Vùng cho phép các View con nhúng bổ sung các đoạn mã Script riêng lẻ vào cuối trang Layout *@
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

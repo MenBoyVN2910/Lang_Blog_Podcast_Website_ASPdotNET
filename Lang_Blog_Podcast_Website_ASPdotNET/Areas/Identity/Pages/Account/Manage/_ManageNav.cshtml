@@ -1,0 +1,128 @@
+@* _ManageNav.cshtml
+    Đây là thanh điều hướng (Sidebar Navigation) cho trang quản lý tài khoản người dùng.
+    Sử dụng các class định sẵn để xác định trạng thái active của menu.
+*@
+
+@inject SignInManager<ApplicationUser> SignInManager
+@{
+    // Kiểm tra xem người dùng có phương thức đăng nhập từ bên thứ ba (Google, Facebook, v.v.) hay không
+    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+}
+
+<style>
+    /* CSS: Định nghĩa cấu trúc danh sách menu */
+    .account-sidebar-nav {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .account-nav-item {
+        margin-bottom: 1.2rem;
+    }
+
+    /* CSS: Định nghĩa kiểu chữ và hiệu ứng link cho menu */
+    .account-nav-link {
+        display: inline-block;
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--lang-muted);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+        /* CSS: Tạo hiệu ứng gạch chân khi di chuột (hover) */
+        .account-nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: var(--lang-brown);
+            transition: width 0.3s ease;
+        }
+
+        .account-nav-link:hover {
+            color: var(--lang-dark);
+        }
+
+            .account-nav-link:hover::after {
+                width: 100%;
+            }
+
+        /* CSS: Style cho mục đang được chọn (Active) */
+        .account-nav-link.active {
+            color: var(--lang-brown) !important;
+            font-weight: 600;
+        }
+
+            .account-nav-link.active::after {
+                width: 100%;
+            }
+
+    /* CSS: Responsive - Chuyển sang dạng thanh ngang trên màn hình nhỏ */
+    @@media (max-width: 900px) {
+        .account-sidebar-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            border-bottom: 1px solid var(--lang-border);
+            padding-bottom: 1rem;
+        }
+
+        .account-nav-item {
+            margin-bottom: 0;
+        }
+    }
+</style>
+
+<ul class="account-sidebar-nav">
+    @* Liên kết trang Hồ sơ cá nhân *@
+    <li class="account-nav-item">
+        <a class="account-nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index">
+            Hồ sơ cá nhân
+        </a>
+    </li>
+
+    @* Liên kết trang cài đặt Email *@
+    <li class="account-nav-item">
+        <a class="account-nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email">
+            Thay đổi Email
+        </a>
+    </li>
+
+    @* Liên kết trang đổi mật khẩu *@
+    <li class="account-nav-item">
+        <a class="account-nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword">
+            Mật khẩu
+        </a>
+    </li>
+
+    @* Chỉ hiển thị nếu tài khoản có liên kết ngoài *@
+    @if (hasExternalLogins)
+    {
+        <li class="account-nav-item" id="external-logins">
+            <a id="external-login" class="account-nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" asp-page="./ExternalLogins">
+                Liên kết ngoài
+            </a>
+        </li>
+    }
+
+    @* Liên kết trang bảo mật 2 lớp *@
+    <li class="account-nav-item">
+        <a class="account-nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication">
+            Bảo mật 2 lớp
+        </a>
+    </li>
+
+    @* Liên kết trang quản lý dữ liệu cá nhân *@
+    <li class="account-nav-item">
+        <a class="account-nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData">
+            Dữ liệu cá nhân
+        </a>
+    </li>
+</ul>

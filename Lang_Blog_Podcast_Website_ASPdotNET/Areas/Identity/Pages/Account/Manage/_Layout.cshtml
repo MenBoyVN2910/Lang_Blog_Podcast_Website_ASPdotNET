@@ -1,0 +1,165 @@
+@* LAYOUT TRANG QUẢN TRỊ (MANAGE)
+    Mục đích: Cung cấp khung sườn nhất quán theo phong cách Editorial/Tạp chí.
+*@
+
+@{
+    // Kiểm tra và gán Layout cha linh hoạt.
+    // Nếu có truyền "ParentLayout" từ View con, dùng nó, nếu không mặc định là _Layout chính.
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout != null)
+    {
+        Layout = parentLayout.ToString();
+    }
+    else
+    {
+        Layout = "/Views/Shared/_Layout.cshtml";
+    }
+}
+
+<style>
+    /* ================================= CSS Khung & Biến ================================= */
+    :root {
+        --lang-bg: #FCFAF6; /* Màu nền kem chủ đạo */
+        --lang-dark: #1E1A17; /* Màu đen than (Tiêu đề, button) */
+        --lang-brown: #8C6A50; /* Màu nâu nhấn (Hover effect) */
+        --lang-border: #E8E5DF; /* Màu viền cho các đường kẻ mảnh */
+    }
+
+    body {
+        background-color: var(--lang-bg);
+    }
+
+    /* ============================ CSS Giao Diện Chính ===================================== */
+
+    /* Wrapper: Căn giữa nội dung, giới hạn chiều rộng và tạo khoảng cách */
+    .lang-profile-wrapper {
+        max-width: 1200px;
+        min-height: 80vh; /* Sử dụng min-height để trang tự co giãn theo nội dung */
+        margin: 0 auto;
+        padding: 6rem 2rem;
+        font-family: 'Playfair Display', 'Times New Roman', serif;
+    }
+
+    /* Header: Phần tiêu đề trang với đường kẻ biên tập */
+    .lang-profile-header {
+        margin-bottom: 1rem;
+        border-bottom: 0.1px solid var(--lang-border);
+        padding-bottom: 1rem;
+    }
+
+    .lang-profile-label {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.25em;
+        color: var(--lang-bg);
+        background-color: var(--lang-dark);
+        padding: 0.3rem 0.8rem;
+        display: inline-block;
+        margin-bottom: 1.5rem;
+    }
+
+    .lang-profile-title {
+        font-size: 4rem;
+        color: var(--lang-dark);
+        line-height: 1.1;
+        margin: 0;
+        font-weight: 400;
+    }
+
+        .lang-profile-title em {
+            font-style: italic;
+            color: var(--lang-brown);
+        }
+
+    /* Grid: Chia cột (Menu bên trái, Nội dung bên phải) */
+    .lang-profile-grid {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: 5rem;
+    }
+
+    /* Hiệu ứng hiển thị nội dung: FadeIn từ dưới lên */
+    .lang-profile-content {
+        animation: fadeIn 1s ease-out;
+    }
+
+        /* Form Design: Style tối giản không viền, chỉ sử dụng gạch chân */
+        .lang-profile-content .form-control {
+            border: none !important;
+            border-bottom: 1px solid var(--lang-border) !important;
+            border-radius: 0 !important;
+            background-color: transparent !important;
+            padding: 0.8rem 0;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.95rem;
+            box-shadow: none !important;
+        }
+
+            .lang-profile-content .form-control:focus {
+                border-bottom-color: var(--lang-dark) !important;
+            }
+
+        /* Button: Style nút bấm mang phong cách Editorial */
+        .lang-profile-content .btn-primary {
+            background-color: var(--lang-dark) !important;
+            color: var(--lang-bg) !important;
+            border: none !important;
+            border-radius: 0 !important;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            padding: 1rem 2.5rem;
+            margin-top: 1.5rem;
+            transition: background-color 0.3s;
+        }
+
+            .lang-profile-content .btn-primary:hover {
+                background-color: var(--lang-brown) !important;
+            }
+
+    /* Keyframes: Định nghĩa animation */
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive: Tự động xếp chồng khi màn hình nhỏ hơn 900px */
+    @@media (max-width: 900px) {
+        .lang-profile-grid {
+            grid-template-columns: 1fr;
+            gap: 3rem;
+        }
+
+        .lang-profile-title {
+            font-size: 2.8rem;
+        }
+    }
+</style>
+
+<div class="lang-profile-wrapper">
+    <header class="lang-profile-header">
+        <span class="lang-profile-label">Khu vực riêng tư</span>
+        <h1 class="lang-profile-title">Dấu ấn <em>cá nhân.</em></h1>
+    </header>
+
+    <div class="lang-profile-grid">
+        <aside class="lang-profile-sidebar">
+            <partial name="_ManageNav" />
+        </aside>
+
+        <main class="lang-profile-content">
+            @RenderBody()
+        </main>
+    </div>
+</div>
+
+@* Render các đoạn script riêng biệt cho từng trang con (nếu có) *@
+@RenderSection("Scripts", required: false)

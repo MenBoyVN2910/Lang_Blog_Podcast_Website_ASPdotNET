@@ -1,0 +1,53 @@
+@page
+@model LoginWith2faModel
+@{
+    ViewData["Title"] = "Xác thực hai yếu tố"; // Tiêu đề trang
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+<p>Đăng nhập của bạn được bảo vệ bằng ứng dụng xác thực. Hãy nhập mã xác thực của bạn bên dưới.</p>
+
+<div class="row">
+    <div class="col-md-4">
+        @* Form đăng nhập xác thực 2 yếu tố *@
+        <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
+            @* Lưu trạng thái RememberMe từ bước đăng nhập trước *@
+            <input asp-for="RememberMe" type="hidden" />
+
+            @* Hiển thị các lỗi xác thực (nếu có) *@
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+            @* Ô nhập mã xác thực (OTP) *@
+            <div class="form-floating mb-3">
+                <input asp-for="Input.TwoFactorCode" class="form-control" autocomplete="off" />
+                <label asp-for="Input.TwoFactorCode" class="form-label"></label>
+                <span asp-validation-for="Input.TwoFactorCode" class="text-danger"></span>
+            </div>
+
+            @* Tùy chọn ghi nhớ thiết bị này để không phải nhập lại 2FA lần sau *@
+            <div class="checkbox mb-3">
+                <label asp-for="Input.RememberMachine" class="form-label">
+                    <input asp-for="Input.RememberMachine" />
+                    @Html.DisplayNameFor(m => m.Input.RememberMachine)
+                </label>
+            </div>
+
+            @* Nút gửi form để xác thực *@
+            <div>
+                <button type="submit" class="w-100 btn btn-lg btn-primary">Đăng nhập</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* Liên kết chuyển hướng sang phương thức đăng nhập bằng mã khôi phục nếu mất thiết bị *@
+<p>
+    Bạn không có quyền truy cập vào thiết bị xác thực của mình? Bạn có thể
+    <a id="recovery-code-login" asp-page="./LoginWithRecoveryCode" asp-route-returnUrl="@Model.ReturnUrl">đăng nhập bằng mã khôi phục</a>.
+</p>
+
+@section Scripts {
+    @* Nhúng các script hỗ trợ xác thực phía client *@
+    <partial name="_ValidationScriptsPartial" />
+}

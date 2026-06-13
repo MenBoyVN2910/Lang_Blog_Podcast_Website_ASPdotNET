@@ -1,0 +1,29 @@
+@page
+@model ResetAuthenticatorModel
+@{
+    // Thiết lập tiêu đề trang
+    ViewData["Title"] = "Đặt lại khóa xác thực";
+    // Đánh dấu trang hiện tại để làm nổi bật trong thanh menu quản lý
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+
+<h3>@ViewData["Title"]</h3>
+
+<div class="alert alert-warning" role="alert">
+    <p>
+        <span class="glyphicon glyphicon-warning-sign"></span>
+        <strong>Nếu bạn đặt lại khóa xác thực, ứng dụng xác thực của bạn sẽ không hoạt động cho đến khi bạn cấu hình lại.</strong>
+    </p>
+    <p>
+        Quá trình này sẽ vô hiệu hóa xác thực 2 yếu tố (2FA) cho đến khi bạn xác minh ứng dụng xác thực của mình.
+        Nếu bạn không hoàn tất việc cấu hình ứng dụng xác thực, bạn có thể bị mất quyền truy cập vào tài khoản của mình.
+    </p>
+</div>
+
+<div>
+    <form id="reset-authenticator-form" method="post">
+        <button id="reset-authenticator-button" class="btn btn-danger" type="submit">Đặt lại khóa xác thực</button>
+    </form>
+</div>

@@ -1,0 +1,710 @@
+﻿@{
+    ViewData["Title"] = "Ban Biên Tập - LẶNG.";
+}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --bg-body: #F7F5F0; /* Màu nền kem sáng hơn */
+        --bg-surface: #FFFFFF;
+        --primary-deep: #2A2825;
+        --primary-soft: #8C8275;
+        --border-light: #EBE6DF;
+        --text-main: #33312E;
+        --text-muted: #7A746D;
+        --accent-green: #4F7959;
+        --accent-green-bg: #EAF4EC;
+        --accent-red: #A65A5A;
+        --accent-red-bg: #F9EBEB;
+        --accent-gold: #B38659;
+        --accent-gold-bg: #F8EFE6;
+        --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.03);
+        --radius-md: 12px;
+        --radius-sm: 6px;
+        --transition: all 0.3s ease;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 40px 20px;
+        background-color: var(--bg-body);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: var(--text-main);
+    }
+
+    /* --- LAYOUT CHÍNH --- */
+    .admin-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background-color: var(--bg-surface);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+    }
+
+    /* --- HEADER --- */
+    .admin-header {
+        padding: 40px 50px;
+        border-bottom: 1px solid var(--border-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--bg-surface);
+    }
+
+    .header-text p {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: var(--accent-gold);
+        margin: 0 0 8px 0;
+    }
+
+    .header-text h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.8rem;
+        font-weight: 500;
+        margin: 0;
+        color: var(--primary-deep);
+    }
+
+    /* --- STATS CARDS (Sinh động hơn) --- */
+    .stats-wrapper {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        padding: 30px 50px;
+        background-color: #FCFAxF8; /* Highlight nhẹ khu vực này */
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .stat-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-sm);
+        padding: 24px 30px;
+        display: flex;
+        flex-direction: column;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: var(--primary-soft);
+            border-radius: 4px 0 0 4px;
+            opacity: 0.5;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-sm);
+            border-color: #D4CDC3;
+        }
+
+        .stat-card:nth-child(1)::before {
+            background-color: var(--accent-gold);
+            opacity: 1;
+        }
+
+        .stat-card:nth-child(2)::before {
+            background-color: var(--accent-green);
+            opacity: 0.7;
+        }
+
+    .stat-title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+    }
+
+    .stat-number {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        color: var(--primary-deep);
+        line-height: 1;
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+    }
+
+    .stat-unit {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 14px;
+        color: var(--text-muted);
+        font-style: italic;
+    }
+
+    /* --- TABS --- */
+    .admin-tabs {
+        display: flex;
+        padding: 0 30px;
+        background-color: var(--bg-surface);
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .tab-btn {
+        background: transparent;
+        border: none;
+        padding: 20px 24px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-muted);
+        cursor: pointer;
+        position: relative;
+        transition: var(--transition);
+        font-family: inherit;
+    }
+
+        .tab-btn:hover {
+            color: var(--primary-deep);
+        }
+
+        .tab-btn.active {
+            color: var(--primary-deep);
+            font-weight: 700;
+        }
+
+            .tab-btn.active::after {
+                content: '';
+                position: absolute;
+                bottom: -1px;
+                left: 0;
+                width: 100%;
+                height: 2px;
+                background-color: var(--primary-deep);
+            }
+
+    /* --- NỘI DUNG TAB --- */
+    .tab-content {
+        display: none;
+        padding: 40px 50px;
+        animation: fadeIn 0.4s ease;
+    }
+
+        .tab-content.active {
+            display: block;
+        }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        font-weight: 500;
+        font-style: italic;
+        margin: 0 0 30px 0;
+        color: var(--primary-deep);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* --- BẢNG DỮ LIỆU --- */
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .data-table th {
+            text-align: left;
+            padding: 16px 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--border-light);
+            background-color: #FDFDFD;
+        }
+
+        .data-table td {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: middle;
+            transition: background-color 0.2s;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tbody tr:hover td {
+            background-color: #FCFBF9;
+        }
+
+    /* --- AVATAR & THÔNG TIN NGƯỜI GỬI --- */
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: var(--bg-body);
+        color: var(--primary-deep);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+        border: 1px solid var(--border-light);
+    }
+
+        .avatar.anon {
+            font-style: italic;
+            color: var(--text-muted);
+            background-color: #F0F0F0;
+        }
+
+    .user-details strong {
+        display: block;
+        font-size: 14px;
+        color: var(--primary-deep);
+    }
+
+    .user-details span {
+        font-size: 11px;
+        color: var(--text-muted);
+    }
+
+    /* --- NỘI DUNG BÀI VIẾT TRONG BẢNG --- */
+    .post-content h4 {
+        margin: 0 0 6px 0;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--primary-deep);
+    }
+
+    .post-content p {
+        margin: 0;
+        font-size: 13px;
+        color: var(--text-muted);
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* --- BADGES (Nhãn) --- */
+    .badge {
+        display: inline-flex;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+        .badge.cat-ky-uc {
+            background-color: var(--accent-gold-bg);
+            color: var(--accent-gold);
+        }
+
+        .badge.cat-chua-lanh {
+            background-color: var(--accent-green-bg);
+            color: var(--accent-green);
+        }
+
+        .badge.cat-tam-su {
+            background-color: #F0F4FA;
+            color: #5A7E9C;
+        }
+
+    /* --- NÚT BẤM (Buttons & Actions) --- */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        border-radius: var(--radius-sm);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        text-decoration: none;
+        cursor: pointer;
+        transition: var(--transition);
+        font-family: inherit;
+        border: 1px solid transparent;
+    }
+
+        .btn.primary {
+            background-color: var(--primary-deep);
+            color: var(--bg-surface);
+        }
+
+            .btn.primary:hover {
+                background-color: #000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            }
+
+        .btn.outline {
+            background-color: transparent;
+            border-color: var(--border-light);
+            color: var(--primary-deep);
+        }
+
+            .btn.outline:hover {
+                border-color: var(--primary-deep);
+                background-color: #FAFAFA;
+            }
+
+    .action-group {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .btn-action {
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: var(--transition);
+    }
+
+        .btn-action.approve {
+            color: var(--accent-green);
+            background-color: var(--accent-green-bg);
+        }
+
+            .btn-action.approve:hover {
+                background-color: #DDF0E0;
+            }
+
+        .btn-action.reject {
+            color: var(--accent-red);
+            background-color: var(--accent-red-bg);
+        }
+
+            .btn-action.reject:hover {
+                background-color: #F2DDDD;
+            }
+
+        .btn-action.edit {
+            color: var(--primary-soft);
+            background-color: #F5F5F5;
+        }
+
+            .btn-action.edit:hover {
+                background-color: #EAEAEA;
+                color: var(--primary-deep);
+            }
+
+    /* --- FORM --- */
+    .input-group {
+        display: flex;
+        gap: 16px;
+        max-width: 600px;
+        margin-bottom: 30px;
+    }
+
+    .input-field {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-sm);
+        font-family: inherit;
+        font-size: 14px;
+        outline: none;
+        transition: var(--transition);
+    }
+
+        .input-field:focus {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 3px var(--accent-gold-bg);
+        }
+
+    /* Thumbnail mượt hơn */
+    .post-thumb {
+        width: 60px;
+        height: 60px;
+        border-radius: var(--radius-sm);
+        background-color: var(--bg-body);
+        object-fit: cover;
+        border: 1px solid var(--border-light);
+    }
+</style>
+
+<div class="admin-container">
+    <header class="admin-header">
+        <div class="header-text">
+            <p>Hệ thống tòa soạn</p>
+            <h1>Ban Biên Tập.</h1>
+        </div>
+        <a href="/" target="_blank" class="btn outline">
+            Xem Website
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+        </a>
+    </header>
+
+    <section class="stats-wrapper">
+        <div class="stat-card">
+            <span class="stat-title">Câu chuyện chờ duyệt</span>
+            <div class="stat-number">04 <span class="stat-unit">bài mới</span></div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-title">Ấn phẩm tạp chí</span>
+            <div class="stat-number">24 <span class="stat-unit">bài viết</span></div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-title">Tổng số danh mục</span>
+            <div class="stat-number">06 <span class="stat-unit">chủ đề</span></div>
+        </div>
+    </section>
+
+    <nav class="admin-tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'stories')">
+            Mảnh ghép ký ức 
+        </button>
+
+        <button class="tab-btn" onclick="openTab(event, 'posts')">
+            Bài viết tạp chí
+        </button>
+
+        <button class="tab-btn" onclick="openTab(event, 'categories')">
+            Quản lý danh mục
+        </button>
+
+        <a asp-controller="Admin"
+           asp-action="ManageUsers"
+           class="tab-btn">
+            Quản lý người dùng
+        </a>
+    </nav>
+
+    <div id="stories" class="tab-content active">
+        <h2 class="section-title">Phê duyệt tâm sự từ độc giả</h2>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width: 20%;">Người gửi</th>
+                    <th style="width: 15%;">Chủ đề</th>
+                    <th style="width: 45%;">Nội dung tâm sự</th>
+                    <th style="width: 20%; text-align: right;">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="user-info">
+                            <div class="avatar">HN</div>
+                            <div class="user-details">
+                                <strong>Hoàng Nam</strong>
+                                <span>09.06.2026</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge cat-ky-uc">Ký ức</span></td>
+                    <td>
+                        <div class="post-content">
+                            <h4>Mùi hương của những ngày tháng cũ</h4>
+                            <p>Tôi lùng sục khắp các tiệm nước hoa chỉ để tìm lại đúng mùi hương của căn phòng năm ấy, nơi chúng ta từng hứa...</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="action-group">
+                            <a href="#" class="btn-action approve">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> Duyệt
+                            </a>
+                            <a href="#" class="btn-action reject">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> Bỏ
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="user-info">
+                            <div class="avatar anon">?</div>
+                            <div class="user-details">
+                                <strong style="color: var(--text-muted); font-style: italic;">Ẩn danh</strong>
+                                <span>08.06.2026</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge cat-chua-lanh">Chữa lành</span></td>
+                    <td>
+                        <div class="post-content">
+                            <h4>Học cách chấp nhận sự dang dở</h4>
+                            <p>Cuối cùng thì tôi cũng nhận ra, dang dở cũng có nét đẹp riêng của nó. Giống như vầng trăng khuyết, nó vẫn sáng dịu dàng theo cách của riêng mình...</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="action-group">
+                            <a href="#" class="btn-action approve">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> Duyệt
+                            </a>
+                            <a href="#" class="btn-action reject">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> Bỏ
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="posts" class="tab-content">
+        <div class="section-title">
+            Danh sách bài viết tạp chí
+            <a href="#" class="btn primary">+ Viết bài mới</a>
+        </div>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width: 12%;">Hình ảnh</th>
+                    <th style="width: 43%;">Tiêu đề</th>
+                    <th style="width: 15%;">Danh mục</th>
+                    <th style="width: 15%;">Lượt xem</th>
+                    <th style="width: 15%; text-align: right;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><div class="post-thumb"></div></td>
+                    <td>
+                        <div class="post-content">
+                            <h4>Nghệ thuật của sự chậm rãi</h4>
+                            <p style="margin-top: 4px;">Đăng ngày: 02.06.2026</p>
+                        </div>
+                    </td>
+                    <td><span class="badge cat-chua-lanh">Chữa lành</span></td>
+                    <td style="font-weight: 600; color: var(--primary-soft);">302 lượt</td>
+                    <td>
+                        <div class="action-group">
+                            <a href="#" class="btn-action edit">Sửa</a>
+                            <a href="#" class="btn-action reject">Xóa</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><div class="post-thumb"></div></td>
+                    <td>
+                        <div class="post-content">
+                            <h4>Tiếng vang trong tĩnh lặng</h4>
+                            <p style="margin-top: 4px;">Đăng ngày: 28.05.2026</p>
+                        </div>
+                    </td>
+                    <td><span class="badge cat-tam-su">Tâm sự</span></td>
+                    <td style="font-weight: 600; color: var(--primary-soft);">421 lượt</td>
+                    <td>
+                        <div class="action-group">
+                            <a href="#" class="btn-action edit">Sửa</a>
+                            <a href="#" class="btn-action reject">Xóa</a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="categories" class="tab-content">
+        <h2 class="section-title">Cấu trúc danh mục</h2>
+
+        <form class="input-group" onsubmit="event.preventDefault();">
+            <input type="text" class="input-field" placeholder="Tên danh mục mới (VD: Triết lý)..." required />
+            <button type="submit" class="btn primary">Thêm danh mục</button>
+        </form>
+
+        <div style="max-width: 600px;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Mã ID</th>
+                        <th style="width: 60%;">Tên danh mục</th>
+                        <th style="width: 20%; text-align: right;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="color: var(--text-muted);">#01</td>
+                        <td><strong>CHỮA LÀNH</strong></td>
+                        <td>
+                            <div class="action-group">
+                                <a href="#" class="btn-action reject">Xóa</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="color: var(--text-muted);">#02</td>
+                        <td><strong>TÂM SỰ</strong></td>
+                        <td>
+                            <div class="action-group">
+                                <a href="#" class="btn-action reject">Xóa</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="color: var(--text-muted);">#03</td>
+                        <td><strong>KÝ ỨC</strong></td>
+                        <td>
+                            <div class="action-group">
+                                <a href="#" class="btn-action reject">Xóa</a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openTab(evt, tabId) {
+        // Ẩn tất cả nội dung
+        const contents = document.querySelectorAll('.tab-content');
+        contents.forEach(content => {
+            content.classList.remove('active');
+        });
+
+        // Tắt trạng thái active của tất cả các nút
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        // Bật tab được chọn
+        document.getElementById(tabId).classList.add('active');
+        evt.currentTarget.classList.add('active');
+    }
+</script>

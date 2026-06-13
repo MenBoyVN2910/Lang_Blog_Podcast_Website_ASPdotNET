@@ -1,0 +1,94 @@
+@* Trang: EnableAuthenticator.cshtml
+    Chức năng: Hướng dẫn người dùng cấu hình ứng dụng xác thực (Authenticator App) để kích hoạt bảo mật 2 lớp (2FA).
+*@
+
+@page
+@model EnableAuthenticatorModel
+@{
+    // Thiết lập tiêu đề trang và chỉ mục menu điều hướng
+    ViewData["Title"] = "Cấu hình ứng dụng xác thực";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<style>
+    .lang-form-wrapper {
+        max-width: 600px;
+    }
+
+    /* Khung cảnh báo nghệ thuật */
+    .lang-alert-warning {
+        padding: 2rem;
+        border: 1px solid #E8D3CC;
+        background-color: #FCF8F7;
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        color: #A34A3B;
+        margin-bottom: 2.5rem;
+    }
+
+    /* Style hiển thị mã khóa (Shared Key) */
+    .lang-kbd {
+        background: #F2EFEA;
+        padding: 0.3rem 0.6rem;
+        border-radius: 0;
+        font-family: monospace;
+        color: #2A2623;
+    }
+
+    /* Danh sách các bước hướng dẫn */
+    .lang-step-list {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .lang-step-item {
+        margin-bottom: 3rem;
+    }
+
+    /* Đánh số bước */
+    .lang-step-num {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        color: #A34A3B;
+        margin-bottom: 1rem;
+        display: block;
+    }
+</style>
+
+@* Hiển thị thông báo trạng thái nếu có lỗi hoặc thành công *@
+<partial name="_StatusMessage" for="StatusMessage" />
+
+<div class="lang-form-wrapper">
+    @* Tiêu đề trang *@
+    <h3 class="lang-page-title">Cấu hình Ứng dụng xác thực</h3>
+
+    <ol class="lang-step-list">
+        @* Bước 1: Hướng dẫn tải app *@
+        <li class="lang-step-item">
+            <span class="lang-step-num">01. Tải ứng dụng</span>
+            <p>Sử dụng Microsoft Authenticator hoặc Google Authenticator trên thiết bị của bạn.</p>
+        </li>
+
+        @* Bước 2: Quét mã QR hoặc nhập thủ công khóa bí mật *@
+        <li class="lang-step-item">
+            <span class="lang-step-num">02. Đồng bộ</span>
+            <p>Quét mã QR hoặc nhập khóa: <kbd class="lang-kbd">@Model.SharedKey</kbd></p>
+            @* Container chứa mã QR (thường được inject bởi thư viện JS bên ngoài) *@
+            <div id="qrCode" style="margin: 1.5rem 0;"></div>
+        </li>
+
+        @* Bước 3: Nhập mã xác thực để hoàn tất liên kết *@
+        <li class="lang-step-item">
+            <span class="lang-step-num">03. Xác thực</span>
+            <form id="send-code" method="post">
+                <input asp-for="Input.Code" class="form-control" placeholder="Nhập mã xác thực từ app..." />
+                <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Hoàn tất</button>
+            </form>
+        </li>
+    </ol>
+</div>
+
+@section Scripts {
+    @* Nạp các đoạn script để xử lý validation và hiển thị mã QR *@
+    <partial name="_ValidationScriptsPartial" />
+}

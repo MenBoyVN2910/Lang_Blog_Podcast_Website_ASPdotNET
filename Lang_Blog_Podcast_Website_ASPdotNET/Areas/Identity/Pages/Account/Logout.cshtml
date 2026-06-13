@@ -1,0 +1,25 @@
+@page
+@model LogoutModel
+@{
+    // Thiết lập tiêu đề trang hiển thị trên trình duyệt
+    ViewData["Title"] = "Đăng xuất";
+}
+
+<header>
+    <h1>@ViewData["Title"]</h1>
+    @{
+        // Kiểm tra xem người dùng có đang đăng nhập hay không
+        if (User.Identity?.IsAuthenticated ?? false)
+        {
+            // Form thực hiện hành động đăng xuất (POST request)
+            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+                <button type="submit" class="nav-link btn btn-link text-dark">Nhấn vào đây để đăng xuất</button>
+            </form>
+        }
+        else
+        {
+            // Hiển thị thông báo khi người dùng đã đăng xuất thành công
+            <p>Bạn đã đăng xuất thành công khỏi ứng dụng.</p>
+        }
+    }
+</header>

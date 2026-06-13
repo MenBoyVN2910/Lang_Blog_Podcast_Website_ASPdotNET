@@ -1,0 +1,459 @@
+@page
+@model RegisterModel
+@{
+    // Thiết lập tiêu đề cho trang web
+    ViewData["Title"] = "Đăng ký";
+}
+
+@* Nhúng các font chữ (Inter, Playfair Display) và biểu tượng icon (FontAwesome) từ bên ngoài để trang trí UI *@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    /* Reset CSS cơ bản và thiết lập box-sizing để đồng bộ kích thước chuẩn cho các thẻ */
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Container chính sử dụng Flexbox để chia đôi màn hình (trái/phải) */
+    .auth-container {
+        display: flex;
+        min-height: 100vh;
+        width: 100%;
+    }
+
+    /* Animation cho hiệu ứng xuất hiện từ dưới lên (Fade in up) */
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Cấu hình giao diện cho Panel bên trái (Phần trang trí) */
+    .auth-left {
+        width: 50%;
+        flex: 0 0 50%;
+        background-color: #312c27;
+        color: #f5f5f5;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 10%;
+    }
+
+        /* Chữ trang trí mờ lớn ở Background bên trái */
+        .auth-left .bg-join {
+            position: absolute;
+            right: -80px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+            font-size: 350px;
+            font-family: 'Playfair Display', serif;
+            color: rgba(255, 255, 255, 0.04);
+            pointer-events: none; /* Ngăn chặn tương tác chuột vào chữ này */
+            letter-spacing: 10px;
+            transition: all 0.6s ease;
+        }
+
+        /* Hiệu ứng phóng to mờ khi hover chuột vào panel trái */
+        .auth-left:hover .bg-join {
+            color: rgba(255, 255, 255, 0.07);
+            transform: translateY(-50%) rotate(-90deg) scale(1.02);
+        }
+
+    /* Khung chứa nội dung chữ của panel trái kèm hiệu ứng xuất hiện */
+    .auth-left-content {
+        z-index: 1;
+        max-width: 500px;
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    .subtitle-small {
+        font-size: 12px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: #9e9a95;
+        margin-bottom: 20px;
+    }
+
+    .main-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 5rem;
+        line-height: 1.1;
+        margin-bottom: 50px;
+    }
+
+        .main-title i {
+            font-style: italic;
+            font-weight: 400;
+        }
+
+    .quote-text {
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        color: #b5b0aa;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        border-left: 2px solid #5a544d;
+        padding-left: 15px;
+    }
+
+    /* Cấu hình giao diện cho Panel bên phải (Phần chứa Form đăng ký) */
+    .auth-right {
+        width: 50%;
+        flex: 0 0 50%;
+        background-color: #faf9f7;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 50px;
+    }
+
+    /* Khung bọc Form đăng ký, có độ trễ hiệu ứng (0.2s) để xuất hiện sau text bên trái */
+    .form-wrapper {
+        width: 100%;
+        max-width: 450px;
+        opacity: 0;
+        animation: fadeInUp 0.8s ease-out 0.2s forwards;
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .form-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 2.5rem;
+            color: #222;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            font-size: 0.8rem;
+            color: #777;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+    /* Style cho từng nhóm nhập liệu (Label + Input) */
+    .custom-form-group {
+        margin-bottom: 30px;
+    }
+
+        .custom-form-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: #666;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+    /* Wrapper bọc input để định vị icon bên trong */
+    .input-icon-wrapper {
+        position: relative;
+    }
+
+        /* Định vị trí icon bên trong ô input */
+        .input-icon-wrapper i {
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bbb;
+            transition: color 0.3s ease;
+        }
+
+    /* Khung nhập liệu tùy chỉnh (Chỉ có border mờ ở dưới) */
+    .custom-input {
+        width: 100%;
+        padding: 10px 10px 10px 35px;
+        background-color: transparent;
+        border: none;
+        border-bottom: 1px solid #e0e0e0;
+        border-radius: 0;
+        font-size: 0.95rem;
+        color: #333;
+        transition: all 0.3s ease;
+    }
+
+        /* Hiệu ứng khi nhấp chuột (focus) vào input */
+        .custom-input:focus {
+            outline: none;
+            border-bottom: 1px solid #312c27;
+        }
+
+            /* Đổi màu icon khi input đang được focus */
+            .custom-input:focus + i, .input-icon-wrapper:focus-within i {
+                color: #312c27;
+            }
+
+    /* Nút Đăng ký chính */
+    .btn-submit {
+        width: 100%;
+        padding: 16px;
+        background-color: #2b2824;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+    }
+
+        .btn-submit:hover {
+            background-color: #1a1815;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+    /* Đường kẻ phân cách ngang chữ "Hoặc" */
+    .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 30px 0;
+        color: #bbb;
+        font-size: 0.8rem;
+    }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .divider span {
+            padding: 0 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+    /* Nút đăng nhập bên thứ 3 (Google/Facebook...) */
+    .btn-google {
+        width: 100%;
+        padding: 14px;
+        background-color: transparent;
+        color: #333;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-google:hover {
+            background-color: #f1f1f1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-google img {
+            width: 18px;
+            height: 18px;
+        }
+
+    /* Khung chứa đường link chuyển đổi Đăng nhập / Đăng ký */
+    .login-link {
+        text-align: center;
+        margin-top: 30px;
+        font-size: 0.85rem;
+        color: #666;
+    }
+
+        .login-link a {
+            color: #2b2824;
+            text-decoration: none;
+            font-weight: 600;
+            border: 1px solid #2b2824;
+            padding: 4px 10px;
+            margin-left: 5px;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            transition: all 0.3s ease;
+        }
+
+            .login-link a:hover {
+                background-color: #2b2824;
+                color: #fff;
+            }
+
+    /* Class dùng để hiển thị text lỗi màu đỏ */
+    .text-danger {
+        color: #dc3545;
+        font-size: 0.8rem;
+        margin-top: 5px;
+        display: block;
+    }
+
+    /* Cấu hình Responsive: Trải dọc giao diện cho màn hình nhỏ (Tablet/Mobile) */
+    @@media (max-width: 900px) {
+        .auth-container {
+            flex-direction: column;
+        }
+
+        .auth-left, .auth-right {
+            width: 100%;
+            flex: none;
+        }
+            /* Ẩn chữ nền lớn đi để tiết kiệm không gian trên Mobile */
+            .auth-left .bg-join {
+                display: none;
+            }
+
+        .main-title {
+            font-size: 3rem;
+        }
+    }
+</style>
+
+<div class="auth-container">
+    @* Phần trang trí bên trái *@
+    <div class="auth-left">
+        <div class="bg-join">THAM GIA</div>
+        <div class="auth-left-content">
+            <div class="subtitle-small">HỆ SINH THÁI TINH THẦN</div>
+            <h1 class="main-title">
+                TRỞ<br /> THÀNH<br />
+                <i> MỘT<br /> PHẦN. </i>
+            </h1>
+            <p class="quote-text">
+                "Chúng tôi tin rằng mỗi tâm hồn đều mang trong mình một bản nhạc riêng. Hãy cùng chúng tôi viết nên những giai điệu của sự tĩnh lặng."
+            </p>
+        </div>
+    </div>
+
+    @* Phần nội dung đăng ký bên phải *@
+    <div class="auth-right">
+        <div class="form-wrapper">
+            <div class="form-header">
+                <h1>BẮT ĐẦU HÀNH TRÌNH.</h1>
+                <p>KIẾN TẠO KHÔNG GIAN CỦA RIÊNG BẠN</p>
+            </div>
+
+            @* Form đăng ký chính: Kích hoạt HTTP Post action khi người dùng submit *@
+            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                @* Vùng hiển thị tổng hợp các thông báo lỗi chung của Model (ví dụ: lỗi từ Server trả về) *@
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+                @* Trường nhập: Tên người dùng *@
+                <div class="custom-form-group">
+                    <label asp-for="Input.FullName">Tên người dùng</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fa-solid fa-user" style="font-size: 0.9em;"></i>
+                        @* Thẻ input được binding dữ liệu trực tiếp với thuộc tính Input.FullName ở phần backend (C#) *@
+                        <input asp-for="Input.FullName" class="custom-input" autocomplete="username" aria-required="true" placeholder="Tên Của Lặnger Là Gì Nèe..." />
+                    </div>
+                    @* Thẻ hiển thị lỗi báo đỏ nếu Tên người dùng không hợp lệ *@
+                    <span asp-validation-for="Input.FullName" class="text-danger"></span>
+                </div>
+
+                @* Trường nhập: Email *@
+                <div class="custom-form-group">
+                    <label asp-for="Input.Email">Địa chỉ Email</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input asp-for="Input.Email" class="custom-input" autocomplete="username" aria-required="true" placeholder="Email của Lặnger..." />
+                    </div>
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+
+                @* Trường nhập: Mật mã *@
+                <div class="custom-form-group">
+                    <label asp-for="Input.Password">Mật mã</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fa-solid fa-lock" style="font-size: 0.9em;"></i>
+                        <input asp-for="Input.Password" class="custom-input" autocomplete="new-password" aria-required="true" placeholder="********" />
+                    </div>
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+
+                @* Trường nhập: Xác nhận mật mã *@
+                <div class="custom-form-group">
+                    <label asp-for="Input.ConfirmPassword">Xác nhận mật mã</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fa-solid fa-lock" style="font-size: 0.9em;"></i>
+                        <input asp-for="Input.ConfirmPassword" class="custom-input" autocomplete="new-password" aria-required="true" placeholder="********" />
+                    </div>
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                @* Nút gửi form đi lên hệ thống *@
+                <button id="registerSubmit" type="submit" class="btn-submit">Đăng ký tài khoản</button>
+            </form>
+
+            <div class="divider">
+                <span>Hoặc</span>
+            </div>
+
+            @* Xử lý hiển thị phần đăng nhập bằng tài khoản liên kết ngoài (Google, Facebook, v.v.) *@
+            @{
+                // Kiểm tra xem backend có cấu hình nhà cung cấp dịch vụ đăng nhập ngoài (ExternalLogins) hay không
+                if ((Model.ExternalLogins?.Count ?? 0) > 0)
+                {
+                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                        @* Lặp qua danh sách các nhà cung cấp được hỗ trợ và render ra nút bấm *@
+                        @foreach (var provider in Model.ExternalLogins!)
+                        {
+                            // Nếu là Google thì sẽ dùng nút có kèm icon svg riêng của Google
+                            if (provider.Name.ToLower() == "google")
+                            {
+                                <button type="submit" class="btn-google" name="provider" value="@provider.Name">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google Logo" />
+                                    TIẾP TỤC VỚI GOOGLE
+                                </button>
+                            }
+                            else
+                            {
+                                // Các provider khác sẽ tự động render icon FontAwesome tương ứng
+                                <button type="submit" class="btn-google" name="provider" value="@provider.Name">
+                                    <i class="fa-brands fa-@provider.Name.ToLower()"></i> TIẾP TỤC VỚI @provider.DisplayName.ToUpper()
+                                </button>
+                            }
+                        }
+                    </form>
+                }
+            }
+
+            @* Đường dẫn chuyển sang trang đăng nhập nếu người dùng đã có tài khoản *@
+            <div class="login-link">
+                Đã có tài khoản? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">ĐĂNG NHẬP NGAY</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @* Nhúng các script mặc định dùng để xác thực (validate) dữ liệu của form ở phía client trước khi gửi lên server *@
+    <partial name="_ValidationScriptsPartial" />
+}

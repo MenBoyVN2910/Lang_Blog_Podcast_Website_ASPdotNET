@@ -1,0 +1,77 @@
+@page
+@model ShowRecoveryCodesModel
+@{
+    // Thiết lập tiêu đề trang hiển thị trên trình duyệt
+    ViewData["Title"] = "Mã khôi phục";
+    // Đánh dấu trang hiện tại để làm nổi bật mục tương ứng trong menu điều hướng
+    ViewData["ActivePage"] = "TwoFactorAuthentication";
+}
+
+<style>
+    /* CSS Wrapper bao bọc nội dung trang */
+    .lang-form-wrapper {
+        max-width: 600px;
+    }
+
+    /* CSS khung cảnh báo nổi bật */
+    .lang-alert-warning {
+        padding: 2rem;
+        border: 1px solid #E8D3CC;
+        background-color: #FCF8F7;
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        color: #A34A3B;
+        margin-bottom: 2.5rem;
+    }
+
+    /* CSS cho các thẻ định dạng mã khôi phục */
+    .lang-kbd {
+        background: #F2EFEA;
+        padding: 0.3rem 0.6rem;
+        border-radius: 0;
+        font-family: monospace;
+        color: #2A2623;
+    }
+
+    /* CSS cho danh sách các bước hướng dẫn (được kế thừa) */
+    .lang-step-list {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .lang-step-item {
+        margin-bottom: 3rem;
+    }
+
+    .lang-step-num {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        color: #A34A3B;
+        margin-bottom: 1rem;
+        display: block;
+    }
+</style>
+
+<partial name="_StatusMessage" for="StatusMessage" />
+
+<h3>@ViewData["Title"]</h3>
+
+<div class="lang-form-wrapper">
+    <h3 class="lang-page-title">Mã khôi phục</h3>
+
+    <div class="lang-alert-warning">
+        Hãy lưu trữ các mã này tại một nơi an toàn. Đây là chìa khóa duy nhất nếu bạn mất quyền truy cập thiết bị.
+    </div>
+
+    <div class="row" style="background: #F2EFEA; padding: 2rem;">
+        @for (var row = 0; row < (Model.RecoveryCodes?.Length ?? 0); row += 2)
+        {
+            <div class="col-6">
+                <code style="font-size: 1.2rem; color: #2A2623;">@Model.RecoveryCodes![row]</code>
+            </div>
+            <div class="col-6">
+                <code style="font-size: 1.2rem; color: #2A2623;">@Model.RecoveryCodes[row + 1]</code>
+            </div>
+        }
+    </div>
+</div>

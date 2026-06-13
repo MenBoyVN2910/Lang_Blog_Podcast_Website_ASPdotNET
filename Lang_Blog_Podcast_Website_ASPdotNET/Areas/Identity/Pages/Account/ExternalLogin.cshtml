@@ -1,0 +1,35 @@
+@page
+@model ExternalLoginModel
+@{
+    // Thiết lập tiêu đề trang hiển thị trên trình duyệt
+    ViewData["Title"] = "Đăng ký";
+}
+
+<h1>@ViewData["Title"]</h1>
+<h2 id="external-login-title">Liên kết tài khoản @Model.ProviderDisplayName của bạn.</h2>
+<hr />
+
+<p id="external-login-description" class="text-info">
+    Bạn đã xác thực thành công với <strong>@Model.ProviderDisplayName</strong>.
+    Vui lòng nhập địa chỉ email cho trang web này ở bên dưới và nhấp vào nút Đăng ký để hoàn tất việc đăng nhập.
+</p>
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" autocomplete="email" placeholder="Vui lòng nhập email của bạn." />
+                <label asp-for="Input.Email" class="form-label">Email</label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Đăng ký</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

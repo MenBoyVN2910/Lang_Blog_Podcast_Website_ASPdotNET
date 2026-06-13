@@ -1,0 +1,416 @@
+﻿@{
+    ViewData["Title"] = "Mảnh ghép Ký ức - Lặng.";
+}
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+<style>
+    /* BẢO BỐI THẦN KỲ: Khóa chặt dòng chảy ngang ở cấp độ cao nhất của trình duyệt */
+    html, body {
+        overflow-x: clip;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    :root {
+        --bg-cream: #F4F1EA;
+        --bg-white: #FFFFFF;
+        --primary-deep: #2A2825;
+        --primary-soft: #8C8275;
+        --border-main: #E2DDD5;
+        --text-muted: #736C65;
+    }
+
+    .stories-wrapper {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        max-width: 1280px;
+        margin: 0 auto;
+        background-color: var(--bg-white);
+        border-left: 1px solid var(--border-main);
+        border-right: 1px solid var(--border-main);
+        min-height: 100vh;
+        color: var(--primary-deep);
+        overflow-x: clip; /* Thay hidden bằng clip để tăng hiệu năng cô lập khung */
+    }
+
+    /* --- HEADER SECTION --- */
+    .stories-header {
+        padding: 80px 20px;
+        border-bottom: 1px solid var(--border-main);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        background-color: #FAF9F6;
+    }
+
+    @@media (min-width: 1024px) {
+        .stories-header {
+            padding: 120px 40px;
+        }
+    }
+
+    /* --- HIỆU ỨNG NHỊP ĐẬP TRÁI TIM KHẼ KHÀNG --- */
+    @@keyframes heartBreathe {
+        0% {
+            transform: scale(1);
+            opacity: 0.7;
+        }
+
+        50% {
+            transform: scale(1.12);
+            opacity: 1;
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 0.7;
+        }
+    }
+
+    .header-badge-group {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        margin-bottom: 32px;
+    }
+
+    .heart-icon {
+        color: var(--primary-soft);
+        fill: currentColor;
+        animation: heartBreathe 3s ease-in-out infinite;
+    }
+
+    .header-badge-text {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5em;
+        color: var(--primary-soft);
+        text-indent: 0.5em;
+    }
+
+    /* --- HIỆU ỨNG TỰ ĐỘNG HIỆN VĂN BẢN KHI VÀO TRANG --- */
+    @@keyframes storyFadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-story-header {
+        opacity: 0;
+        animation: storyFadeUp 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .s-delay-1 {
+        animation-delay: 0.1s;
+    }
+
+    .s-delay-2 {
+        animation-delay: 0.3s;
+    }
+
+    .s-delay-3 {
+        animation-delay: 0.5s;
+    }
+
+    .s-delay-4 {
+        animation-delay: 0.7s;
+    }
+
+    .header-main-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        font-weight: 300;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+        margin: 0 0 32px 0;
+        color: var(--primary-deep);
+    }
+
+    @@media (min-width: 768px) {
+        .header-main-title {
+            font-size: 5.5rem;
+        }
+    }
+
+    .header-main-title span.italic {
+        font-style: italic;
+    }
+
+    .header-description {
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: var(--text-muted);
+        max-width: 650px;
+        margin: 0 auto 48px auto;
+    }
+
+    .btn-submit-story {
+        background-color: var(--primary-deep);
+        color: var(--bg-white);
+        padding: 16px 40px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.4em;
+        text-indent: 0.4em;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 10px 30px rgba(42, 40, 37, 0.1);
+        transition: background-color 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+    }
+
+        .btn-submit-story:hover {
+            background-color: #000000;
+            transform: translateY(-3px);
+            box-shadow: 0 16px 35px rgba(0, 0, 0, 0.15);
+        }
+
+
+    /* --- STORIES LIST SECTION (LƯỚI BÀI VIẾT) --- */
+    .stories-body {
+        padding: 40px 20px;
+        overflow-x: clip; /* Khóa đuôi hiệu ứng quét lên của AOS, loại bỏ hoàn toàn nguy cơ scroll ngang */
+    }
+
+    @@media (min-width: 1024px) {
+        .stories-body {
+            padding: 80px 60px;
+        }
+    }
+
+    .stories-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 60px 40px;
+    }
+
+    @@media (min-width: 768px) {
+        .stories-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    .story-card {
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        color: inherit;
+        padding: 12px;
+        border: 1px solid transparent;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s ease, background-color 0.6s ease;
+    }
+
+        .story-card:hover {
+            background-color: #FAF9F6;
+            border-color: var(--border-main);
+            transform: translateY(-6px);
+            box-shadow: 0 16px 35px rgba(42, 40, 37, 0.04);
+        }
+
+    .story-img-box {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 4 / 5;
+        overflow: hidden;
+        margin-bottom: 24px;
+        border: 1px solid var(--border-main);
+    }
+
+    .story-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .story-card:hover .story-img {
+        transform: scale(1.04); /* Thu nhỏ biên độ zoom một chút để an toàn tuyệt đối trên Safari */
+    }
+
+    .story-tag {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background-color: #8C6239;
+        color: var(--bg-white);
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        letter-spacing: 0.1em;
+        z-index: 3;
+        transition: background-color 0.3s ease;
+    }
+
+    .story-card:hover .story-tag {
+        background-color: var(--primary-deep);
+    }
+
+    .story-meta {
+        font-size: 11px;
+        color: #A39E96;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        letter-spacing: 0.05em;
+    }
+
+    .story-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 400;
+        line-height: 1.35;
+        margin: 0 0 12px 0;
+        color: var(--primary-deep);
+        text-transform: uppercase;
+        transition: color 0.4s ease;
+    }
+
+    .story-card:hover .story-title {
+        color: var(--primary-soft);
+    }
+
+    .story-excerpt {
+        font-size: 0.88rem;
+        line-height: 1.65;
+        color: var(--text-muted);
+        margin: 0 0 20px 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .story-action-link {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--primary-deep);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: auto;
+    }
+
+        .story-action-link::after {
+            content: "";
+            display: inline-block;
+            width: 16px;
+            height: 1px;
+            background-color: var(--primary-deep);
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease;
+        }
+
+    .story-card:hover .story-action-link::after {
+        width: 32px;
+        background-color: var(--primary-soft);
+    }
+</style>
+
+<div class="stories-wrapper">
+    <header class="stories-header">
+        <div class="header-badge-group animate-story-header s-delay-1">
+            <svg class="heart-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+            </svg>
+            <span class="header-badge-text">Cộng đồng của sự sẻ chia</span>
+            <svg class="heart-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+            </svg>
+        </div>
+
+        <h1 class="header-main-title animate-story-header s-delay-2">
+            Mảnh ghép <br /> <span class="italic">Ký ức.</span>
+        </h1>
+
+        <p class="header-description animate-story-header s-delay-3">
+            "Mỗi câu chuyện bạn gửi đi là một nhịp cầu nối liền những tâm hồn cô đơn. Hãy để tiếng lòng của bạn được lắng nghe tại đây."
+        </p>
+
+        <div class="animate-story-header s-delay-4">
+            <button class="btn-submit-story" onclick="location.href='@Url.Action("Create", "Stories")'">
+                Gửi câu chuyện của bạn
+            </button>
+        </div>
+    </header>
+
+    <main class="stories-body">
+        <div class="stories-grid">
+
+            <a href="#" class="story-card" data-aos="fade-up" data-aos-delay="0">
+                <div class="story-img-box">
+                    <span class="story-tag">TÂM SỰ</span>
+                    <img src="~/images/logo_website.png" class="story-img" alt="Góc quán quen và những khoảng lặng" />
+                </div>
+                <div class="story-meta">
+                    <span>09.06.2026</span>
+                    <span>•</span>
+                    <span>184 LƯỢT XEM</span>
+                </div>
+                <h3 class="story-title">Góc quán quen và những khoảng lặng</h3>
+                <p class="story-excerpt">
+                    Có những chiều mưa muộn muộn, tôi chỉ thích ngồi thu mình bên khung cửa kính ngắm dòng người hối hả xuôi ngược qua những vệt nước nhạt nhòa...
+                </p>
+                <div class="story-action-link">ĐỌC THÊM</div>
+            </a>
+
+            <a href="#" class="story-card" data-aos="fade-up" data-aos-delay="150">
+                <div class="story-img-box">
+                    <span class="story-tag">KÝ ỨC</span>
+                    <img src="~/images/logo_website.png" class="story-img" alt="Bức thư gửi lại năm tháng cũ" />
+                </div>
+                <div class="story-meta">
+                    <span>06.06.2026</span>
+                    <span>•</span>
+                    <span>256 LƯỢT XEM</span>
+                </div>
+                <h3 class="story-title">Bức thư gửi lại năm tháng cũ</h3>
+                <p class="story-excerpt">
+                    Thời gian dập tắt những bồng bột thanh xuân nhưng lại nhen nhóm trong ta những hoài niệm sâu lắng về một người đã từng đi chung một đoạn đường ngắn...
+                </p>
+                <div class="story-action-link">ĐỌC THÊM</div>
+            </a>
+
+            <a href="#" class="story-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="story-img-box">
+                    <span class="story-tag">CHỮA LÀNH</span>
+                    <img src="~/images/logo_website.png" class="story-img" alt="Đi qua giông bão để học cách bao dung" />
+                </div>
+                <div class="story-meta">
+                    <span>01.06.2026</span>
+                    <span>•</span>
+                    <span>412 LƯỢT XEM</span>
+                </div>
+                <h3 class="story-title">Đi qua giông bão học cách bao dung</h3>
+                <p class="story-excerpt">
+                    Chúng ta thường dành quá nhiều thời gian để dằn vặt bản thân vì những sai lầm trong quá khứ mà quên mất rằng, hoa chỉ nở khi đất trời đủ bình yên...
+                </p>
+                <div class="story-action-link">ĐỌC THÊM</div>
+            </a>
+
+        </div>
+    </main>
+</div>
+
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script>
+    AOS.init({
+    once: true,
+    offset: 40,              /* Giảm offset xuống tí cho mượt mà, không bị khựng */
+    duration: 1000,
+    easing: 'ease-out-cubic'
+    });
+</script>

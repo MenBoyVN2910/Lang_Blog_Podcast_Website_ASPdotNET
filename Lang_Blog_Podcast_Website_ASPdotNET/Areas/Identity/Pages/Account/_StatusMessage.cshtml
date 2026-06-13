@@ -1,0 +1,16 @@
+@model string
+
+@* Kiểm tra xem thông báo có nội dung hay không trước khi hiển thị *@
+@if (!String.IsNullOrEmpty(Model))
+{
+    @* Xác định màu sắc của khung thông báo dựa trên nội dung (Error = đỏ/nguy hiểm, còn lại = xanh/thành công) *@
+    var statusMessageClass = Model.StartsWith("Error") ? "danger" : "success";
+
+    <div class="alert alert-@statusMessageClass alert-dismissible" role="alert">
+        @* Nút đóng thông báo (Close) *@
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+
+        @* Nội dung thông báo hiển thị cho người dùng *@
+        @Model
+    </div>
+}

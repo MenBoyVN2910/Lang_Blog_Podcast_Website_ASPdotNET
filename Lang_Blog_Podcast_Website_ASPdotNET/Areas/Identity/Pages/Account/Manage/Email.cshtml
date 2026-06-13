@@ -1,0 +1,112 @@
+@* Trang: Email.cshtml
+    Chức năng: Quản lý và cập nhật địa chỉ Email của người dùng, bao gồm cả trạng thái xác thực.
+*@
+
+@page
+@model EmailModel
+@{
+    // Thiết lập tiêu đề trang và chỉ mục trang đang hoạt động trong menu điều hướng
+    ViewData["Title"] = "Quản lý Email";
+    ViewData["ActivePage"] = ManageNavPages.Email;
+}
+
+<style>
+    /* CSS: Định nghĩa kích thước khung chứa form */
+    .lang-form-wrapper {
+        max-width: 550px;
+    }
+
+    /* CSS: Khoảng cách giữa các nhóm trường nhập liệu */
+    .lang-form-group {
+        margin-bottom: 2.5rem;
+        position: relative;
+    }
+
+        /* CSS: Style cho nhãn của input (Label) */
+        .lang-form-group .form-label {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--lang-muted);
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            display: block;
+        }
+
+    /* CSS: Badge hiển thị trạng thái xác thực */
+    .lang-verified-badge {
+        position: absolute;
+        right: 0;
+        top: 2.2rem;
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #6B7A65; /* Màu xanh rêu trầm */
+    }
+
+    /* CSS: Nút bấm dạng link phong cách nghệ thuật */
+    .lang-btn-link {
+        background: none;
+        border: none;
+        padding: 0;
+        margin-top: 0.5rem;
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        color: var(--lang-brown);
+        text-decoration: underline;
+        cursor: pointer;
+    }
+</style>
+
+<div class="lang-form-wrapper">
+    @* Nạp partial view hiển thị thông báo trạng thái (nếu có) *@
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    <h3 class="lang-page-title">Hòm thư (Email)</h3>
+    <div class="lang-page-subtitle" style="margin-bottom: 3rem; color: var(--lang-muted); font-style: italic; font-family: 'Playfair Display', serif;">
+        Kênh liên lạc chính của bạn với Lặng.
+    </div>
+
+    @* Form cập nhật Email *@
+    <form id="email-form" method="post">
+        @* Hiển thị danh sách lỗi tổng quát (nếu có) *@
+        <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+
+        @* Hiển thị Email hiện tại và trạng thái xác thực *@
+        @if (Model.IsEmailConfirmed)
+        {
+            <div class="lang-form-group">
+                <label class="form-label">Email hiện tại</label>
+                <input asp-for="Email" class="form-control" disabled />
+                <span class="lang-verified-badge">✓ Đã xác thực</span>
+            </div>
+        }
+        else
+        {
+            <div class="lang-form-group">
+                <label class="form-label">Email hiện tại</label>
+                <input asp-for="Email" class="form-control" disabled />
+                @* Nút gửi lại email xác thực nếu email chưa được xác nhận *@
+                <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="lang-btn-link">Gửi lại email xác thực</button>
+            </div>
+        }
+
+        @* Nhóm: Nhập Email mới *@
+        <div class="lang-form-group">
+            <label class="form-label">Email mới</label>
+            <input asp-for="Input.NewEmail" class="form-control" autocomplete="email" aria-required="true" placeholder="Nhập địa chỉ email mới..." />
+            <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
+        </div>
+
+        @* Nút thực hiện yêu cầu thay đổi Email *@
+        <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="w-100 btn btn-primary">
+            Thay đổi Email
+        </button>
+    </form>
+</div>
+
+@section Scripts {
+    @* Nạp các đoạn script hỗ trợ xác thực phía Client *@
+    <partial name="_ValidationScriptsPartial" />
+}

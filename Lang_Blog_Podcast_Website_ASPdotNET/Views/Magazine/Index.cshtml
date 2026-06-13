@@ -1,0 +1,470 @@
+﻿@{
+    ViewData["Title"] = "Lặng. Journal";
+}
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+<style>
+    /* TUYỆT CHIÊU MỚI: Dùng 'clip' thay vì 'hidden' để triệt tiêu hoàn toàn dòng chảy ngang */
+    html, body {
+        overflow-x: clip;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    :root {
+        --bg-cream: #F5F3ED;
+        --bg-white: #FFFFFF;
+        --primary-deep: #2A2927;
+        --primary-soft: #8E8373;
+        --border-main: #E5E1D8;
+        --text-muted: #7A746D;
+    }
+
+    .magazine-wrapper {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        max-width: 1280px;
+        margin: 0 auto;
+        background-color: var(--bg-white);
+        border-left: 1px solid var(--border-main);
+        border-right: 1px solid var(--border-main);
+        min-height: 100vh;
+        color: var(--primary-deep);
+        overflow-x: clip; /* Khóa chặt khung viền nội bộ */
+    }
+
+    /* --- HEADER SECTION --- */
+    .magazine-header {
+        padding: 80px 20px 60px 20px;
+        border-bottom: 1px solid var(--border-main);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        background-color: var(--bg-white);
+    }
+
+    @@media (min-width: 1024px) {
+        .magazine-header {
+            padding: 120px 40px 80px 40px;
+        }
+    }
+
+    /* --- THAY ĐỔI HIỆU ỨNG TẠI ĐÂY: Chỉ thay đổi độ mờ (Opacity), không đổi kích thước (Scale) --- */
+    @@keyframes issueBreathePure {
+        0% {
+            opacity: 0.01;
+        }
+
+        50% {
+            opacity: 0.04;
+        }
+
+        100% {
+            opacity: 0.01;
+        }
+    }
+
+    .header-bg-text {
+        position: absolute;
+        top: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: 'Playfair Display', serif;
+        /* Giới hạn kích cỡ chữ bằng clamp() để không bị phình to vô hạn trên màn hình lớn */
+        font-size: clamp(6rem, 16vw, 13rem);
+        font-weight: 900;
+        text-transform: uppercase;
+        color: var(--primary-deep);
+        letter-spacing: -0.03em;
+        line-height: 1;
+        pointer-events: none;
+        user-select: none;
+        z-index: 1;
+        animation: issueBreathePure 12s ease-in-out infinite; /* Nhịp thở mờ ảo mượt mà */
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* --- HIỆU ỨNG HIỆN CHỮ TẠP CHÍ LÚC TẢI TRANG --- */
+    @@keyframes journalFadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-journal {
+        opacity: 0;
+        animation: journalFadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .j-delay-1 {
+        animation-delay: 0.1s;
+    }
+
+    .j-delay-2 {
+        animation-delay: 0.25s;
+    }
+
+    .j-delay-3 {
+        animation-delay: 0.4s;
+    }
+
+    .j-delay-4 {
+        animation-delay: 0.55s;
+    }
+
+    .header-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        margin-bottom: 32px;
+    }
+
+        .header-badge .line {
+            width: 48px;
+            height: 1px;
+            background-color: var(--border-main);
+        }
+
+        .header-badge .text {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.4em;
+            color: var(--primary-soft);
+        }
+
+    .header-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 3.5rem;
+        font-weight: 400;
+        letter-spacing: -0.03em;
+        line-height: 1;
+        margin: 0 0 40px 0;
+        color: var(--primary-deep);
+    }
+
+    @@media (min-width: 768px) {
+        .header-title {
+            font-size: 6.5rem;
+        }
+    }
+
+    .header-title em, .header-title .italic {
+        font-style: italic;
+        font-weight: 400;
+    }
+
+    .header-quote {
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        font-size: 1.15rem;
+        line-height: 1.7;
+        color: var(--text-muted);
+        max-width: 600px;
+        margin: 0 auto 48px auto;
+    }
+
+    .header-meta {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 48px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.3em;
+        color: #A6A096;
+    }
+
+        .header-meta .dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--border-main);
+            border-radius: 50%;
+        }
+
+
+    /* --- POST LIST SECTION (LƯỚI BÀI VIẾT) --- */
+    .magazine-body {
+        padding: 40px 20px;
+        overflow: hidden; /* Chặn đứng mọi tia dịch chuyển ngang từ thư viện AOS */
+    }
+
+    @@media (min-width: 1024px) {
+        .magazine-body {
+            padding: 80px 60px;
+        }
+    }
+
+    .posts-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 60px 40px;
+    }
+
+    @@media (min-width: 768px) {
+        .posts-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    .post-card {
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        color: inherit;
+        background: transparent;
+        padding: 12px;
+        border: 1px solid transparent;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s ease, background-color 0.6s ease;
+    }
+
+        .post-card:hover {
+            background-color: #FAF9F6;
+            border-color: var(--border-main);
+            transform: translateY(-6px);
+            box-shadow: 0 16px 35px rgba(42, 41, 39, 0.04);
+        }
+
+    .post-image-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 3 / 4;
+        overflow: hidden;
+        margin-bottom: 24px;
+        border: 1px solid rgba(0,0,0,0.02);
+    }
+
+    .post-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .post-card:hover .post-image {
+        transform: scale(1.04); /* Phóng nhẹ, an toàn tuyệt đối */
+    }
+
+    .post-category-tag {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background-color: #8C6239;
+        color: #FFFFFF;
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        letter-spacing: 0.1em;
+        pointer-events: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .post-card:hover .post-category-tag {
+        background-color: var(--primary-deep);
+    }
+
+    .post-card-meta {
+        font-size: 11px;
+        color: #A39E96;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        letter-spacing: 0.05em;
+    }
+
+    .post-card-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.65rem;
+        font-weight: 400;
+        line-height: 1.35;
+        margin: 0 0 14px 0;
+        color: var(--primary-deep);
+        letter-spacing: -0.01em;
+        text-transform: uppercase;
+        transition: color 0.4s ease;
+    }
+
+    .post-card:hover .post-card-title {
+        color: var(--primary-soft);
+    }
+
+    .post-card-excerpt {
+        font-size: 0.88rem;
+        line-height: 1.65;
+        color: var(--text-muted);
+        margin: 0 0 20px 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .post-card-action {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--primary-deep);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: auto;
+    }
+
+        .post-card-action::after {
+            content: "";
+            display: inline-block;
+            width: 16px;
+            height: 1px;
+            background-color: var(--primary-deep);
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease;
+        }
+
+    .post-card:hover .post-card-action::after {
+        width: 32px;
+        background-color: var(--primary-soft);
+    }
+</style>
+
+<div class="magazine-wrapper">
+    <header class="magazine-header">
+        <div class="header-bg-text">ISSUE</div>
+        <div class="header-content">
+            <div class="header-badge animate-journal j-delay-1">
+                <span class="line"></span>
+                <span class="text">Ấn phẩm tập san</span>
+                <span class="line"></span>
+            </div>
+
+            <h1 class="header-title animate-journal j-delay-2">
+                Lặng. <span class="italic">Journal</span>
+            </h1>
+
+            <p class="header-quote animate-journal j-delay-3">
+                "Định nghĩa về nghệ thuật sống qua lăng kính của sự tĩnh lặng và chiều sâu nội tại."
+            </p>
+
+            <div class="header-meta animate-journal j-delay-4">
+                <span>Quarterly No. 1</span>
+                <span class="header-meta dot"></span>
+                <span>Summer 2024</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="magazine-body">
+        <div class="posts-grid">
+
+            <a href="#" class="post-card" data-aos="fade-up" data-aos-delay="0">
+                <div class="post-image-container">
+                    <span class="post-category-tag">CHỮA LÀNH</span>
+                    <img src="~/images/logo_website.png" class="post-image" alt="Nghệ thuật của sự chậm rãi" />
+                </div>
+                <div class="post-card-meta">
+                    <span>02.06.2026</span>
+                    <span>•</span>
+                    <span>302 LƯỢT XEM</span>
+                </div>
+                <h3 class="post-card-title">Nghệ thuật của sự chậm rãi</h3>
+                <p class="post-card-excerpt">
+                    Trong một thế giới luôn hối hả, sự chậm rãi đôi khi bị coi là yếu đuối. Nhưng thực tế, chậm lại là cách duy nhất để chúng ta nhìn nhận rõ bản chất...
+                </p>
+                <div class="post-card-action">ĐỌC THÊM</div>
+            </a>
+
+            <a href="#" class="post-card" data-aos="fade-up" data-aos-delay="150">
+                <div class="post-image-container">
+                    <span class="post-category-tag">TÂM SỰ</span>
+                    <img src="~/images/logo_website.png" class="post-image" alt="Tiếng vang trong tĩnh lặng" />
+                </div>
+                <div class="post-card-meta">
+                    <span>08.06.2026</span>
+                    <span>•</span>
+                    <span>421 LƯỢT XEM</span>
+                </div>
+                <h3 class="post-card-title">Tiếng vang trong tĩnh lặng</h3>
+                <p class="post-card-excerpt">
+                    Có những điều chỉ có thể nghe thấy khi ta hoàn toàn im lặng. Im lặng không phải là sự vắng mặt của âm thanh, mà là trạng thái đón nhận trọn vẹn nhất...
+                </p>
+                <div class="post-card-action">ĐỌC THÊM</div>
+            </a>
+
+            <a href="#" class="post-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="post-image-container">
+                    <span class="post-category-tag">KÝ ỨC</span>
+                    <img src="~/images/logo_website.png" class="post-image" alt="Ký ức về những ngày nắng cũ" />
+                </div>
+                <div class="post-card-meta">
+                    <span>18.05.2026</span>
+                    <span>•</span>
+                    <span>719 LƯỢT XEM</span>
+                </div>
+                <h3 class="post-card-title">Ký ức về những ngày nắng cũ</h3>
+                <p class="post-card-excerpt">
+                    Hoài niệm là một phần của tâm hồn. Những ngày nắng cũ mang theo mùi hương của sách mới, vị ngọt của tách trà chiều gieo vào lòng ta những bình lặng lạ kỳ...
+                </p>
+                <div class="post-card-action">ĐỌC THÊM</div>
+            </a>
+
+            <a href="#" class="post-card" data-aos="fade-up" data-aos-delay="0">
+                <div class="post-image-container">
+                    <span class="post-category-tag">TRIẾT LÝ</span>
+                    <img src="~/images/logo_website.png" class="post-image" alt="Vết rêu phong trên thềm cũ" />
+                </div>
+                <div class="post-card-meta">
+                    <span>04.06.2026</span>
+                    <span>•</span>
+                    <span>745 LƯỢT XEM</span>
+                </div>
+                <h3 class="post-card-title">Vết rêu phong trên thềm cũ</h3>
+                <p class="post-card-excerpt">
+                    Thời gian không xóa nhòa mọi thứ, nó chỉ phủ lên một lớp rêu xanh. Những mảng xanh li ti bám trên gạch đá kể câu chuyện về sự trường tồn thầm lặng...
+                </p>
+                <div class="post-card-action">ĐỌC THÊM</div>
+            </a>
+
+            <a href="#" class="post-card" data-aos="fade-up" data-aos-delay="150">
+                <div class="post-image-container">
+                    <span class="post-category-tag">TỰ NHIÊN</span>
+                    <img src="~/images/logo_website.png" class="post-image" alt="Bản giao hưởng của đại ngàn" />
+                </div>
+                <div class="post-card-meta">
+                    <span>24.05.2026</span>
+                    <span>•</span>
+                    <span>291 LƯỢT XEM</span>
+                </div>
+                <h3 class="post-card-title">Bản giao hưởng của đại ngàn</h3>
+                <p class="post-card-excerpt">
+                    Rừng sâu không bao giờ tĩnh mịch hoàn toàn. Đó là một bản giao hưởng phức tạp của hàng triệu sinh linh đang thở, đang chuyển động nhịp nhàng...
+                </p>
+                <div class="post-card-action">ĐỌC THÊM</div>
+            </a>
+
+        </div>
+    </main>
+</div>
+
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script>
+    AOS.init({
+    once: true,
+    offset: 40,
+    duration: 1000,
+    easing: 'ease-out-cubic'
+    });
+</script>

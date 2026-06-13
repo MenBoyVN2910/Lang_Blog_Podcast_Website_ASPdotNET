@@ -1,0 +1,114 @@
+@page
+@using Microsoft.AspNetCore.Http.Features
+@model TwoFactorAuthenticationModel
+@{
+    // Thiết lập tiêu đề trang và đánh dấu mục menu đang hoạt động
+    ViewData["Title"] = "Bảo mật 2 lớp (2FA)";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<style>
+    .lang-form-wrapper {
+        max-width: 650px;
+    }
+
+    .lang-2fa-section {
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--lang-border);
+    }
+
+    .lang-alert {
+        padding: 1.2rem 1.5rem;
+        margin-bottom: 2rem;
+        border-left: 2px solid;
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        background-color: transparent;
+    }
+
+    .lang-alert-danger {
+        border-color: #A34A3B;
+        color: #A34A3B;
+    }
+
+    .lang-alert-warning {
+        border-color: var(--lang-brown);
+        color: var(--lang-dark);
+    }
+
+    .lang-btn-outline {
+        background: transparent !important;
+        color: var(--lang-dark) !important;
+        border: 1px solid var(--lang-dark) !important;
+        margin-right: 1rem;
+        margin-bottom: 1rem;
+    }
+</style>
+
+<div class="lang-form-wrapper">
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    <h3 class="lang-page-title">Bảo mật 2 lớp</h3>
+    <div class="lang-page-subtitle" style="margin-bottom: 3rem; color: var(--lang-muted); font-style: italic; font-family: 'Playfair Display', serif;">
+        Tạo thêm một rào chắn an toàn cho tài khoản của bạn.
+    </div>
+
+    @{
+        // Kiểm tra tính năng đồng ý theo dõi cookie (Tracking Consent)
+        var consentFeature = HttpContext.Features.Get<ITrackingConsentFeature>();
+        @if (consentFeature?.CanTrack ?? true)
+        {
+            // Kiểm tra trạng thái 2FA đã được bật hay chưa
+            @if (Model.Is2faEnabled)
+            {
+                <div class="lang-2fa-section">
+                    @if (Model.RecoveryCodesLeft == 0)
+                    {
+                        <div class="lang-alert lang-alert-danger">
+                            <strong style="font-family: sans-serif; font-style: normal; text-transform: uppercase; font-size: 0.8rem;">Cảnh báo:</strong> Bạn không còn mã khôi phục nào. Vui lòng <a asp-page="./GenerateRecoveryCodes" style="color: inherit;">tạo bộ mã mới</a>.
+                        </div>
+                    }
+                    else if (Model.RecoveryCodesLeft <= 3)
+                    {
+                        <div class="lang-alert lang-alert-warning">
+                            <strong style="font-family: sans-serif; font-style: normal; text-transform: uppercase; font-size: 0.8rem;">Lưu ý:</strong> Bạn chỉ còn @Model.RecoveryCodesLeft mã khôi phục. Nên <a asp-page="./GenerateRecoveryCodes" style="color: inherit;">tạo bộ mã mới</a>.
+                        </div>
+                    }
+
+                    @if (Model.IsMachineRemembered)
+                    {
+                        <form method="post" style="display: inline-block;">
+                            <button type="submit" class="btn btn-primary lang-btn-outline">Quên trình duyệt này</button>
+                        </form>
+                    }
+                    <a asp-page="./Disable2fa" class="btn btn-primary lang-btn-outline">Tắt 2FA</a>
+                    <a asp-page="./GenerateRecoveryCodes" class="btn btn-primary lang-btn-outline">Tạo lại mã khôi phục</a>
+                </div>
+            }
+
+            <div class="lang-2fa-section" style="border-bottom: none;">
+                <h4 style="font-family: 'Playfair Display', serif; margin-bottom: 1.5rem;">Ứng dụng xác thực</h4>
+                @if (!Model.HasAuthenticator)
+                {
+                    <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-primary">Thêm ứng dụng xác thực</a>
+                }
+                else
+                {
+                    <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-primary lang-btn-outline">Cấu hình ứng dụng</a>
+                    <a id="reset-authenticator" asp-page="./ResetAuthenticator" class="btn btn-primary lang-btn-outline" style="border-color: #A34A3B !important; color: #A34A3B !important;">Reset ứng dụng</a>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="lang-alert lang-alert-danger">
+                Bạn cần chấp nhận chính sách quyền riêng tư và cookie trước khi bật tính năng này.
+            </div>
+        }
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

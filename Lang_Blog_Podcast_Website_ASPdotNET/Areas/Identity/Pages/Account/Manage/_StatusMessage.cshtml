@@ -1,0 +1,96 @@
+@* _StatusMessage.cshtml
+    Chức năng: Hiển thị thông báo trạng thái (thành công hoặc lỗi) sau khi người dùng thực hiện hành động.
+    Logic: Nhận vào một chuỗi (Model). Nếu chuỗi bắt đầu bằng "Error", hệ thống sẽ tách tiền tố và định dạng lại thành thông báo lỗi.
+*@
+
+@model string
+
+@if (!String.IsNullOrEmpty(Model))
+{
+    // Xác định xem thông báo có phải là lỗi hay không
+    var isError = Model.StartsWith("Error");
+
+    // Tách chuỗi hiển thị: Nếu là lỗi, bỏ tiền tố "Error :" để lấy nội dung chính
+    var displayMessage = Model.StartsWith("Error :") ? Model.Substring(7) : Model;
+
+    // Gán class CSS tương ứng dựa trên loại thông báo
+    var statusClass = isError ? "lang-alert-danger" : "lang-alert-success";
+
+    <style>
+        /* CSS: Khung chứa thông báo chung */
+        .lang-alert-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 2.5rem;
+            border-radius: 0;
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            font-style: italic;
+            transition: all 0.3s ease;
+            border-left: 3px solid;
+            background-color: transparent;
+        }
+
+        /* CSS: Thông báo thành công (Viền trái nâu đồng) */
+        .lang-alert-success {
+            border-color: var(--lang-brown);
+            border-top: 1px solid var(--lang-border);
+            border-right: 1px solid var(--lang-border);
+            border-bottom: 1px solid var(--lang-border);
+            color: var(--lang-dark);
+        }
+
+        /* CSS: Thông báo lỗi (Tông màu đỏ trầm tinh tế) */
+        .lang-alert-danger {
+            border-color: #A34A3B;
+            border-top: 1px solid #F5EAE6;
+            border-right: 1px solid #F5EAE6;
+            border-bottom: 1px solid #F5EAE6;
+            color: #A34A3B;
+            background-color: #FCF8F7;
+        }
+
+        /* CSS: Nhãn tiêu đề thông báo (ví dụ: Lỗi) */
+        .lang-alert-text strong {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-style: normal;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-right: 0.5rem;
+        }
+
+        /* CSS: Nút đóng thông báo */
+        .lang-alert-close {
+            background: none;
+            border: none;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: inherit;
+            cursor: pointer;
+            padding: 0 0 0 1rem;
+            opacity: 0.4;
+            transition: opacity 0.3s;
+        }
+
+            .lang-alert-close:hover {
+                opacity: 1;
+            }
+    </style>
+
+    <div class="lang-alert-container @statusClass" role="alert">
+        <span class="lang-alert-text">
+            @if (isError)
+            {
+                @* Hiển thị tiền tố "Lỗi" nếu là thông báo lỗi *@
+                <strong>Lỗi —</strong>
+            }
+            @displayMessage
+        </span>
+        @* Nút tắt thông báo: Sử dụng JavaScript để ẩn phần tử cha *@
+        <button type="button" class="lang-alert-close" onclick="this.parentElement.style.display='none';" aria-label="Đóng">&times;</button>
+    </div>
+}

@@ -1,0 +1,75 @@
+@* Trang: Disable2fa.cshtml
+    Chức năng: Cung cấp giao diện cho phép người dùng vô hiệu hóa bảo mật xác thực hai yếu tố (2FA).
+*@
+
+@page
+@model Disable2faModel
+@{
+    // Thiết lập tiêu đề trang và chỉ mục trang đang hoạt động trong menu
+    ViewData["Title"] = "Tắt xác thực hai yếu tố (2FA)";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<style>
+    /* CSS: Định nghĩa giới hạn chiều rộng của form */
+    .lang-form-wrapper {
+        max-width: 600px;
+    }
+
+    /* CSS: Khung cảnh báo màu đỏ trầm cho hành động quan trọng */
+    .lang-alert-warning {
+        padding: 2rem;
+        border: 1px solid #E8D3CC;
+        background-color: #FCF8F7;
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        color: #A34A3B;
+        margin-bottom: 2.5rem;
+    }
+
+    .lang-kbd {
+        background: #F2EFEA;
+        padding: 0.3rem 0.6rem;
+        border-radius: 0;
+        font-family: monospace;
+        color: #2A2623;
+    }
+
+    .lang-step-list {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .lang-step-item {
+        margin-bottom: 3rem;
+    }
+
+    .lang-step-num {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        color: #A34A3B;
+        margin-bottom: 1rem;
+        display: block;
+    }
+</style>
+
+@* Nạp partial view hiển thị thông báo trạng thái (nếu có) *@
+<partial name="_StatusMessage" for="StatusMessage" />
+
+<div class="lang-form-wrapper">
+    @* Tiêu đề trang *@
+    <h3 class="lang-page-title">@ViewData["Title"]</h3>
+
+    @* Khối cảnh báo về hậu quả của việc tắt 2FA *@
+    <div class="lang-alert-warning">
+        Việc vô hiệu hóa xác thực hai yếu tố (2FA) không làm thay đổi các khóa được sử dụng trong ứng dụng xác thực. Nếu bạn muốn thay đổi khóa
+        được sử dụng trong ứng dụng xác thực, bạn nên <a asp-page="./ResetAuthenticator">Đặt lại khóa xác thực của bạn.</a>
+    </div>
+
+    @* Form thực hiện yêu cầu vô hiệu hóa 2FA *@
+    <div>
+        <form method="post">
+            <button class="btn btn-danger" type="submit">Tắt 2FA</button>
+        </form>
+    </div>
+</div>

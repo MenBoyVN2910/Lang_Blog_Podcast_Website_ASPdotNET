@@ -1,0 +1,84 @@
+@page
+@model PersonalDataModel
+@{
+    // Thiết lập tiêu đề trang hiển thị trên trình duyệt
+    ViewData["Title"] = "Dữ liệu cá nhân";
+    // Đánh dấu trang hiện tại trong thanh điều hướng để áp dụng CSS "active"
+    ViewData["ActivePage"] = ManageNavPages.PersonalData;
+}
+
+<style>
+    /* CSS Wrapper bao bọc nội dung trang */
+    .lang-form-wrapper {
+        max-width: 650px;
+    }
+
+    /* CSS cho các khối chứa dữ liệu */
+    .lang-data-card {
+        padding: 2rem 0;
+        border-bottom: 1px solid var(--lang-border);
+    }
+
+        .lang-data-card:last-child {
+            border-bottom: none;
+        }
+
+    /* CSS tiêu đề nhỏ cho các mục dữ liệu */
+    .lang-data-title-small {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        margin-bottom: 1rem;
+        color: var(--lang-dark);
+    }
+
+    /* CSS mô tả nội dung */
+    .lang-data-desc {
+        font-family: 'Playfair Display', serif;
+        color: var(--lang-muted);
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+
+    /* CSS tùy chỉnh cho nút chức năng cảnh báo (Nguy hiểm) */
+    .lang-btn-danger {
+        background-color: transparent !important;
+        color: #A34A3B !important;
+        border: 1px solid #A34A3B !important;
+    }
+
+        .lang-btn-danger:hover {
+            background-color: #A34A3B !important;
+            color: #FFF !important;
+        }
+</style>
+
+<div class="lang-form-wrapper">
+    <h3 class="lang-page-title">Dữ liệu cá nhân</h3>
+    <div class="lang-page-subtitle" style="margin-bottom: 2rem; color: var(--lang-muted); font-style: italic; font-family: 'Playfair Display', serif;">
+        Quyền kiểm soát thuộc về bạn.
+    </div>
+
+    <div class="lang-data-card">
+        <div class="lang-data-title-small">Trích xuất dữ liệu</div>
+        <p class="lang-data-desc">
+            Tài khoản của bạn chứa dữ liệu cá nhân mà bạn đã cung cấp cho chúng tôi. Bạn có thể xuất và tải về toàn bộ dữ liệu này.
+        </p>
+        <form id="download-data" asp-page="DeletePersonalData" asp-page="DownloadPersonalData" method="post">
+            <button class="btn btn-primary" type="submit">Tải xuống bản sao</button>
+        </form>
+    </div>
+
+    <div class="lang-data-card">
+        <div class="lang-data-title-small" style="color: #A34A3B;">Xóa bỏ tài khoản</div>
+        <p class="lang-data-desc">
+            Hành động này sẽ xóa vĩnh viễn tài khoản và toàn bộ dữ liệu của bạn khỏi hệ sinh thái Lặng. Quá trình này không thể hoàn tác.
+        </p>
+        <a id="delete" asp-page="DeletePersonalData" class="btn btn-primary lang-btn-danger">Tiến hành xóa</a>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

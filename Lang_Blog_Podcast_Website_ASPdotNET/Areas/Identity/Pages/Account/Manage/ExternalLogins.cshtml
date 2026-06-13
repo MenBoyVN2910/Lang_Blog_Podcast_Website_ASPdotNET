@@ -1,0 +1,121 @@
+@* Trang: ExternalLogins.cshtml
+    Chức năng: Quản lý các tài khoản liên kết ngoài (như Google, Facebook) để đăng nhập vào hệ thống.
+*@
+
+@page
+@model ExternalLoginsModel
+@{
+    // Thiết lập tiêu đề trang và chỉ mục trang đang hoạt động trong menu
+    ViewData["Title"] = "Liên kết ngoài";
+    ViewData["ActivePage"] = ManageNavPages.ExternalLogins;
+}
+
+<style>
+    /* CSS: Giới hạn độ rộng container */
+    .lang-form-wrapper {
+        max-width: 650px;
+    }
+
+    /* CSS: Tiêu đề các mục nhỏ */
+    .lang-section-title {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--lang-muted);
+        margin-bottom: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    /* CSS: Bảng danh sách nhà cung cấp dịch vụ */
+    .lang-provider-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2rem;
+    }
+
+        .lang-provider-table td {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--lang-border);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: var(--lang-dark);
+        }
+
+            .lang-provider-table td:last-child {
+                text-align: right;
+            }
+
+    /* CSS: Nút gỡ bỏ liên kết */
+    .lang-btn-remove {
+        background: none;
+        border: none;
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #A34A3B;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    /* CSS: Nút liên kết mới */
+    .lang-provider-btn {
+        margin-right: 1rem;
+        margin-bottom: 1rem;
+    }
+</style>
+
+<div class="lang-form-wrapper">
+    @* Nạp partial view hiển thị thông báo trạng thái *@
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    <h3 class="lang-page-title">Liên kết ngoài</h3>
+    <div class="lang-page-subtitle" style="margin-bottom: 2rem; color: var(--lang-muted); font-style: italic; font-family: 'Playfair Display', serif;">
+        Quản lý đăng nhập qua các nền tảng khác.
+    </div>
+
+    @* Danh sách các liên kết hiện tại của người dùng *@
+    @if (Model.CurrentLogins?.Count > 0)
+    {
+        <div class="lang-section-title">Tài khoản đã liên kết</div>
+        <table class="lang-provider-table">
+            <tbody>
+                @foreach (var login in Model.CurrentLogins)
+                {
+                    <tr>
+                        <td id="@($"login-provider-{login.LoginProvider}")">@login.ProviderDisplayName</td>
+                        <td>
+                            @* Nút gỡ bỏ liên kết nếu người dùng có ít nhất một cách đăng nhập khác *@
+                            @if (Model.ShowRemoveButton)
+                            {
+                                <form id="@($"remove-login-{login.LoginProvider}")" asp-page-handler="RemoveLogin" method="post">
+                                    <input asp-for="@login.LoginProvider" name="LoginProvider" type="hidden" />
+                                    <input asp-for="@login.ProviderKey" name="ProviderKey" type="hidden" />
+                                    <button type="submit" class="lang-btn-remove" title="Gỡ bỏ liên kết @login.ProviderDisplayName">Gỡ bỏ</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    @* Danh sách các nhà cung cấp dịch vụ có thể liên kết thêm *@
+    @if (Model.OtherLogins?.Count > 0)
+    {
+        <div class="lang-section-title">Thêm liên kết mới</div>
+        <form id="link-login-form" asp-page-handler="LinkLogin" method="post">
+            <div id="socialLoginList">
+                @foreach (var provider in Model.OtherLogins)
+                {
+                    <button id="@($"link-login-button-{provider.Name}")" type="submit" class="btn btn-primary lang-provider-btn" name="provider" value="@provider.Name" title="Đăng nhập bằng @provider.DisplayName">
+                        Liên kết @provider.DisplayName
+                    </button>
+                }
+            </div>
+        </form>
+    }
+</div>

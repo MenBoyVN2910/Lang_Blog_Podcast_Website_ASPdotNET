@@ -1,0 +1,104 @@
+@* Trang: DeletePersonalData.cshtml
+    Chức năng: Cung cấp giao diện xác nhận xóa vĩnh viễn dữ liệu cá nhân của người dùng.
+*@
+
+@page
+@model DeletePersonalDataModel
+@{
+    // Thiết lập tiêu đề trang và chỉ mục trang đang hoạt động trong menu
+    ViewData["Title"] = "Xóa tài khoản";
+    ViewData["ActivePage"] = ManageNavPages.PersonalData;
+}
+
+<style>
+    /* CSS: Định nghĩa kích thước khung chứa form */
+    .lang-form-wrapper {
+        max-width: 550px;
+    }
+
+    /* CSS: Khung cảnh báo nghệ thuật (Phong cách cảnh báo tinh tế) */
+    .lang-delete-alert {
+        padding: 2rem;
+        border: 1px solid #E8D3CC;
+        background-color: #FCF8F7;
+        margin-bottom: 3rem;
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        color: #A34A3B;
+        line-height: 1.6;
+    }
+
+    /* CSS: Khoảng cách nhóm input */
+    .lang-form-group {
+        margin-bottom: 2rem;
+    }
+
+        /* CSS: Style cho nhãn input (Label) */
+        .lang-form-group .form-label {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--lang-muted);
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            display: block;
+        }
+
+    /* CSS: Nút xóa tài khoản với màu đỏ đặc trưng cho hành động hủy */
+    .lang-btn-delete {
+        background-color: #A34A3B !important;
+        border: none !important;
+        color: #FFFFFF !important;
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        padding: 1rem 2.5rem;
+        transition: all 0.3s ease;
+    }
+
+        .lang-btn-delete:hover {
+            background-color: #8C3E32 !important;
+        }
+</style>
+
+<div class="lang-form-wrapper">
+    <h3 class="lang-page-title">Xóa tài khoản</h3>
+    <div class="lang-page-subtitle" style="margin-bottom: 3rem; color: var(--lang-muted); font-style: italic; font-family: 'Playfair Display', serif;">
+        Hành động này sẽ xóa vĩnh viễn dấu ấn của bạn.
+    </div>
+
+    @* Khối hiển thị cảnh báo người dùng trước khi xóa *@
+    <div class="lang-delete-alert" role="alert">
+        <strong>Lưu ý quan trọng:</strong> Việc xóa dữ liệu sẽ làm mất vĩnh viễn tài khoản và toàn bộ nội dung bạn đã chia sẻ trên Lặng. Hành động này không thể khôi phục.
+    </div>
+
+    <div>
+        @* Form yêu cầu xác nhận xóa *@
+        <form id="delete-user" method="post">
+            @* Hiển thị lỗi từ Model nếu có *@
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert" style="margin-bottom: 1.5rem;"></div>
+
+            @* Logic: Chỉ yêu cầu nhập mật khẩu nếu tài khoản được thiết lập để xác thực *@
+            @if (Model.RequirePassword)
+            {
+                <div class="lang-form-group">
+                    <label asp-for="Input.Password" class="form-label">Xác nhận mật khẩu</label>
+                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Nhập mật khẩu để xác nhận..." />
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+            }
+
+            @* Nút thực hiện hành động xóa *@
+            <button class="w-100 btn lang-btn-delete" type="submit">
+                Xác nhận xóa tài khoản
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @* Nạp các đoạn script hỗ trợ xác thực phía Client *@
+    <partial name="_ValidationScriptsPartial" />
+}

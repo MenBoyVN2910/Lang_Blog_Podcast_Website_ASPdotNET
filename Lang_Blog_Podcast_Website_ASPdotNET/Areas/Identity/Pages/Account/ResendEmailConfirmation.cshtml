@@ -1,0 +1,34 @@
+@page
+@model ResendEmailConfirmationModel
+@{
+    ViewData["Title"] = "Gửi lại xác nhận email"; // Tiêu đề trang
+}
+
+<h1>@ViewData["Title"]</h1>
+<h2>Nhập email của bạn.</h2>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        @* Form yêu cầu gửi lại email xác nhận *@
+        <form method="post">
+            @* Hiển thị danh sách các lỗi xác thực (nếu có) *@
+            <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+
+            @* Ô nhập địa chỉ email *@
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" aria-required="true" placeholder="name@example.com" />
+                <label asp-for="Input.Email" class="form-label"></label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            @* Nút thực hiện gửi lại yêu cầu xác nhận *@
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Gửi lại</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @* Nhúng các script hỗ trợ xác thực phía client *@
+    <partial name="_ValidationScriptsPartial" />
+}

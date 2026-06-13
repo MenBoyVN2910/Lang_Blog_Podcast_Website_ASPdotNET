@@ -1,0 +1,34 @@
+﻿@* Khai báo Model dữ liệu được truyền từ Controller sang View này để hiển thị thông tin lỗi *@
+@model ErrorViewModel
+
+@{
+    @* Thiết lập tiêu đề cho trang web hiển thị trên tab trình duyệt *@
+    ViewData["Title"] = "Lỗi";
+}
+
+@* Tiêu đề lớn hiển thị trạng thái lỗi với màu đỏ nguy hiểm (text-danger) *@
+<h1 class="text-danger">Lỗi.</h1>
+@* Tiêu đề phụ thông báo cho người dùng biết hệ thống gặp sự cố khi xử lý *@
+<h2 class="text-danger">Đã xảy ra lỗi trong quá trình xử lý yêu cầu của bạn.</h2>
+
+@* Kiểm tra điều kiện: Nếu Model có cấu hình hiển thị mã định danh yêu cầu (RequestId) *@
+@if (Model.ShowRequestId)
+{
+    <p>
+        @* Hiển thị mã Request ID để người dùng có thể gửi cho kỹ thuật viên kiểm tra log hệ thống *@
+        <strong>Mã định danh yêu cầu (Request ID):</strong> <code>@Model.RequestId</code>
+    </p>
+}
+
+@* ---------------------------------------------------------------------------------- *@
+@* PHẦN THÔNG TIN CẢNH BÁO DÀNH CHO LẬP TRÌNH VIÊN (CHỈ NÊN HIỂN THỊ KHI PHÁT TRIỂN) *@
+@* ---------------------------------------------------------------------------------- *@
+<h3>Chế độ Phát triển (Development Mode)</h3>
+<p>
+    Chuyển đổi sang môi trường <strong>Development</strong> (Phát triển) sẽ hiển thị thông tin chi tiết hơn về lỗi đã xảy ra.
+</p>
+<p>
+    <strong>Không nên kích hoạt môi trường phát triển cho các ứng dụng đã triển khai (Production).</strong>
+    Điều này có thể dẫn đến việc rò rỉ và hiển thị thông tin nhạy cảm từ các ngoại lệ (nhật ký lỗi hệ thống) cho người dùng cuối.
+    Để gỡ lỗi cục bộ, hãy bật tùy chọn môi trường <strong>Development</strong> bằng cách thiết lập biến môi trường <strong>ASPNETCORE_ENVIRONMENT</strong> thành <strong>Development</strong> và khởi động lại ứng dụng.
+</p>

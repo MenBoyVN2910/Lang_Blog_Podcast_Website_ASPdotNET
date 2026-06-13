@@ -1,0 +1,55 @@
+@page
+@model GenerateRecoveryCodesModel
+
+@{
+    // Tiêu đề hiển thị trên trang
+    ViewData["Title"] = "Tạo mã khôi phục 2 lớp";
+
+    // Đánh dấu menu "Xác thực hai lớp" đang được chọn
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<!-- Hiển thị thông báo thành công hoặc lỗi từ server -->
+<partial name="_StatusMessage" for="StatusMessage" />
+
+<!-- Tiêu đề chính của trang -->
+<h3 class="mb-4">@ViewData["Title"]</h3>
+
+<!-- Khung cảnh báo giải thích về mã khôi phục -->
+<div class="alert alert-warning shadow-sm" role="alert">
+
+    <!-- Tiêu đề cảnh báo -->
+    <h5>⚠ Lưu ý quan trọng</h5>
+
+    <!-- Hướng dẫn người dùng lưu mã khôi phục -->
+    <p>
+        Hãy lưu các mã khôi phục ở nơi an toàn như trình quản lý mật khẩu hoặc thiết bị bảo mật cá nhân.
+    </p>
+
+    <!-- Giải thích công dụng của mã khôi phục -->
+    <p>
+        Trong trường hợp mất điện thoại hoặc không thể sử dụng ứng dụng xác thực,
+        các mã này sẽ giúp anh truy cập lại tài khoản.
+    </p>
+
+    <!-- Liên kết đến trang đặt lại ứng dụng xác thực -->
+    <p>
+        Việc tạo mã khôi phục mới không ảnh hưởng đến ứng dụng xác thực hiện tại.
+        Nếu muốn tạo lại mã QR hoặc khóa xác thực,
+        hãy <a asp-page="./ResetAuthenticator">đặt lại ứng dụng xác thực</a>.
+    </p>
+
+</div>
+
+<!-- Form gửi yêu cầu tạo bộ mã khôi phục mới -->
+<form method="post">
+
+    <!-- Nút submit gửi POST request đến PageModel -->
+    <button type="submit" class="btn btn-danger">
+
+        <!-- Khi bấm nút sẽ tạo danh sách mã khôi phục mới -->
+        Tạo mã khôi phục mới
+
+    </button>
+
+</form>
