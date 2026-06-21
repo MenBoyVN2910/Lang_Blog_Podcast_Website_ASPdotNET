@@ -7,6 +7,7 @@ public class ApplicationUser : IdentityUser
 
     [Required]
     public string? FullName { get; set; }
+
     // THÊM DÒNG NÀY: Lưu ảnh dưới dạng mảng byte
     public byte[]? ProfilePicture { get; set; }
 }

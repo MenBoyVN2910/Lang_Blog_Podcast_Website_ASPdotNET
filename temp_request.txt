@@ -1,0 +1,1 @@
+Reading Program.cs and ExternalLogin.cshtml.cs to determine current authentication configuration and whether AddGoogle is already configured.

@@ -36,11 +36,13 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Areas.Identity.Pages.Account.Manag
         public class InputModel
         {
             [Phone]
-            [Display(Name = "Phone number")]
-            public string PhoneNumber { get; set; }
+            [Display(Name = "Số Điện Thoạia")]
+            // Kiểm tra 10 số, bắt đầu bằng 03, 05, 07, 08, hoặc 09.
+            [RegularExpression(@"^0(3|5|7|8|9)[0-9]{8}$", ErrorMessage = "Số điện thoại không hợp lệ. Vui lòng nhập 10 chữ số bắt đầu bằng 03, 05, 07, 08 hoặc 09.")]
+            public string? PhoneNumber { get; set; }
 
             // Khai báo kiểu IFormFile để nhận file gửi lên từ form html
-            public IFormFile ProfilePicture { get; set; }
+            public IFormFile? ProfilePicture { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)

@@ -127,7 +127,11 @@
         @* 3. VÙNG SỐ ĐIỆN THOẠI: Thông tin có thể thay đổi *@
         <div class="lang-form-group">
             <label class="form-label">Số điện thoại</label>
-            <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Nhập số điện thoại của bạn..." />
+            <input asp-for="Input.PhoneNumber"
+                   class="form-control"
+                   placeholder="Nhập số điện thoại của bạn..."
+                   pattern="^0(3|5|7|8|9)[0-9]{8}$"
+                   title="Vui lòng nhập 10 chữ số bắt đầu bằng 03, 05, 07, 08 hoặc 09." />
             <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
         </div>
 

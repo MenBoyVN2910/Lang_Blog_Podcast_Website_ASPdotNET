@@ -364,7 +364,14 @@
                     <label asp-for="Input.Email">Địa chỉ Email</label>
                     <div class="input-icon-wrapper">
                         <i class="fa-regular fa-envelope"></i>
-                        <input asp-for="Input.Email" class="custom-input" autocomplete="username" aria-required="true" placeholder="Email của Lặnger..." />
+                        @* Thêm pattern kiểm tra đuôi định dạng email *@
+                        <input asp-for="Input.Email"
+                               class="custom-input"
+                               autocomplete="username"
+                               aria-required="true"
+                               placeholder="Email của Lặnger..."
+                               pattern="^[a-zA-Z0-9._%+-]+@@(gmail\.com|outlook\.com)$"
+                               title="Vui lòng nhập đúng định dạng email (ví dụ: @@gmail.com, @@outlook.com)" />
                     </div>
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>

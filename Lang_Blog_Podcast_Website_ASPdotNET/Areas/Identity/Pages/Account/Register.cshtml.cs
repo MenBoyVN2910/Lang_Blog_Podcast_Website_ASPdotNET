@@ -57,20 +57,22 @@ public class RegisterModel : PageModel
         [Display(Name = "Tên người dùng")]
         public string FullName { get; set; } = default!;
 
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "Email không được để trống.")]
+        [EmailAddress(ErrorMessage = "Địa chỉ email không hợp lệ.")]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@(gmail\.com|outlook\.com|yahoo\.com)$",
+        ErrorMessage = "Hệ thống chỉ chấp nhận email đuôi @gmail.com, @outlook.com hoặc @yahoo.com")]
         [Display(Name = "Email")]
         public string Email { get; set; } = default!;
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [StringLength(100, ErrorMessage = "{0} phải có độ dài tối thiểu {2} và tối đa {1} ký tự.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
+        [Display(Name = "Mật Khẩu")]
         public string Password { get; set; } = default!;
 
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        [Display(Name = "Nhập Lại Mật Khẩu")]
+        [Compare("Password", ErrorMessage = "Mật khẩu và mật khẩu xác nhận không khớp.")]
         public string? ConfirmPassword { get; set; }
     }
 
@@ -115,7 +117,7 @@ public class RegisterModel : PageModel
             }
             catch (Microsoft.EntityFrameworkCore.DbUpdateException dbEx)
             {
-                _logger.LogError(dbEx, "Failed to create user.");
+                _logger.LogError(dbEx, "Tạo người dùng thất bại.");
                 ModelState.AddModelError(string.Empty, "Không thể tạo tài khoản: Email có thể đã tồn tại.");
                 ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
                 return Page();
@@ -124,7 +126,7 @@ public class RegisterModel : PageModel
             // 6. Xử lý sau khi tạo tài khoản thành công
             if (result.Succeeded)
             {
-                _logger.LogInformation("User created a new account with password.");
+                _logger.LogInformation("Người dùng đã tạo tài khoản mới với mật khẩu.");
 
                 var userId = await _userManager.GetUserIdAsync(user);
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -135,8 +137,8 @@ public class RegisterModel : PageModel
                     values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                     protocol: Request.Scheme)!;
 
-                await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                await _emailSender.SendEmailAsync(Input.Email, "Xác nhận email của bạn",
+                    $"Vui lòng xác nhận tài khoản của bạn bằng cách <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                 if (_userManager.Options.SignIn.RequireConfirmedAccount)
                 {
@@ -168,8 +170,8 @@ public class RegisterModel : PageModel
         }
         catch
         {
-            throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
-                $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
+            throw new InvalidOperationException($"Không thể tạo một thể hiện của '{nameof(ApplicationUser)}'. " +
+                $"Ensure that '{nameof(ApplicationUser)}' không phải là một lớp trừu tượng và có hàm tạo không tham số, hoặc nói cách khác là.. " +
                 $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
         }
     }
@@ -178,7 +180,7 @@ public class RegisterModel : PageModel
     {
         if (!_userManager.SupportsUserEmail)
         {
-            throw new NotSupportedException("The default UI requires a user store with email support.");
+            throw new NotSupportedException("Giao diện người dùng mặc định yêu cầu một kho lưu trữ người dùng có hỗ trợ email.");
         }
         return (IUserEmailStore<ApplicationUser>)_userStore;
     }

@@ -1,0 +1,51 @@
+﻿@model Lang_Blog_Podcast_Website_ASPdotNET.Models.AdminDashboardViewModel
+
+
+@* ======================================================================================================================================================== *@
+<link rel="stylesheet" href="~/css/Admin/ReviewStories.css" />
+@* ======================================================================================================================================================== *@
+
+
+@* ======================================================================================================================================================== *@
+<div class="editorial-container">
+    <div class="editorial-header">
+        <h2>Hộp thư chờ đợi</h2>
+        <p>Những tâm hồn đang chờ được lắng nghe.</p>
+    </div>
+
+    @if (!Model.PendingStories.Any())
+    {
+        <div class="empty-state">Hiện không có câu chuyện mới nào.</div>
+    }
+    else
+    {
+        <div class="submission-list">
+            @foreach (var item in Model.PendingStories)
+            {
+                <div class="submission-item">
+                    <div class="submission-meta">
+                        <span class="category-tag">@item.Category</span>
+                        <span class="date">@item.CreatedAt.ToString("dd.MM.yyyy")</span>
+                    </div>
+                    <h3 class="submission-title">@item.Title</h3>
+                    <p class="submission-author">Gửi bởi: <strong>@item.Author</strong></p>
+
+                    <div class="submission-actions">
+                        <a asp-action="StoryDetails" asp-route-id="@item.Id" class="view-btn">Đọc & Duyệt →</a>
+
+                        <form asp-controller="Admin" asp-action="Approve" asp-route-id="@item.Id" method="post" style="display:inline-block; margin-left:10px;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn-action approve">Duyệt</button>
+                        </form>
+
+                        <form asp-controller="Admin" asp-action="Reject" asp-route-id="@item.Id" method="post" style="display:inline-block; margin-left:6px;" onsubmit="return confirm('Bạn có chắc muốn xóa bài viết này vĩnh viễn?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn-action reject">Bỏ</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+@* ======================================================================================================================================================== *@

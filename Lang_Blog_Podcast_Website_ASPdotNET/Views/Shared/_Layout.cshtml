@@ -1,5 +1,7 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
+
+@* ======================================================================================================================================================== *@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,12 +15,19 @@
 
     @* Nhúng file CSS chính của trang web, tự động tạo chuỗi định danh phiên bản (v=...) để tránh lỗi bộ nhớ đệm (Cache) *@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
     @* Cấu hình ảnh biểu tượng thu nhỏ (Favicon) hiển thị trên tab trình duyệt *@
     <link rel="icon"
           type="image/png"
           href="~/images/Logo/logo_website.png" />
 </head>
+@* ======================================================================================================================================================== *@
+
+
+
+
+@* ======================================================================================================================================================== *@
 <body>
 
     @* =================================HEADER==============================================(Phần Đầu Trang) *@
@@ -157,8 +166,8 @@
                 });
             })();
     </script>
-
     @* Vùng cho phép các View con nhúng bổ sung các đoạn mã Script riêng lẻ vào cuối trang Layout *@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+@* ======================================================================================================================================================== *@
 </html>

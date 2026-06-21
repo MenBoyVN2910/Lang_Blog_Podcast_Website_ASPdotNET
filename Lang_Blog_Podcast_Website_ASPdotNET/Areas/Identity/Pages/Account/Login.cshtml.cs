@@ -65,8 +65,11 @@ public class LoginModel : PageModel
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
-        [Required]
-        [EmailAddress]
+
+        [Required(ErrorMessage = "Email không được để trống.")]
+        [EmailAddress(ErrorMessage = "Địa chỉ email không hợp lệ.")]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@(gmail\.com|outlook\.com|yahoo\.com)$",
+        ErrorMessage = "Hệ thống chỉ chấp nhận email đuôi @gmail.com, @outlook.com hoặc @yahoo.com")]
         public string Email { get; set; } = default!;
 
         /// <summary>
@@ -81,7 +84,7 @@ public class LoginModel : PageModel
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
-        [Display(Name = "Remember me?")]
+        [Display(Name = "Nhớ Tôi Không?")]
         public bool RememberMe { get; set; }
     }
 
@@ -115,7 +118,7 @@ public class LoginModel : PageModel
             var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
             if (result.Succeeded)
             {
-                _logger.LogInformation("User logged in.");
+                _logger.LogInformation("Người dùng đã đăng nhập.");
                 return LocalRedirect(returnUrl);
             }
             if (result.RequiresTwoFactor)
@@ -124,12 +127,12 @@ public class LoginModel : PageModel
             }
             if (result.IsLockedOut)
             {
-                _logger.LogWarning("User account locked out.");
+                _logger.LogWarning("Tài khoản người dùng bị khóa.");
                 return RedirectToPage("./Lockout");
             }
             else
             {
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                ModelState.AddModelError(string.Empty, "Đăng nhập không hợp lệ.");
                 return Page();
             }
         }

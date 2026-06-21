@@ -1,0 +1,296 @@
+:root {
+    --text-main: #222222;
+    --text-muted: #8C847D;
+    --bg-color: #FAF9F6;
+    --accent-color: #B29B84;
+    --font-serif: 'Playfair Display', Georgia, serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+}
+
+/* CĂN GIỮA KHUNG TRANG CHUẨN */
+.article-container {
+    max-width: 1024px;
+    margin-top: 140px;
+    margin-bottom: 120px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.custom-editorial-layout {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+/* =========================================
+   CỘT TRÁI: SIDEBAR THÔNG TIN
+========================================= */
+.sidebar-column {
+    width: 240px;
+    flex-shrink: 0;
+    border-right: 1px solid #EBE5DF;
+    padding-right: 30px;
+}
+
+.sidebar-meta {
+    position: sticky;
+    top: 140px;
+    align-self: flex-start;
+}
+
+.back-link {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 40px;
+    transition: color 0.3s ease;
+}
+
+    .back-link:hover {
+        color: #7A6754;
+    }
+
+.meta-group {
+    margin-bottom: 25px;
+}
+
+.meta-label {
+    display: block;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: #A39B94;
+    margin-bottom: 6px;
+}
+
+.meta-value {
+    font-family: var(--font-serif);
+    font-size: 15px;
+    color: var(--text-main);
+}
+
+.font-italic {
+    font-style: italic;
+}
+
+.article-actions {
+    margin-top: 35px;
+    padding-top: 25px;
+    border-top: 1px solid #EBE5DF;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.btn-action {
+    background: none;
+    border: none;
+    text-align: left;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: #A39B94;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.3s ease;
+}
+
+    .btn-action i {
+        margin-right: 10px;
+        font-size: 13px;
+    }
+
+    .btn-action:hover {
+        color: var(--text-main);
+    }
+
+/* =========================================
+   CỘT PHẢI: CHI TIẾT NỘI DUNG
+========================================= */
+.content-column {
+    flex: 1;
+    min-width: 0;
+    padding-left: 15px;
+}
+
+.category-badge {
+    display: inline-block;
+    background-color: #EBE5DF;
+    color: var(--accent-color);
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 5px 12px;
+    margin-bottom: 20px;
+}
+
+.article-title {
+    font-family: var(--font-serif);
+    font-size: 3.2rem;
+    font-weight: 400;
+    color: #111111;
+    line-height: 1.25;
+    margin-bottom: 25px;
+    letter-spacing: -0.5px;
+}
+
+.article-stats {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    color: #A39B94;
+    margin-bottom: 40px; /* Tạo khoảng cách vừa đủ xuống phần chữ */
+    display: flex;
+    gap: 24px;
+    border-top: 1px solid #EBE5DF;
+    border-bottom: 1px solid #EBE5DF;
+    padding: 14px 0;
+}
+
+/* =========================================
+   TYPOGRAPHY NỘI DUNG (Hỗ trợ TinyMCE)
+========================================= */
+.article-body {
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    line-height: 1.95;
+    color: #2c2c2c;
+}
+
+    .article-body p {
+        margin-bottom: 24px;
+        text-align: justify;
+    }
+
+    .article-body h2, .article-body h3 {
+        font-family: var(--font-serif);
+        font-size: 1.85rem;
+        margin-top: 40px;
+        margin-bottom: 18px;
+        color: #111111;
+        font-weight: 500;
+    }
+
+    /* HIỆU ỨNG DROP CAP CHỮ ĐẦU DÒNG */
+    .article-body > p:first-of-type::first-letter {
+        font-family: var(--font-serif);
+        font-size: 4.5rem;
+        font-weight: 600;
+        color: var(--accent-color);
+        float: left;
+        line-height: 0.85;
+        margin-top: 6px;
+        margin-right: 10px;
+        padding: 0 2px;
+        text-transform: uppercase;
+    }
+
+    /* Các hình ảnh lẻ tẻ do người dùng chèn trực tiếp trong nội dung truyện */
+    .article-body img {
+        max-width: 100%;
+        height: auto;
+        margin: 30px auto;
+        display: block;
+        border-radius: 4px;
+    }
+
+    .article-body blockquote {
+        border-left: 3px solid var(--accent-color);
+        padding-left: 20px;
+        margin: 35px 0;
+        font-style: italic;
+        font-size: 1.4rem;
+        color: #444444;
+    }
+
+/* =========================================
+   FOOTER BÀI VIẾT
+========================================= */
+.article-divider {
+    border-top: 1px solid #EBE5DF;
+    margin: 50px 0 35px 0;
+    opacity: 1;
+}
+
+.article-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 30px;
+}
+
+.note-label {
+    display: block;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #A39B94;
+    margin-bottom: 10px;
+}
+
+.author-note p {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.magazine-signature {
+    text-align: right;
+}
+
+    .magazine-signature h4 {
+        font-family: var(--font-serif);
+        font-style: italic;
+        font-size: 1.65rem;
+        color: var(--text-main);
+        margin: 0;
+        font-weight: 500;
+    }
+
+/* RESPONSIVE DI ĐỘNG */
+@media (max-width: 992px) {
+    .custom-editorial-layout {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .sidebar-column {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #EBE5DF;
+        padding-right: 0;
+        padding-bottom: 20px;
+    }
+
+    .article-title {
+        font-size: 2.2rem;
+    }
+
+    .article-footer {
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .magazine-signature {
+        text-align: left;
+    }
+}

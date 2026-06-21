@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Lang_Blog_Podcast_Website_ASPdotNET.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,5 +11,8 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Data
             : base(options)
         {
         }
+
+        public DbSet<Story> Stories { get; set; }
+        public DbSet<Category> Categories { get; set; }
     }
 }

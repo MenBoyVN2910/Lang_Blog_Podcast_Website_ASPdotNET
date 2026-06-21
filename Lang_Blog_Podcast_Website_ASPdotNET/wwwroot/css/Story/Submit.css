@@ -1,0 +1,149 @@
+﻿.lang-form-wrapper {
+    max-width: 1200px;
+    margin: 60px auto;
+    padding: 50px;
+    background-color: #ffffff;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.04);
+    border-radius: 8px;
+}
+
+.editorial-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.5rem;
+    color: #1a1a1a;
+    margin-bottom: 15px;
+}
+
+.editorial-subtitle {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: #8C847D;
+    font-size: 1.1rem;
+    margin-bottom: 50px;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.form-col {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.lang-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    .lang-label i {
+        color: #8C847D;
+        font-size: 1rem;
+    }
+
+.form-control-lang {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 15px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.95rem;
+    color: #333;
+    background-color: #fcfcfc;
+    transition: all 0.3s ease;
+}
+
+    .form-control-lang:focus {
+        outline: none;
+        border-color: #8C847D;
+        background-color: #fff;
+        box-shadow: 0 0 0 3px rgba(140, 132, 125, 0.1);
+    }
+
+.custom-file-upload {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 15px;
+    border: 1px dashed #b0a8a2;
+    border-radius: 4px;
+    background-color: #faf9f8;
+    color: #555;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.3s;
+    box-sizing: border-box;
+}
+
+    .custom-file-upload:hover {
+        background-color: #f0ebe6;
+        border-color: #8C847D;
+        color: #1a1a1a;
+    }
+
+.btn-submit-lang {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    border: none;
+    padding: 18px 50px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    margin-top: 20px;
+}
+
+    .btn-submit-lang:hover {
+        background-color: #8C847D;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(140, 132, 125, 0.3);
+    }
+
+.preview-box {
+    margin-top: 15px;
+    padding: 12px;
+    background: #faf9f8;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+}
+/* 1. Tô đỏ chữ thông báo lỗi */
+.field-validation-error {
+    color: #db2725 !important; /* Màu đỏ thẫm sang trọng */
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* 2. Tô đỏ viền các ô nhập liệu thông thường (Tiêu đề, Tác giả, Lời tự sự, Danh mục) */
+.form-control-lang.input-validation-error {
+    border-color: #db2725 !important;
+    background-color: #fff8f8; /* Nền hồng cực nhẹ để người dùng dễ chú ý */
+}
+
+/* 3. ĐẶC BIỆT: Tô đỏ nút "Nhấn để chọn ảnh..." khi chưa upload ảnh bìa */
+input[type="file"].input-validation-error + .custom-file-upload {
+    border-color: #db2725 !important;
+    background-color: #fff8f8;
+    color: #db2725;
+}

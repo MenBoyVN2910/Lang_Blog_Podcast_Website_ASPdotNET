@@ -1,18 +1,21 @@
 @page
-@model RegisterModel
+@model LoginModel
+
 @{
-    // Thiết lập tiêu đề cho trang web
-    ViewData["Title"] = "Đăng ký";
+    // Thiết lập tiêu đề hiển thị trên tab trình duyệt
+    ViewData["Title"] = "Đăng nhập";
+    // Nếu bạn muốn trang này full màn hình và không dính Layout mặc định, hãy bỏ comment dòng dưới:
+    // Layout = null;
 }
 
-@* Nhúng các font chữ (Inter, Playfair Display) và biểu tượng icon (FontAwesome) từ bên ngoài để trang trí UI *@
+@* Nhúng các thư viện font chữ từ Google Fonts và bộ thư viện biểu tượng Font Awesome *@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-    /* Reset CSS cơ bản và thiết lập box-sizing để đồng bộ kích thước chuẩn cho các thẻ */
+    /* Bắt buộc áp dụng box-sizing để padding không làm sai lệch tỷ lệ 50/50 của bố cục */
     *, *::before, *::after {
         box-sizing: border-box;
     }
@@ -24,14 +27,14 @@
         font-family: 'Inter', sans-serif;
     }
 
-    /* Container chính sử dụng Flexbox để chia đôi màn hình (trái/phải) */
+    /* Container chính bao bọc toàn bộ trang, chia đôi màn hình dạng Flexbox */
     .auth-container {
         display: flex;
         min-height: 100vh;
         width: 100%;
     }
 
-    /* Animation cho hiệu ứng xuất hiện từ dưới lên (Fade in up) */
+    /* Hiệu ứng trượt nhẹ từ dưới lên và mờ dần (Fade in up) khi tải trang */
     @@keyframes fadeInUp {
         from {
             opacity: 0;
@@ -44,11 +47,11 @@
         }
     }
 
-    /* Cấu hình giao diện cho Panel bên trái (Phần trang trí) */
+    /* Panel bên trái - Phần thiết kế hình ảnh/nội dung thương hiệu (Tông màu tối) */
     .auth-left {
-        width: 50%;
+        width: 50%; /* Ép chính xác phân nửa màn hình */
         flex: 0 0 50%;
-        background-color: #312c27;
+        background-color: #312c27; /* Màu nâu đen chủ đạo */
         color: #f5f5f5;
         position: relative;
         overflow: hidden;
@@ -58,7 +61,7 @@
         padding: 10%;
     }
 
-        /* Chữ trang trí mờ lớn ở Background bên trái */
+        /* Chữ nền trang trí cỡ lớn được xoay dọc và làm mờ */
         .auth-left .bg-join {
             position: absolute;
             right: -80px;
@@ -67,22 +70,22 @@
             font-size: 350px;
             font-family: 'Playfair Display', serif;
             color: rgba(255, 255, 255, 0.04);
-            pointer-events: none; /* Ngăn chặn tương tác chuột vào chữ này */
+            pointer-events: none; /* Tránh việc người dùng vô tình bôi đen trúng chữ này */
             letter-spacing: 10px;
-            transition: all 0.6s ease;
+            transition: all 0.6s ease; /* Tạo hiệu ứng chuyển động mượt mà */
         }
 
-        /* Hiệu ứng phóng to mờ khi hover chuột vào panel trái */
+        /* Khi rê chuột vào vùng bên trái, chữ nền trang trí sẽ sáng nhẹ và phóng to lên */
         .auth-left:hover .bg-join {
             color: rgba(255, 255, 255, 0.07);
             transform: translateY(-50%) rotate(-90deg) scale(1.02);
         }
 
-    /* Khung chứa nội dung chữ của panel trái kèm hiệu ứng xuất hiện */
+    /* Khung chứa các văn bản giới thiệu bên trái */
     .auth-left-content {
         z-index: 1;
         max-width: 500px;
-        animation: fadeInUp 0.8s ease-out forwards;
+        animation: fadeInUp 0.8s ease-out forwards; /* Áp dụng hiệu ứng xuất hiện chuyển động */
     }
 
     .subtitle-small {
@@ -105,6 +108,7 @@
             font-weight: 400;
         }
 
+    /* Định dạng câu trích dẫn ngắn (Quote) kèm đường viền dọc bên trái */
     .quote-text {
         font-family: 'Playfair Display', serif;
         font-style: italic;
@@ -115,9 +119,9 @@
         padding-left: 15px;
     }
 
-    /* Cấu hình giao diện cho Panel bên phải (Phần chứa Form đăng ký) */
+    /* Panel bên phải - Khu vực hiển thị Form đăng nhập (Tông màu sáng) */
     .auth-right {
-        width: 50%;
+        width: 50%; /* Ép chính xác phân nửa màn hình còn lại */
         flex: 0 0 50%;
         background-color: #faf9f7;
         display: flex;
@@ -127,7 +131,7 @@
         padding: 50px;
     }
 
-    /* Khung bọc Form đăng ký, có độ trễ hiệu ứng (0.2s) để xuất hiện sau text bên trái */
+    /* Khung bọc form, cấu hình xuất hiện trễ hơn bên trái 0.2 giây tạo nhịp điệu chuyển động */
     .form-wrapper {
         width: 100%;
         max-width: 450px;
@@ -155,61 +159,64 @@
             text-transform: uppercase;
         }
 
-    /* Style cho từng nhóm nhập liệu (Label + Input) */
+    /* Quản lý khoảng cách của từng hàng nhập liệu (Label + Input) */
     .custom-form-group {
-        margin-bottom: 30px;
+        margin-bottom: 25px;
     }
 
         .custom-form-group label {
             display: block;
             font-size: 0.75rem;
             color: #666;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             letter-spacing: 1px;
             text-transform: uppercase;
             font-weight: 600;
         }
 
-    /* Wrapper bọc input để định vị icon bên trong */
+    /* Vùng bọc để đặt các icon canh lề tuyệt đối bên trong ô nhập liệu */
     .input-icon-wrapper {
         position: relative;
     }
 
-        /* Định vị trí icon bên trong ô input */
+        /* Định vị trí cho icon nằm bên trái phía trong ô input */
         .input-icon-wrapper i {
             position: absolute;
-            left: 5px;
+            left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: #bbb;
+            color: #999;
             transition: color 0.3s ease;
         }
 
-    /* Khung nhập liệu tùy chỉnh (Chỉ có border mờ ở dưới) */
+    /* Ô input tùy chỉnh thiết kế tối giản (Chỉ hiển thị đường gạch dưới) */
     .custom-input {
         width: 100%;
-        padding: 10px 10px 10px 35px;
-        background-color: transparent;
-        border: none;
-        border-bottom: 1px solid #e0e0e0;
-        border-radius: 0;
+        padding: 15px 15px 15px 45px !important; /* Dành khoảng trống bên trái cho icon */
+        background: transparent !important;
+        border: none !important;
+        border-bottom: 1px solid #dcdcdc !important;
+        border-radius: 0 !important;
         font-size: 0.95rem;
         color: #333;
-        transition: all 0.3s ease;
     }
 
-        /* Hiệu ứng khi nhấp chuột (focus) vào input */
-        .custom-input:focus {
-            outline: none;
-            border-bottom: 1px solid #312c27;
+        /* Loại bỏ các đường viền mặc định và đổi màu gạch dưới khi người dùng click vào ô nhập */
+        .custom-input:focus,
+        .custom-input:active {
+            background: transparent !important;
+            border: none !important;
+            border-bottom: 1px solid #312c27 !important;
+            outline: none !important;
+            box-shadow: none !important;
         }
 
-            /* Đổi màu icon khi input đang được focus */
+            /* Đổi màu icon đồng bộ theo ô input khi đang được focus */
             .custom-input:focus + i, .input-icon-wrapper:focus-within i {
                 color: #312c27;
             }
 
-    /* Nút Đăng ký chính */
+    /* Nút Submit gửi dữ liệu đăng nhập */
     .btn-submit {
         width: 100%;
         padding: 16px;
@@ -226,13 +233,19 @@
         margin-top: 10px;
     }
 
+        /* Hiệu ứng nhấc nhẹ nút lên và đổ bóng khi di chuột qua */
         .btn-submit:hover {
             background-color: #1a1815;
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
         }
 
-    /* Đường kẻ phân cách ngang chữ "Hoặc" */
+        /* Trả nút về vị trí cũ khi nhấn giữ chuột */
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+    /* Thanh phân cách ngang ở giữa kèm chữ "Hoặc" */
     .divider {
         display: flex;
         align-items: center;
@@ -254,7 +267,7 @@
             letter-spacing: 1px;
         }
 
-    /* Nút đăng nhập bên thứ 3 (Google/Facebook...) */
+    /* Nút Đăng nhập nhanh bằng bên thứ 3 (Google, v.v.) */
     .btn-google {
         width: 100%;
         padding: 14px;
@@ -272,6 +285,7 @@
         transition: all 0.3s ease;
     }
 
+        /* Hiệu ứng hover cho nút Google liên kết */
         .btn-google:hover {
             background-color: #f1f1f1;
             transform: translateY(-2px);
@@ -283,15 +297,15 @@
             height: 18px;
         }
 
-    /* Khung chứa đường link chuyển đổi Đăng nhập / Đăng ký */
-    .login-link {
+    /* Khu vực liên kết điều hướng sang trang tạo tài khoản mới */
+    .register-link {
         text-align: center;
         margin-top: 30px;
         font-size: 0.85rem;
         color: #666;
     }
 
-        .login-link a {
+        .register-link a {
             color: #2b2824;
             text-decoration: none;
             font-weight: 600;
@@ -303,12 +317,12 @@
             transition: all 0.3s ease;
         }
 
-            .login-link a:hover {
+            .register-link a:hover {
                 background-color: #2b2824;
                 color: #fff;
             }
 
-    /* Class dùng để hiển thị text lỗi màu đỏ */
+    /* Định dạng màu chữ đỏ cảnh báo khi có lỗi nhập liệu xảy ra */
     .text-danger {
         color: #dc3545;
         font-size: 0.8rem;
@@ -316,17 +330,17 @@
         display: block;
     }
 
-    /* Cấu hình Responsive: Trải dọc giao diện cho màn hình nhỏ (Tablet/Mobile) */
+    /* Thiết lập giao diện phản hồi (Responsive) chạy trên môi trường di động/màn hình nhỏ dưới 900px */
     @@media (max-width: 900px) {
         .auth-container {
-            flex-direction: column;
+            flex-direction: column; /* Chuyển bố cục từ hàng ngang thành hàng dọc */
         }
 
         .auth-left, .auth-right {
-            width: 100%;
+            width: 100%; /* Giãn đầy màn hình theo chiều rộng */
             flex: none;
         }
-            /* Ẩn chữ nền lớn đi để tiết kiệm không gian trên Mobile */
+            /* Ẩn chữ nền lớn để không gian hiển thị thông tin gọn gàng hơn trên điện thoại */
             .auth-left .bg-join {
                 display: none;
             }
@@ -335,17 +349,36 @@
             font-size: 3rem;
         }
     }
+
+    /* --- PHẦN SỬA LỖI NỀN XANH KHI AUTOFILL --- */
+    /* Triệt tiêu màu nền vàng/xanh mặc định của các trình duyệt khi tự động điền (autofill) thông tin tài khoản */
+    .custom-input:-webkit-autofill,
+    .custom-input:-webkit-autofill:hover,
+    .custom-input:-webkit-autofill:focus,
+    .custom-input:-webkit-autofill:active {
+        /* Phủ một lớp bóng đổ bên trong (inset) trùng màu với background mong muốn (#faf9f7) */
+        -webkit-box-shadow: 0 0 0px 1000px #faf9f7 inset !important;
+        /* Giữ lại màu chữ xám đậm nguyên bản */
+        -webkit-text-fill-color: #333 !important;
+        /* Trì hoãn việc đổi màu tự động bằng bộ đếm thời gian chuyển cảnh cực dài */
+        transition: background-color 5000s ease-in-out 0s;
+    }
 </style>
 
 <div class="auth-container">
-    @* Phần trang trí bên trái *@
+    @* Khối nội dung nghệ thuật trang trí phía bên trái *@
     <div class="auth-left">
+        @* Đã chuyển đổi chữ hiển thị từ "JOIN" sang tiếng Việt "THAM GIA" *@
         <div class="bg-join">THAM GIA</div>
         <div class="auth-left-content">
             <div class="subtitle-small">HỆ SINH THÁI TINH THẦN</div>
             <h1 class="main-title">
-                TRỞ<br /> THÀNH<br />
-                <i> MỘT<br /> PHẦN. </i>
+                TRỞ<br />
+                THÀNH<br />
+                <i>
+                    MỘT<br />
+                    PHẦN.
+                </i>
             </h1>
             <p class="quote-text">
                 "Chúng tôi tin rằng mỗi tâm hồn đều mang trong mình một bản nhạc riêng. Hãy cùng chúng tôi viết nên những giai điệu của sự tĩnh lặng."
@@ -353,79 +386,66 @@
         </div>
     </div>
 
-    @* Phần nội dung đăng ký bên phải *@
+    @* Khối form xử lý đăng nhập phía bên phải *@
     <div class="auth-right">
         <div class="form-wrapper">
             <div class="form-header">
-                <h1>BẮT ĐẦU HÀNH TRÌNH.</h1>
-                <p>KIẾN TẠO KHÔNG GIAN CỦA RIÊNG BẠN</p>
+                <h1>CHÀO MỪNG TRỞ LẠI.</h1>
+                <p>ĐĂNG NHẬP ĐỂ TIẾP TỤC CÂU CHUYỆN</p>
             </div>
 
-            @* Form đăng ký chính: Kích hoạt HTTP Post action khi người dùng submit *@
-            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-                @* Vùng hiển thị tổng hợp các thông báo lỗi chung của Model (ví dụ: lỗi từ Server trả về) *@
+            @* Thẻ Form chính thực hiện gửi request đăng nhập bằng phương thức POST *@
+            <form id="account" method="post">
+                @* Hiển thị danh sách tổng hợp các thông báo lỗi kiểm thử từ máy chủ gửi về *@
                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
-                @* Trường nhập: Tên người dùng *@
-                <div class="custom-form-group">
-                    <label asp-for="Input.FullName">Tên người dùng</label>
-                    <div class="input-icon-wrapper">
-                        <i class="fa-solid fa-user" style="font-size: 0.9em;"></i>
-                        @* Thẻ input được binding dữ liệu trực tiếp với thuộc tính Input.FullName ở phần backend (C#) *@
-                        <input asp-for="Input.FullName" class="custom-input" autocomplete="username" aria-required="true" placeholder="Tên Của Lặnger Là Gì Nèe..." />
-                    </div>
-                    @* Thẻ hiển thị lỗi báo đỏ nếu Tên người dùng không hợp lệ *@
-                    <span asp-validation-for="Input.FullName" class="text-danger"></span>
-                </div>
-
-                @* Trường nhập: Email *@
+                @* Ô nhập dữ liệu: Địa chỉ Email *@
                 <div class="custom-form-group">
                     <label asp-for="Input.Email">Địa chỉ Email</label>
                     <div class="input-icon-wrapper">
                         <i class="fa-regular fa-envelope"></i>
-                        <input asp-for="Input.Email" class="custom-input" autocomplete="username" aria-required="true" placeholder="Email của Lặnger..." />
+                        @* Thêm pattern kiểm tra đuôi định dạng email *@
+                        <input asp-for="Input.Email"
+                               class="custom-input"
+                               autocomplete="username"
+                               aria-required="true"
+                               placeholder="Email của bạn..."
+                               pattern="^[a-zA-Z0-9._%+-]+@@(gmail\.com|outlook\.com)$"
+                               title="Vui lòng nhập đúng định dạng email (ví dụ: @@gmail.com, @@outlook.com)" />
                     </div>
+                    @* Vùng hiển thị thông báo lỗi riêng cho trường nhập Email *@
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
 
-                @* Trường nhập: Mật mã *@
+                @* Ô nhập dữ liệu: Mật mã *@
                 <div class="custom-form-group">
                     <label asp-for="Input.Password">Mật mã</label>
                     <div class="input-icon-wrapper">
                         <i class="fa-solid fa-lock" style="font-size: 0.9em;"></i>
-                        <input asp-for="Input.Password" class="custom-input" autocomplete="new-password" aria-required="true" placeholder="********" />
+                        <input asp-for="Input.Password" class="custom-input" autocomplete="current-password" aria-required="true" placeholder="********" />
                     </div>
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
                 </div>
 
-                @* Trường nhập: Xác nhận mật mã *@
-                <div class="custom-form-group">
-                    <label asp-for="Input.ConfirmPassword">Xác nhận mật mã</label>
-                    <div class="input-icon-wrapper">
-                        <i class="fa-solid fa-lock" style="font-size: 0.9em;"></i>
-                        <input asp-for="Input.ConfirmPassword" class="custom-input" autocomplete="new-password" aria-required="true" placeholder="********" />
-                    </div>
-                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-                </div>
+                @* Input ẩn giữ trạng thái "Ghi nhớ đăng nhập" thiết lập mặc định là false *@
+                <input type="hidden" asp-for="Input.RememberMe" value="false" />
 
-                @* Nút gửi form đi lên hệ thống *@
-                <button id="registerSubmit" type="submit" class="btn-submit">Đăng ký tài khoản</button>
+                @* Nút gửi yêu cầu xác thực form tài khoản *@
+                <button id="login-submit" type="submit" class="btn-submit">Xác thực</button>
             </form>
 
             <div class="divider">
                 <span>Hoặc</span>
             </div>
 
-            @* Xử lý hiển thị phần đăng nhập bằng tài khoản liên kết ngoài (Google, Facebook, v.v.) *@
+            @* Vòng lặp cấu trúc Razor để quét và hiển thị các phương thức đăng nhập liên kết ngoài nếu có thiết lập cấu hình *@
             @{
-                // Kiểm tra xem backend có cấu hình nhà cung cấp dịch vụ đăng nhập ngoài (ExternalLogins) hay không
                 if ((Model.ExternalLogins?.Count ?? 0) > 0)
                 {
                     <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-                        @* Lặp qua danh sách các nhà cung cấp được hỗ trợ và render ra nút bấm *@
                         @foreach (var provider in Model.ExternalLogins!)
                         {
-                            // Nếu là Google thì sẽ dùng nút có kèm icon svg riêng của Google
+                            // Nếu hệ thống nhận diện thấy dịch vụ phân quyền từ Google
                             if (provider.Name.ToLower() == "google")
                             {
                                 <button type="submit" class="btn-google" name="provider" value="@provider.Name">
@@ -435,7 +455,7 @@
                             }
                             else
                             {
-                                // Các provider khác sẽ tự động render icon FontAwesome tương ứng
+                                // Render động icon liên kết cho các bên dịch vụ thứ 3 khác ngoài Google
                                 <button type="submit" class="btn-google" name="provider" value="@provider.Name">
                                     <i class="fa-brands fa-@provider.Name.ToLower()"></i> TIẾP TỤC VỚI @provider.DisplayName.ToUpper()
                                 </button>
@@ -445,15 +465,15 @@
                 }
             }
 
-            @* Đường dẫn chuyển sang trang đăng nhập nếu người dùng đã có tài khoản *@
-            <div class="login-link">
-                Đã có tài khoản? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">ĐĂNG NHẬP NGAY</a>
+            @* Điều hướng nhanh quay lại form đăng ký dành cho người dùng mới *@
+            <div class="register-link">
+                Chưa có tài khoản? <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">TẠO TÀI KHOẢN MỚI</a>
             </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
-    @* Nhúng các script mặc định dùng để xác thực (validate) dữ liệu của form ở phía client trước khi gửi lên server *@
+    @* Nhúng tệp mã Script xác thực dữ liệu tại Client Side (trước khi gửi dữ liệu đi để giảm tải cho Server) *@
     <partial name="_ValidationScriptsPartial" />
 }

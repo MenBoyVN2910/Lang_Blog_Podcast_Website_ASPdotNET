@@ -1,0 +1,241 @@
+@model Lang_Blog_Podcast_Website_ASPdotNET.Models.StoryUploadViewModel
+
+@{
+    ViewData["Title"] = "Gửi câu chuyện của bạn";
+}
+
+@* ======================================================================================================================================================== *@
+<link rel="stylesheet" href="~/css/Story/Submit.css" />
+@* ======================================================================================================================================================== *@
+
+
+@* ======================================================================================================================================================== *@
+@* --- KHUNG GIAO DIỆN CHÍNH --- *@
+<div class="lang-form-wrapper">
+    <div class="text-center">
+        <h1 class="editorial-title">Mảnh ghép Ký ức.</h1>
+        <p class="editorial-subtitle">"Gửi đi một lời tự sự, để thấy lòng mình nhẹ tênh giữa thinh không."</p>
+    </div>
+
+    <form asp-action="Submit" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+
+        <div class="form-row">
+            <div class="form-col" style="flex: 100%;">
+                <label class="lang-label"><i class="fa-solid fa-heading"></i> Tiêu đề câu chuyện</label>
+                <input asp-for="Title" class="form-control-lang" placeholder="Viết một tiêu đề thật thơ..." />
+                <span asp-validation-for="Title" class="text-danger small mt-1"></span>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-col">
+                <label class="lang-label"><i class="fa-solid fa-pen-nib"></i> Tác giả <span class="text-danger">*</span></label>
+
+                <input asp-for="Author" class="form-control-lang" placeholder="Nhập tên của bạn..." />
+
+                <span asp-validation-for="Author" class="text-danger small mt-1"></span>
+            </div>
+        </div>
+
+        <div class="form-col">
+            <label class="lang-label"><i class="fa-solid fa-layer-group"></i> Danh mục</label>
+            @* 💡 ĐÃ TỐI ƯU: Đổi sang bind với CategoryId lấy từ Database *@
+            <select asp-for="CategoryId" class="form-control-lang"
+                    asp-items="@(new SelectList(ViewBag.Categories, "Id", "Name"))">
+                <option value="">-- Chọn danh mục câu chuyện --</option>
+            </select>
+            <span asp-validation-for="CategoryId" class="text-danger small mt-1"></span>
+        </div>
+
+        
+        <div class="form-row">
+            <div class="form-col">
+                <label class="lang-label"><i class="fa-regular fa-image"></i> Ảnh bìa câu chuyện</label>
+                <label for="image-upload" class="custom-file-upload">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> <span>Nhấn để chọn ảnh...</span>
+                </label>
+                <input id="image-upload" asp-for="ImageFile" type="file" style="display:none;" accept="~/images/Default_Images/Blog.png" onchange="updateFileName(this, 'file-name-img')" />
+                <div id="file-name-img" class="small text-muted mt-2"></div>
+                <div id="image-preview-container" class="text-center" style="display: none; margin-top: 15px;"></div>
+
+                @* 🌟 THÊM DÒNG NÀY: Hiển thị thông báo lỗi nếu không chọn ảnh bìa *@
+                <span asp-validation-for="ImageFile" class="text-danger small mt-1 d-block"></span>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-col" style="flex: 100%;">
+                <label class="lang-label"><i class="fa-solid fa-book-open"></i> Lời tự sự</label>
+                <textarea id="storyContent" asp-for="Content" class="form-control-lang" rows="15" placeholder="Hãy để những con chữ dẫn lối..."></textarea>
+                <span asp-validation-for="Content" class="text-danger small mt-1"></span>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn-submit-lang">GỬI ĐI YÊU THƯƠNG <i class="fa-solid fa-paper-plane ms-2"></i></button>
+        </div>
+    </form>
+</div>
+@* ======================================================================================================================================================== *@
+
+
+
+@* ======================================================================================================================================================== *@
+@* --- ĐƯA TOÀN BỘ SCRIPTS VÀO SECTION SCRIPTS ĐỂ CHẠY SAU KHI TẢI XONG TRANG --- *@
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @* Khuyến khích thêm 2 script bẩm sinh của ASP.NET để bắt lỗi nhanh trên Client-side mà không cần load lại trang *@
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        // =========================================================================
+        // 1. HÀM CẬP NHẬT TÊN TỆP VÀ HIỂN THỊ PREVIEW ẢNH BÌA
+        // =========================================================================
+        function updateFileName(input, targetId) {
+        if (input.files && input.files.length > 0) {
+        var file = input.files[0];
+        var fileName = file.name;
+
+        document.getElementById(targetId).innerHTML = "<i class='fa-solid fa-check text-success'></i> Đã chọn: <strong>" + fileName + "</strong>";
+
+        if (input.id === 'image-upload') {
+        var imgContainer = document.getElementById('image-preview-container');
+        if (imgContainer && file.type.match('image.*')) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+        imgContainer.innerHTML = '<img src="' + e.target.result + '" style="max-width: 100%; max-height: 200px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 2px solid #fff;" />';
+        imgContainer.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+        }
+        }
+        }
+        }
+
+        // =========================================================================
+        // 2. CẤU HÌNH TRÌNH SOẠN THẢO TINYMCE
+        // =========================================================================
+        tinymce.init({
+        selector: '#storyContent',
+        height: 600,
+        menubar: true,
+        plugins: [
+        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+        'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons'
+        ],
+        toolbar: 'undo redo | blocks | fontfamily fontsize forecolor backcolor | ' +
+        'bold italic underline strikethrough | alignleft aligncenter ' +
+        'alignright alignjustify | bullist numlist outdent indent | ' +
+        'emoticons link image | removeformat | help',
+        font_family_formats: 'Playfair Display=Playfair Display, serif; Montserrat=Montserrat, sans-serif; Arial=arial,helvetica,sans-serif; Times New Roman=times new roman,times;',
+        font_size_formats: '10pt 12pt 14pt 16pt 18pt 24pt 36pt',
+        content_style: `
+        @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap');
+        body {
+        font-family: 'Playfair Display', serif;
+        color: #8C847D;
+        font-size: 16px;
+        line-height: 1.8;
+        padding: 10px;
+        }
+        body::placeholder { color: #ccc; }
+        `,
+        setup: function (editor) {
+        // 2.1 Kích hoạt lưu dữ liệu ngay khi gõ để jQuery Validate bắt lỗi chính xác
+        editor.on('change keyup nodeChange', function () {
+        editor.save();
+        });
+
+        // 2.2 Chặn nút bấm "Chèn ảnh" nếu chưa đủ 30 chữ
+        editor.on('BeforeExecCommand', function (e) {
+        if (e.command === 'mceImage') {
+        var wordCount = editor.plugins.wordcount.getCount();
+        if (wordCount < 30) {
+        e.preventDefault();
+        alert('Vui lòng viết ít nhất 30 chữ trước khi chèn ảnh! (Hiện tại: ' + wordCount + ' chữ)');
+        }
+        }
+        });
+
+        // 2.3 Chặn thao tác kéo - thả ảnh trực tiếp nếu chưa đủ 30 chữ
+        editor.on('drop', function (e) {
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        var isImage = false;
+        for (var i = 0; i < e.dataTransfer.files.length; i++) {
+        if (e.dataTransfer.files[i].type.match('image.*')) {
+        isImage = true;
+        break;
+        }
+        }
+        if (isImage) {
+        var wordCount = editor.plugins.wordcount.getCount();
+        if (wordCount < 30) {
+        e.preventDefault();
+        alert('Vui lòng viết ít nhất 30 chữ trước khi chèn ảnh! (Hiện tại: ' + wordCount + ' chữ)');
+        }
+        }
+        }
+        });
+
+        // 2.4 Ép kích thước ảnh thành 720x480 khi chèn thành công
+        editor.on('SetContent', function (e) {
+        var images = editor.dom.select('img');
+        for (var i = 0; i < images.length; i++) {
+        if (!editor.dom.getAttrib(images[i], 'data-resized')) {
+        editor.dom.setAttrib(images[i], 'width', '720');
+        editor.dom.setAttrib(images[i], 'height', '480');
+        editor.dom.setStyle(images[i], 'object-fit', 'cover');
+        editor.dom.setStyle(images[i], 'border-radius', '8px');
+        editor.dom.setAttrib(images[i], 'data-resized', 'true');
+        }
+        }
+        });
+        }
+        });
+
+        // =========================================================================
+        // 3. HIỂN THỊ THÔNG BÁO (SWEETALERT2) KHI CÓ KẾT QUẢ TỪ SERVER
+        // =========================================================================
+        document.addEventListener("DOMContentLoaded", function () {
+
+        // NẾU CÓ THÔNG BÁO THÀNH CÔNG
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <text>
+                Swal.fire({
+                title: 'Đã gửi thành công.',
+                html: '@Html.Raw(ViewBag.SuccessMessage)', // Đã thêm Html.Raw để chuẩn tiếng Việt
+                icon: 'success',
+                confirmButtonColor: '#111',
+                confirmButtonText: 'Về trang chủ',
+                allowOutsideClick: false
+                }).then((result) => {
+                if (result.isConfirmed) {
+                window.location.href = '@Url.Action("Index", "Home")';
+                }
+                });
+            </text>
+        }
+
+        // NẾU CÓ THÔNG BÁO LỖI
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <text>
+                Swal.fire({
+                title: 'Chưa thể gửi!',
+                html: '@Html.Raw(ViewBag.ErrorMessage)', // Đã thêm Html.Raw để chuẩn tiếng Việt
+                icon: 'error',
+                confirmButtonColor: '#111',
+                confirmButtonText: 'Tôi sẽ kiểm tra lại'
+                });
+            </text>
+        }
+        });
+    </script>
+}
+@* ======================================================================================================================================================== *@

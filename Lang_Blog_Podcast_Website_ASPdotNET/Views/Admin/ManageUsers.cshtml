@@ -1,57 +1,76 @@
 ﻿@model List<Lang_Blog_Podcast_Website_ASPdotNET.Models.UserRoleViewModel>
 
 @{
-    ViewData["Title"] = "Quản lý tài khoản";
-    Layout = "~/Views/Shared/_Layout.cshtml"; // Đảm bảo trỏ đúng Layout của bạn
+    ViewData["Title"] = "";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="admin-container" style="max-width: 1000px; margin: 0 auto; padding: 40px 20px;">
+@* ======================================================================================================================================================== *@
+<link rel="stylesheet" href="~/css/Admin/ManageUsers.css" />
+@* ======================================================================================================================================================== *@
 
-    <div style="margin-bottom: 30px;">
-        <h2 style="font-family: 'Playfair Display', serif; font-style: italic;">Quản lý phân quyền hệ thống</h2>
-        <a asp-action="Index" class="btn btn-link" style="color: #666; text-decoration: none; font-size: 14px;">&larr; Quay lại Bảng điều khiển</a>
+
+
+
+@* ======================================================================================================================================================== *@
+<div class="admin-container">
+
+    <div class="lang-title-section" style="margin-bottom: 40px; border-bottom: 1px solid var(--lang-border); padding-bottom: 20px;">
+        <h2>Quản lý phân quyền hệ thống</h2>
+        <a asp-action="Index" class="btn-back">
+            <span>&larr;</span> Quay lại Bảng điều khiển
+        </a>
     </div>
 
-    <table style="width: 100%; border-collapse: collapse; text-align: left;">
-        <thead>
-            <tr style="border-bottom: 2px solid #eee; color: #888; font-size: 12px; text-transform: uppercase;">
-                <th style="padding: 15px 10px;">Tài khoản</th>
-                <th style="padding: 15px 10px;">Email</th>
-                <th style="padding: 15px 10px;">Vai trò</th>
-                <th style="padding: 15px 10px; text-align: right;">Hành động</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in Model)
-            {
-                <tr style="border-bottom: 1px solid #f5f5f5;">
-                    <td style="padding: 15px 10px; font-weight: 500;">@user.UserName</td>
-                    <td style="padding: 15px 10px; color: #666;">@user.Email</td>
-                    <td style="padding: 15px 10px;">
-                        @if (user.IsAdmin)
-                        {
-                            <span style="background: #e8f5e9; color: #2e7d32; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">Admin</span>
-                        }
-                        else
-                        {
-                            <span style="background: #f5f5f5; color: #666; padding: 4px 12px; border-radius: 20px; font-size: 12px;">Độc giả</span>
-                        }
-                    </td>
-                    <td style="padding: 15px 10px; text-align: right;">
-                        <form asp-action="ToggleAdminRole" method="post" style="display: inline;">
-                            <input type="hidden" name="userId" value="@user.UserId" />
+    <div class="lang-table-wrapper">
+        <table class="lang-table">
+            <thead>
+                <tr>
+                    <th>Tài khoản</th>
+                    <th>Email</th>
+                    <th>Vai trò</th>
+                    <th style="text-align: right;">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td class="user-name-cell">@user.UserName</td>
+                        <td style="color: #555;">@user.Email</td>
+                        <td>
                             @if (user.IsAdmin)
                             {
-                                <button type="submit" style="background: white; color: #d32f2f; border: 1px solid #d32f2f; padding: 6px 15px; border-radius: 4px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='#ffebee'" onmouseout="this.style.background='white'">Gỡ quyền</button>
+                                <span class="badge-role badge-admin">
+                                    <i class="fa-solid fa-user-shield" style="margin-right: 4px; font-size: 11px;"></i> Admin
+                                </span>
                             }
                             else
                             {
-                                <button type="submit" style="background: #212121; color: white; border: 1px solid #212121; padding: 6px 15px; border-radius: 4px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='#424242'" onmouseout="this.style.background='#212121'">Cấp quyền Admin</button>
+                                <span class="badge-role badge-reader">Độc giả</span>
                             }
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                        </td>
+                        <td style="text-align: right;">
+                            <form asp-action="ToggleAdminRole" method="post" style="display: inline;" onsubmit="return confirm('Bạn có chắc chắn muốn thay đổi quyền của tài khoản này không?');">
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                @if (user.IsAdmin)
+                                {
+                                    <button type="submit" class="btn-action btn-revoke">
+                                        <i class="fa-solid fa-user-minus" style="font-size: 12px;"></i> Gỡ quyền
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="submit" class="btn-action btn-grant">
+                                        <i class="fa-solid fa-user-plus" style="font-size: 12px;"></i> Cấp quyền Admin
+                                    </button>
+                                }
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
+@* ======================================================================================================================================================== *@

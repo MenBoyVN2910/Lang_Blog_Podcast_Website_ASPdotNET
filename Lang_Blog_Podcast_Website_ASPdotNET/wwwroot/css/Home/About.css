@@ -1,0 +1,391 @@
+﻿/* ==========================================================================
+           CSS ĐỒNG BỘ CHUẨN CHO TRANG ABOUT (VỀ LẶNG)
+           ========================================================================== */
+
+.about-page-wrapper {
+    --about-bg-card: #FFFFFF;
+    --about-text-muted: #9A9187;
+    --about-border: #DCD7D2;
+    --about-accent-gold: #A38A75;
+    --color-dark: #2E2A27;
+    background-color: #F5F1EE;
+    width: 100%;
+    min-height: 100vh;
+    color: var(--color-dark);
+    overflow-x: hidden; /* Ngăn cuộn ngang khi có hiệu ứng trượt */
+}
+
+/* --- 1. Header Hero Section --- */
+.about-hero {
+    position: relative;
+    height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: #F5F1EE;
+}
+
+/* --- HIỆU ỨNG THỞ CHO ẢNH NỀN --- */
+@keyframes slowBreathe {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.about-hero-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.12;
+    filter: grayscale(100%);
+    animation: slowBreathe 20s ease-in-out infinite; /* Áp dụng thở chậm 20 giây */
+}
+
+.about-hero-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 0 24px;
+    max-width: 1100px;
+}
+
+/* --- HIỆU ỨNG CHỮ BAY LÊN TỪ TỪ --- */
+@keyframes gentleFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-text-up {
+    opacity: 0;
+    animation: gentleFadeUp 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.delay-1 {
+    animation-delay: 0.3s;
+}
+
+.delay-2 {
+    animation-delay: 0.6s;
+}
+
+.about-hero-subtitle {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6em;
+    color: var(--about-accent-gold);
+    display: block;
+    margin-bottom: 40px;
+}
+
+.about-hero-title {
+    font-family: "Playfair Display", serif;
+    font-size: clamp(3.5rem, 7vw, 7.5rem);
+    font-weight: 300;
+    color: var(--color-dark);
+    line-height: 1.1;
+    letter-spacing: -2px;
+}
+
+    .about-hero-title span.italic {
+        font-style: italic;
+    }
+
+/* --- 2. Story Section (Sự ra đời) --- */
+.about-story-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 100px 40px;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 80px;
+    align-items: center;
+}
+
+@media (max-width: 991px) {
+    .about-story-section {
+        grid-template-columns: 1fr;
+        gap: 50px;
+        padding: 60px 20px;
+    }
+}
+
+.about-section-tag {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4em;
+    color: var(--about-text-muted);
+    margin-bottom: 30px;
+    display: block;
+}
+
+.about-story-quote {
+    font-family: "Playfair Display", serif;
+    font-style: italic;
+    font-size: 32px;
+    line-height: 1.5;
+    color: var(--color-dark);
+    margin-bottom: 40px;
+}
+
+.about-story-desc {
+    font-size: 14px;
+    line-height: 1.8;
+    color: #55524E;
+    text-align: justify;
+}
+
+.about-story-img-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: #E6E1DC;
+    border: 1px solid var(--about-border);
+    overflow: hidden; /* Cần thiết để ảnh không tràn ra ngoài khi zoom */
+}
+
+.about-story-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%);
+    transition: filter 1s ease, transform 1.5s cubic-bezier(0.25, 1, 0.5, 1); /* Thêm hiệu ứng zoom */
+}
+
+.about-story-img-wrapper:hover .about-story-img {
+    filter: grayscale(0%);
+    transform: scale(1.08); /* Zoom nhẹ khi trỏ chuột */
+}
+
+/* --- 3. Core Values Section --- */
+.about-values-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 40px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 60px;
+    border-top: 1px solid var(--about-border);
+}
+
+@media (max-width: 768px) {
+    .about-values-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        padding: 60px 20px;
+    }
+}
+
+.about-value-item {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.4s ease;
+}
+
+    .about-value-item:hover {
+        transform: translateY(-8px); /* Trượt nhẹ lên trên khi trỏ chuột */
+    }
+
+.about-value-line {
+    width: 40px;
+    height: 1px;
+    background-color: var(--about-accent-gold);
+    margin-bottom: 25px;
+    transition: width 0.4s ease;
+}
+
+.about-value-item:hover .about-value-line {
+    width: 60px; /* Vạch kẻ dài ra khi trỏ chuột */
+}
+
+.about-value-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--about-accent-gold);
+    margin-bottom: 15px;
+}
+
+.about-value-text {
+    font-family: "Playfair Display", serif;
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #6E675F;
+}
+
+/* --- 4. Contact & Form Section --- */
+.about-contact-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 100px 40px 140px 40px;
+    border-top: 1px solid var(--about-border);
+}
+
+.about-contact-container {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 100px;
+    margin-top: 50px;
+}
+
+@media (max-width: 991px) {
+    .about-contact-container {
+        grid-template-columns: 1fr;
+        gap: 60px;
+    }
+}
+
+.about-contact-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.about-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.about-contact-icon {
+    width: 52px;
+    height: 52px;
+    background-color: #FFFFFF;
+    border: 1px solid var(--about-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-dark);
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    flex-shrink: 0;
+}
+
+.about-contact-item:hover .about-contact-icon {
+    background-color: var(--color-dark);
+    color: #FFFFFF;
+    transform: translateY(-5px); /* Khối vuông nảy nhẹ lên */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+}
+
+.about-contact-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--about-text-muted);
+    margin-bottom: 4px;
+}
+
+.about-contact-value {
+    font-family: "Playfair Display", serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--color-dark);
+}
+
+.about-form-card {
+    background-color: var(--about-bg-card);
+    border: 1px solid var(--about-border);
+    padding: 50px;
+    box-shadow: 0 30px 60px rgba(26, 24, 23, 0.03);
+    position: relative;
+    transition: box-shadow 0.4s ease, transform 0.4s ease;
+}
+
+    .about-form-card:hover {
+        box-shadow: 0 40px 80px rgba(26, 24, 23, 0.06);
+        transform: translateY(-3px);
+    }
+
+@media (max-width: 576px) {
+    .about-form-card {
+        padding: 30px 20px;
+    }
+}
+
+.about-form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 35px;
+}
+
+.about-form-label {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #B2A9A0;
+    margin-bottom: 8px;
+}
+
+.about-form-input,
+.about-form-textarea {
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid var(--about-border);
+    padding: 10px 0;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    color: var(--color-dark);
+    outline: none;
+    transition: border-color 0.4s ease, padding-left 0.4s ease;
+}
+
+    .about-form-input::placeholder,
+    .about-form-textarea::placeholder {
+        color: #D3C9C0;
+    }
+
+    .about-form-input:focus,
+    .about-form-textarea:focus {
+        border-bottom-color: var(--about-accent-gold);
+        padding-left: 10px; /* Chữ đẩy nhẹ sang phải khi đang gõ */
+    }
+
+.about-form-textarea {
+    resize: none;
+}
+
+.about-btn-submit {
+    width: 100%;
+    background-color: #2E2A27;
+    color: #FFFFFF;
+    border: none;
+    padding: 18px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    margin-top: 10px;
+}
+
+    .about-btn-submit:hover {
+        background-color: var(--about-accent-gold); /* Chuyển màu vàng nâu thay vì đen thui */
+        letter-spacing: 0.4em; /* Chữ giãn ra một chút */
+    }

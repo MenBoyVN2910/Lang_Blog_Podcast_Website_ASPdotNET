@@ -1,25 +1,3 @@
-html {
-    font-size: 14px;
-    position: relative;
-    min-height: 100%;
-}
-
-@media (min-width: 768px) {
-    html {
-        font-size: 16px;
-    }
-}
-
-@media (min-width: 768px) {
-    html {
-        font-size: 16px;
-    }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
 /* ==========================================================================
    1. CẤU HÌNH GỐC TOÀN TRANG (GLOBAL LAYOUT SETTINGS)
    ========================================================================== */
@@ -48,6 +26,11 @@ html {
         font-size: 16px;
     }
 }
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
 
 body {
     font-family: var(--font-sans);
@@ -376,3 +359,37 @@ button.btn-join {
     text-decoration: none;
 }
 
+
+
+/* Style cho nút "GỬI CÂU CHUYỆN CỦA BẠN" */
+.btn-gui-cau-chuyen {
+    display: inline-block;
+    background-color: #1e1e1e; /* Màu nền đen/charcoal sang trọng như thiết kế */
+    color: #ffffff !important; /* Màu chữ trắng tinh khôi */
+    font-family: 'Montserrat', sans-serif; /* Định dạng font chữ thanh lịch */
+    font-size: 0.75rem; /* Kích thước chữ nhỏ vừa vặn, tinh tế */
+    font-weight: 600; /* Độ đậm nét vừa phải */
+    letter-spacing: 3px; /* Giãn chữ - vũ khí bí mật của thiết kế tạp chí */
+    text-transform: uppercase; /* Buộc viết hoa toàn bộ */
+    padding: 16px 42px; /* Tạo độ dày và độ rộng chuẩn cho nút */
+    border: none;
+    border-radius: 0; /* Giữ góc vuông tuyệt đối, không bo tròn */
+    text-decoration: none !important; /* Xóa bỏ hoàn toàn cái gạch chân màu tím đáng ghét */
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Hiệu ứng chuyển động mượt mà */
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* Đổ bóng cực mờ tạo chiều sâu */
+}
+
+    /* Hiệu ứng nghệ thuật khi di chuột (Hover) */
+    .btn-gui-cau-chuyen:hover {
+        background-color: #333333; /* Nền sáng lên một chút khi chạm nhẹ */
+        color: #ffffff !important;
+        letter-spacing: 5px; /* Chữ tự động giãn rộng ra thêm một chút (rất nghệ) */
+        transform: translateY(-2px); /* Nút nhấc nhẹ lên khỏi mặt phẳng */
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Bóng đổ đậm hơn khi nhấc lên */
+    }
+
+    /* Hiệu ứng khi bấm vào (Active) */
+    .btn-gui-cau-chuyen:active {
+        transform: translateY(1px); /* Lún nhẹ xuống tạo cảm giác vật lý khi nhấn nút */
+    }
