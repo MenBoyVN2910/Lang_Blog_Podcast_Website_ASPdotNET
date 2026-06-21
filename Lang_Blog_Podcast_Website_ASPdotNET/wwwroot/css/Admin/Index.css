@@ -1,4 +1,4 @@
-﻿
+
 :root {
     --bg-body: #F7F5F0;
     --bg-surface: #FFFFFF;
@@ -25,7 +25,7 @@
 
 body {
     margin: 0;
-    padding: 40px 20px;
+    padding: 100px 0px 20px 0px;
     background-color: var(--bg-body);
     font-family: 'Plus Jakarta Sans', sans-serif;
     color: var(--text-main);
@@ -33,7 +33,7 @@ body {
 
 /* --- LAYOUT CHÍNH --- */
 .admin-container {
-    max-width: 1200px;
+    max-width: 1800px;
     margin: 0 auto;
     background-color: var(--bg-surface);
     border-radius: var(--radius-md);
@@ -41,13 +41,34 @@ body {
     overflow: hidden;
 }
 
+.admin-layout {
+    display: flex;
+    min-height: 80vh;
+}
+
+.admin-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border-light);
+    background-color: var(--bg-surface);
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-main {
+    
+    flex-grow: 1;
+    overflow-x: hidden;
+    background-color: #FCFAF8;
+}
+
 /* --- HEADER --- */
 .admin-header {
-    padding: 40px 50px;
+    padding: 30px 24px;
     border-bottom: 1px solid var(--border-light);
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     background-color: var(--bg-surface);
 }
 
@@ -62,7 +83,7 @@ body {
 
 .header-text h1 {
     font-family: 'Playfair Display', serif;
-    font-size: 2.8rem;
+    font-size: 2.2rem;
     font-weight: 500;
     margin: 0;
     color: var(--primary-deep);
@@ -147,16 +168,17 @@ body {
 /* --- TABS --- */
 .admin-tabs {
     display: flex;
-    padding: 0 30px;
+    flex-direction: column;
+    padding: 20px 0;
     background-color: var(--bg-surface);
-    border-bottom: 1px solid var(--border-light);
+    border-bottom: none;
 }
 
 .tab-btn {
     background: transparent;
     border: none;
-    padding: 20px 24px;
-    font-size: 13px;
+    padding: 16px 24px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--text-muted);
     cursor: pointer;
@@ -164,24 +186,46 @@ body {
     transition: var(--transition);
     font-family: inherit;
     text-decoration: none;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
+
+    .tab-btn i {
+        font-size: 16px;
+        width: 20px;
+        text-align: center;
+        opacity: 0.7;
+    }
 
     .tab-btn:hover {
         color: var(--primary-deep);
+        background-color: #F7F5F0;
+    }
+
+    .tab-btn:hover i {
+        opacity: 1;
     }
 
     .tab-btn.active {
         color: var(--primary-deep);
         font-weight: 700;
+        background-color: #F7F5F0;
+    }
+
+    .tab-btn.active i {
+        opacity: 1;
+        color: var(--accent-gold);
     }
 
         .tab-btn.active::after {
             content: '';
             position: absolute;
-            bottom: -1px;
+            top: 0;
             left: 0;
-            width: 100%;
-            height: 2px;
+            width: 4px;
+            height: 100%;
             background-color: var(--primary-deep);
         }
 
@@ -657,3 +701,190 @@ body {
         object-fit: cover; /* Giúp ảnh tự co giãn đầy khung mà không bị méo */
         display: block;
     }
+
+/* --- QUẢN LÝ NGƯỜI DÙNG TAB STYLES --- */
+.lang-table-wrapper {
+    overflow-x: auto;
+    margin-top: 20px;
+    padding: 0 40px 30px;
+}
+
+.lang-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    text-align: left;
+}
+
+.lang-table th {
+    padding: 16px 20px;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border-bottom: 2px solid var(--primary-deep);
+}
+
+.lang-table td {
+    padding: 18px 20px;
+    color: var(--text-main);
+    font-size: 14px;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: middle;
+    transition: background-color 0.25s ease;
+}
+
+.lang-table tbody tr {
+    transition: all 0.25s ease;
+}
+
+.lang-table tbody tr:hover td {
+    background-color: #fdfdfc;
+}
+
+.user-name-cell {
+    font-weight: 600;
+    color: var(--primary-deep);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.badge-role {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.badge-admin {
+    background-color: var(--accent-green-bg);
+    color: var(--accent-green);
+    border: 1px solid rgba(79, 121, 89, 0.15);
+}
+
+.badge-reader {
+    background-color: var(--bg-body);
+    color: var(--text-muted);
+    border: 1px solid var(--border-light);
+}
+
+.btn-grant {
+    background-color: var(--primary-deep);
+    color: #ffffff;
+}
+
+.btn-grant:hover {
+    background-color: #3f3c38;
+    box-shadow: 0 4px 12px rgba(42, 40, 37, 0.15);
+    transform: translateY(-2px);
+}
+
+.btn-grant:active {
+    transform: translateY(0);
+}
+
+.btn-revoke {
+    background-color: #ffffff;
+    color: var(--accent-red);
+    border-color: var(--accent-red);
+}
+
+.btn-revoke:hover {
+    background-color: var(--accent-red-bg);
+    box-shadow: 0 4px 12px rgba(166, 90, 90, 0.1);
+    transform: translateY(-2px);
+}
+
+.btn-revoke:active {
+    transform: translateY(0);
+}
+
+/* --- FORM THÊM NGƯỜI DÙNG --- */
+.add-user-container {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 24px 30px;
+    margin-bottom: 30px;
+}
+
+.subsection-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent-gold);
+    margin: 0 0 16px 0;
+}
+
+.add-user-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 180px 120px;
+    gap: 15px;
+    align-items: center;
+}
+
+.select-field {
+    width: 100%;
+    height: 48px;
+    padding: 0 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-light);
+    background-color: #FAFAFA;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--text-main);
+    font-size: 14px;
+    outline: none;
+    transition: var(--transition);
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238C8275' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
+}
+
+.select-field:focus {
+    border-color: var(--accent-gold);
+    background-color: #FFF;
+}
+
+.btn-add-user {
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 0 !important;
+}
+
+.btn-delete-user {
+    background-color: #ffffff;
+    color: var(--accent-red);
+    border: 1px solid var(--accent-red);
+}
+
+.btn-delete-user:hover {
+    background-color: var(--accent-red-bg);
+    box-shadow: 0 4px 12px rgba(166, 90, 90, 0.1);
+    transform: translateY(-2px);
+}
+
+.btn-delete-user:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 1200px) {
+    .add-user-form .form-row {
+        grid-template-columns: 1fr 1fr;
+    }
+    .form-col.action-col {
+        grid-column: span 2;
+    }
+}

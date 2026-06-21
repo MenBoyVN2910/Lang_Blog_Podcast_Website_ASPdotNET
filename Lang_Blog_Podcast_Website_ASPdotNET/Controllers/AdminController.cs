@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,10 +9,13 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
-using System.Collections.Generic;
 
 namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
 {
+    /// <summary>
+    /// Controller xử lý các hoạt động quản trị hệ thống như duyệt câu chuyện, quản lý danh mục và người dùng.
+    /// Yêu cầu vai trò Admin để truy cập toàn bộ các Action.
+    /// </summary>
     [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
@@ -30,28 +33,42 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
-        // ------------------------------------------------------------------
-        // SECTION 1: QUẢN LÝ USER & PHÂN QUYỀN (TỐI ƯU HIỆU NĂNG)
-        // ------------------------------------------------------------------
-
+        /// <summary>
+        /// GET: /Admin/
+        /// Trang Dashboard chính của Admin: Hiển thị danh sách câu chuyện chờ duyệt, đã duyệt và quản lý danh mục.
+        /// </summary>
         public async Task<IActionResult> Index()
         {
-            // Lấy câu chuyện chờ duyệt
+            // Tải danh sách bài viết chờ duyệt
             var pendingStories = await _db.Stories
                 .Include(s => s.Category)
+                .Include(s => s.User)
                 .Where(s => s.Status == StoryStatus.Pending)
                 .OrderByDescending(s => s.CreatedAt)
                 .ToListAsync();
 
-            // Lấy câu chuyện đã duyệt
+            // Tải danh sách bài viết đã duyệt
             var approvedStories = await _db.Stories
                 .Include(s => s.Category)
+                .Include(s => s.User)
                 .Where(s => s.Status == StoryStatus.Approved)
                 .OrderByDescending(s => s.PublishDate)
                 .ToListAsync();
 
-            // Lấy danh sách danh mục
+            // Tải danh sách toàn bộ danh mục bài viết
             var categories = await _db.Categories.ToListAsync();
+
+            // Tải danh sách người dùng để phân quyền
+            var adminUsers = await _userManager.GetUsersInRoleAsync("Admin");
+            var adminIds = adminUsers.Select(u => u.Id).ToHashSet();
+            var users = await _userManager.Users.ToListAsync();
+            var userRolesViewModel = users.Select(user => new UserRoleViewModel
+            {
+                UserId = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                IsAdmin = adminIds.Contains(user.Id)
+            }).ToList();
 
             var viewModel = new AdminDashboardViewModel
             {
@@ -60,23 +77,29 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 Categories = categories,
                 PendingCount = pendingStories.Count,
                 ApprovedCount = approvedStories.Count,
-                TotalCategoriesCount = categories.Count
+                TotalCategoriesCount = categories.Count,
+                Users = userRolesViewModel
             };
 
             return View(viewModel);
         }
 
-        // Hàm Thêm Danh Mục Mới (Sẽ được gọi từ Form)
+        /// <summary>
+        /// POST: /Admin/CreateCategory
+        /// Thêm danh mục mới vào hệ thống (không cho phép trùng lặp tên).
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateCategory(string CategoryName)
+        public async Task<IActionResult> CreateCategory(string categoryName)
         {
-            if (!string.IsNullOrWhiteSpace(CategoryName))
+            if (!string.IsNullOrWhiteSpace(categoryName))
             {
-                var exists = await _db.Categories.AnyAsync(c => c.Name.ToLower() == CategoryName.Trim().ToLower());
+                string cleanedName = categoryName.Trim();
+                bool exists = await _db.Categories.AnyAsync(c => c.Name.ToLower() == cleanedName.ToLower());
+                
                 if (!exists)
                 {
-                    _db.Categories.Add(new Category { Name = CategoryName.Trim() });
+                    _db.Categories.Add(new Category { Name = cleanedName });
                     await _db.SaveChangesAsync();
                     TempData["AdminMessage"] = "Đã thêm danh mục mới thành công!";
                 }
@@ -85,28 +108,33 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                     TempData["AdminError"] = "Tên danh mục này đã tồn tại!";
                 }
             }
-            return RedirectToAction(nameof(Index)); // Xong thì quay lại trang Index
+            return RedirectToAction(nameof(Index));
         }
 
-        // 3. Hàm Xóa Danh Mục
+        /// <summary>
+        /// POST: /Admin/DeleteCategory/5
+        /// Xóa danh mục bài viết.
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteCategory(int id)
         {
-            var cat = await _db.Categories.FindAsync(id);
-            if (cat != null)
+            if (await _db.Categories.FindAsync(id) is { } category)
             {
-                _db.Categories.Remove(cat);
+                _db.Categories.Remove(category);
                 await _db.SaveChangesAsync();
-                TempData["AdminMessage"] = "Đã xóa danh mục!";
+                TempData["AdminMessage"] = "Đã xóa danh mục thành công!";
             }
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Admin/ManageUsers
+        /// <summary>
+        /// GET: /Admin/ManageUsers
+        /// Quản lý danh sách thành viên và phân quyền trong hệ thống.
+        /// </summary>
         public async Task<IActionResult> ManageUsers()
         {
-            // 💡 TỐI ƯU: Lấy trước danh sách Admin để tránh lỗi N+1 Queries (gọi DB liên tục trong vòng lặp foreach)
+            // TỐI ƯU: Tải danh sách Admin trước đưa vào HashSet trong bộ nhớ để tránh lỗi truy vấn N+1
             var adminUsers = await _userManager.GetUsersInRoleAsync("Admin");
             var adminIds = adminUsers.Select(u => u.Id).ToHashSet();
 
@@ -117,13 +145,16 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 UserId = user.Id,
                 UserName = user.UserName,
                 Email = user.Email,
-                IsAdmin = adminIds.Contains(user.Id) // Kiểm tra cực nhanh trên HashSet bộ nhớ
+                IsAdmin = adminIds.Contains(user.Id) // Kiểm tra tốc độ O(1)
             }).ToList();
 
             return View(userRolesViewModel);
         }
 
-        // POST: Admin/ToggleAdminRole
+        /// <summary>
+        /// POST: /Admin/ToggleAdminRole
+        /// Bật/Tắt quyền quản trị (Admin) của một thành viên. Ngăn ngừa tự hạ quyền của chính mình.
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleAdminRole(string userId)
@@ -134,12 +165,12 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 return NotFound();
             }
 
-            // 🛡️ BẢO MẬT: Ngăn chặn Admin tự hạ quyền của chính mình gây khóa tài khoản
-            var currentUserId = _userManager.GetUserId(User);
+            // BẢO MẬT: Không cho phép Admin tự hạ quyền của bản thân tránh khóa tài khoản Admin cuối cùng
+            string currentUserId = _userManager.GetUserId(User);
             if (userId == currentUserId)
             {
                 TempData["AdminError"] = "Bạn không thể tự gỡ quyền Admin của chính mình!";
-                return RedirectToAction(nameof(ManageUsers));
+                return Redirect("/Admin#manageusers");
             }
 
             if (await _userManager.IsInRoleAsync(user, "Admin"))
@@ -153,38 +184,120 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 TempData["AdminMessage"] = $"Đã cấp quyền Admin cho tài khoản {user.UserName} thành công.";
             }
 
-            return RedirectToAction(nameof(ManageUsers));
+            return Redirect("/Admin#manageusers");
         }
 
-        // ------------------------------------------------------------------
-        // SECTION 2: CHỨC NĂNG DUYỆT CÂU CHUYỆN
-        // ------------------------------------------------------------------
-
-        // (Đã xóa bỏ hoàn toàn hàm ReviewStories theo yêu cầu)
-
-        // GET: Admin/StoryDetails/5
-        public async Task<IActionResult> StoryDetails(int id)
+        /// <summary>
+        /// POST: /Admin/CreateUser
+        /// Thêm người dùng mới vào hệ thống
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateUser(string fullName, string email, string password, string role)
         {
-            // 💡 CẬP NHẬT: Thêm .Include(s => s.Category) để xem chi tiết thông tin danh mục của bài viết
-            var story = await _db.Stories
-                .Include(s => s.Category)
-                .FirstOrDefaultAsync(s => s.Id == id);
+            if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            {
+                TempData["AdminError"] = "Vui lòng nhập đầy đủ thông tin!";
+                return Redirect("/Admin#manageusers");
+            }
 
-            if (story == null)
+            // Kiểm tra định dạng email đuôi gmail/outlook/yahoo
+            string cleanedEmail = email.Trim();
+            if (!System.Text.RegularExpressions.Regex.IsMatch(cleanedEmail, @"^[a-zA-Z0-9._%+-]+@(gmail\.com|outlook\.com|yahoo\.com)$"))
+            {
+                TempData["AdminError"] = "Chỉ chấp nhận email đuôi @gmail.com, @outlook.com hoặc @yahoo.com!";
+                return Redirect("/Admin#manageusers");
+            }
+
+            // Kiểm tra trùng email
+            var existingUser = await _userManager.FindByEmailAsync(cleanedEmail);
+            if (existingUser != null)
+            {
+                TempData["AdminError"] = "Email này đã được sử dụng!";
+                return Redirect("/Admin#manageusers");
+            }
+
+            var newUser = new ApplicationUser
+            {
+                FullName = fullName.Trim(),
+                UserName = cleanedEmail,
+                Email = cleanedEmail,
+                EmailConfirmed = true // Tự động xác thực email khi admin tạo
+            };
+
+            var result = await _userManager.CreateAsync(newUser, password);
+            if (result.Succeeded)
+            {
+                // Nếu chọn quyền Admin, thêm vào Role Admin
+                if (role == "Admin")
+                {
+                    await _userManager.AddToRoleAsync(newUser, "Admin");
+                }
+                TempData["AdminMessage"] = $"Đã tạo tài khoản {newUser.UserName} thành công!";
+            }
+            else
+            {
+                TempData["AdminError"] = $"Lỗi tạo tài khoản: {string.Join(", ", result.Errors.Select(e => e.Description))}";
+            }
+
+            return Redirect("/Admin#manageusers");
+        }
+
+        /// <summary>
+        /// POST: /Admin/DeleteUser
+        /// Xóa người dùng khỏi hệ thống
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteUser(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
             {
                 return NotFound();
             }
-            return View(story);
+
+            // Không cho phép tự xóa tài khoản của chính mình
+            string currentUserId = _userManager.GetUserId(User);
+            if (userId == currentUserId)
+            {
+                TempData["AdminError"] = "Bạn không thể tự xóa tài khoản của chính mình!";
+                return Redirect("/Admin#manageusers");
+            }
+
+            // Gỡ bỏ liên kết UserId của người dùng này khỏi tất cả các bài viết (chuyển thành vô danh)
+            var userStories = await _db.Stories.Where(s => s.UserId == userId).ToListAsync();
+            foreach (var story in userStories)
+            {
+                story.UserId = null;
+            }
+            await _db.SaveChangesAsync();
+
+            // Xóa người dùng
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                TempData["AdminMessage"] = $"Đã xóa tài khoản {user.UserName} thành công!";
+            }
+            else
+            {
+                TempData["AdminError"] = $"Không thể xóa tài khoản: {string.Join(", ", result.Errors.Select(e => e.Description))}";
+            }
+
+            return Redirect("/Admin#manageusers");
         }
 
-        // POST: Admin/Approve
+
+
+        /// <summary>
+        /// POST: /Admin/Approve
+        /// Phê duyệt một câu chuyện để xuất bản công khai lên tập san.
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Approve(int id, string finalIssueNumber)
         {
-            // 💡 TỐI ƯU: Sử dụng FindAsync thay cho FirstOrDefaultAsync để tìm kiếm theo Primary Key nhanh hơn
-            var story = await _db.Stories.FindAsync(id);
-            if (story == null)
+            if (await _db.Stories.FindAsync(id) is not { } story)
             {
                 return NotFound();
             }
@@ -192,60 +305,53 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             story.Status = StoryStatus.Approved;
             story.PublishDate = DateTime.Now;
 
-            if (!string.IsNullOrEmpty(finalIssueNumber))
+            if (!string.IsNullOrWhiteSpace(finalIssueNumber))
             {
-                story.IssueNumber = finalIssueNumber;
+                story.IssueNumber = finalIssueNumber.Trim();
             }
 
             await _db.SaveChangesAsync();
             TempData["AdminMessage"] = $"Đã duyệt và xuất bản bài viết '{story.Title}' thành công!";
 
-            // 💡 Đã đổi hướng trang về Index thay vì ReviewStories
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: Admin/Reject
+        /// <summary>
+        /// POST: /Admin/Reject
+        /// Từ chối câu chuyện: Xóa bài khỏi cơ sở dữ liệu và dọn dẹp tệp tin ảnh bìa vật lý trên Server.
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reject(int id)
         {
-            var story = await _db.Stories.FindAsync(id);
-            if (story == null)
+            if (await _db.Stories.FindAsync(id) is not { } story)
             {
                 return NotFound();
             }
 
-            // Capture file paths before deleting the DB record
-            var imagePath = story.ImagePath;
-            // If you have other file properties (e.g. AudioPath), capture them here as well
+            string imagePath = story.ImagePath;
 
-            // Remove the story entity from the database
             _db.Stories.Remove(story);
             await _db.SaveChangesAsync();
 
-            // Delete physical files after DB change (so we don't lose files if DB update fails)
+            // Xóa tệp vật lý sau khi DB cập nhật thành công
             DeletePhysicalFile(imagePath);
 
-            TempData["AdminMessage"] = $"Đã xóa bài viết '{story.Title}' và dọn dẹp file liên quan.";
+            TempData["AdminMessage"] = $"Đã xóa bài viết '{story.Title}' và dọn dẹp các tệp liên quan.";
 
-            // 💡 Đã đổi hướng trang về Index thay vì ReviewStories
             return RedirectToAction(nameof(Index));
         }
 
-        // ------------------------------------------------------------------
-        // SECTION 3: CÁC HÀM TRỢ GIÚP (HELPER METHODS)
-        // ------------------------------------------------------------------
-
-        // Hàm hỗ trợ xóa file vật lý trong thư mục wwwroot một cách an toàn
+        /// <summary>
+        /// Hàm hỗ trợ xóa các tệp tin vật lý trong thư mục wwwroot để tránh rác server.
+        /// </summary>
         private void DeletePhysicalFile(string relativePath)
         {
             if (string.IsNullOrEmpty(relativePath)) return;
 
             try
             {
-                // Tìm đường dẫn tuyệt đối trên ổ cứng của server
-                var absolutePath = Path.Combine(_webHostEnvironment.WebRootPath, relativePath.TrimStart('/'));
-
+                string absolutePath = Path.Combine(_webHostEnvironment.WebRootPath, relativePath.TrimStart('/'));
                 if (System.IO.File.Exists(absolutePath))
                 {
                     System.IO.File.Delete(absolutePath);
@@ -253,7 +359,7 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             }
             catch (Exception)
             {
-                // Ghi log lỗi nếu cần, tạm thời bỏ qua để không làm gián đoạn luồng xử lý chính
+                // Ghi log lỗi nếu cần thiết
             }
         }
     }

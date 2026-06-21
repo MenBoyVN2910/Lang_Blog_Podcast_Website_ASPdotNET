@@ -28,8 +28,14 @@
 
                 <div class="meta-group">
                     <span class="meta-label">TÁC GIẢ</span>
-                    <span class="meta-value font-italic">@(string.IsNullOrEmpty(Model.Author) ? "Ẩn danh" : Model.Author)</span>
+                    <span class="meta-value font-italic">@(string.IsNullOrEmpty(Model.User?.FullName) ? (string.IsNullOrEmpty(Model.Author) ? "Ẩn danh" : Model.Author) : Model.User.FullName)</span>
                 </div>
+
+                <div class="meta-group">
+                    <span class="meta-label">SỐ PHÁT HÀNH</span>
+                    <span class="meta-value font-italic">@(string.IsNullOrEmpty(Model.IssueNumber) ? "None" : Model.IssueNumber)</span>
+                </div>
+
 
                 <!-- 💡 ĐÃ XÓA KHỐI ARTICLE-ACTIONS (LƯU TRANG & CHIA SẺ) TẠI ĐÂY -->
             </div>

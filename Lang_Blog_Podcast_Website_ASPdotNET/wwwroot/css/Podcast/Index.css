@@ -1,4 +1,4 @@
-﻿/* Khởi tạo biến màu sắc đồng bộ hệ sinh thái Lặng. */
+/* Khởi tạo biến màu sắc đồng bộ hệ sinh thái Lặng. */
 :root {
     --bg-cream: #F4F1EA; /* Màu nền kem đặc trưng */
     --bg-white: #FFFFFF;
@@ -290,4 +290,33 @@
 
 .podcast-card:hover .podcast-line {
     width: 50px; /* Kéo dài thanh ngang mượt mà */
+}
+
+/* --- NÚT GỬI CÂU CHUYỆN (PHÙ HỢP GIAO DIỆN TỐI) --- */
+.btn-gui-podcast {
+    display: inline-block;
+    background-color: transparent;
+    color: var(--bg-cream) !important;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 14px 36px;
+    border: 1px solid var(--bg-cream);
+    text-decoration: none !important;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+}
+
+.btn-gui-podcast:hover {
+    background-color: var(--bg-cream);
+    color: var(--primary-deep) !important;
+    letter-spacing: 3px;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.btn-gui-podcast:active {
+    transform: translateY(1px);
 }

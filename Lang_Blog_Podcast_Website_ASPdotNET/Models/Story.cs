@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
+using Lang_Blog_Podcast_Website_ASPdotNET.Data;
 
 namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
 {
@@ -18,6 +19,10 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
 
         [Display(Name = "Tác giả")]
         public string Author { get; set; } // Có thể để ẩn danh hoặc tên tự điền
+
+        // Liên kết với ApplicationUser (Người gửi bài)
+        public string? UserId { get; set; }
+        public ApplicationUser? User { get; set; }
 
         [Display(Name = "Số phát hành")]
         public string? IssueNumber { get; set; } // Ví dụ: Autumn Editorial Series

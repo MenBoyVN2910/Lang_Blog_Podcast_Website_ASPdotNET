@@ -1,6 +1,7 @@
-﻿@model Lang_Blog_Podcast_Website_ASPdotNET.Models.AdminDashboardViewModel
+@model Lang_Blog_Podcast_Website_ASPdotNET.Models.AdminDashboardViewModel
 @using System.Text.Encodings.Web
 @using System.Text.RegularExpressions
+@inject Lang_Blog_Podcast_Website_ASPdotNET.Data.ApplicationDbContext DbContext
 
 @{
     ViewData["Title"] = "Ban Biên Tập - Hệ thống quản trị";
@@ -20,50 +21,56 @@
 
 
 @* ======================================================================================================================================================== *@
-<div class="admin-container">
-    <header class="admin-header">
-        <div class="header-text">
-            <p>Hệ thống tòa soạn</p>
-            <h1>Ban Biên Tập.</h1>
-        </div>
-        @* <a href="/" target="_blank" class="btn outline">Xem Website</a> *@
-    </header>
-
-    @if (TempData["AdminMessage"] != null)
-    {
-        <div class="alert-box">@TempData["AdminMessage"]</div>
-    }
-
-    <section class="stats-wrapper">
-        <div class="stat-card">
-            <span class="stat-title">Câu chuyện chờ duyệt</span>
-            <div class="stat-number">
-                @Model.PendingCount.ToString("D2")
-                <span class="stat-unit">bài mới</span>
+<div class="admin-container admin-layout">
+    <aside class="admin-sidebar">
+        <header class="admin-header">
+            <div class="header-text">
+                <p>Hệ thống tòa soạn</p>
+                <h1>Ban Biên Tập.</h1>
             </div>
-        </div>
-        <div class="stat-card">
-            <span class="stat-title">Ấn phẩm tạp chí</span>
-            <div class="stat-number">
-                @Model.ApprovedCount.ToString("D2")
-                <span class="stat-unit">bài viết</span>
-            </div>
-        </div>
-        <div class="stat-card">
-            <span class="stat-title">Tổng số danh mục</span>
-            <div class="stat-number">
-                @Model.TotalCategoriesCount.ToString("D2")
-                <span class="stat-unit">chủ đề</span>
-            </div>
-        </div>
-    </section>
+        </header>
 
-    <nav class="admin-tabs">
-        <button class="tab-btn active" onclick="openTab(event, 'stories')">Mảnh ghép ký ức</button>
-        <button class="tab-btn" onclick="openTab(event, 'posts')">Bài viết tạp chí</button>
-        <button class="tab-btn" onclick="openTab(event, 'categories')">Quản lý danh mục</button>
-        <a asp-controller="Admin" asp-action="ManageUsers" class="tab-btn">Quản lý người dùng</a>
-    </nav>
+        @* =====================Navigation Menu========================================== *@
+        <nav class="admin-tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'stories')"><i class="fa-solid fa-book-open"></i> Mảnh ghép ký ức</button>
+            <button class="tab-btn" onclick="openTab(event, 'posts')"><i class="fa-regular fa-newspaper"></i> Bài viết tạp chí</button>
+            <button class="tab-btn" onclick="openTab(event, 'podcast')"><i class="fa-solid fa-headphones"></i> PodCast Series</button>
+            <button class="tab-btn" onclick="openTab(event, 'categories')"><i class="fa-solid fa-list"></i> Quản lý danh mục</button>
+            <button class="tab-btn" onclick="openTab(event, 'manageusers')"><i class="fa-solid fa-list"></i> Quản lý người dùng</button>
+        </nav>
+    </aside>
+
+
+    @* =====================Menu admin========================================== *@
+    <main class="admin-main">
+        @if (TempData["AdminMessage"] != null)
+        {
+            <div class="alert-box">@TempData["AdminMessage"]</div>
+        }
+
+        <section class="stats-wrapper">
+            <div class="stat-card">
+                <span class="stat-title">Câu chuyện chờ duyệt</span>
+                <div class="stat-number">
+                    @Model.PendingCount.ToString("D2")
+                    <span class="stat-unit">bài mới</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-title">Ấn phẩm tạp chí</span>
+                <div class="stat-number">
+                    @Model.ApprovedCount.ToString("D2")
+                    <span class="stat-unit">bài viết</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-title">Tổng số danh mục</span>
+                <div class="stat-number">
+                    @Model.TotalCategoriesCount.ToString("D2")
+                    <span class="stat-unit">chủ đề</span>
+                </div>
+            </div>
+        </section>
 
 
     @* =====================Blog========================================== *@
@@ -95,16 +102,24 @@
                         // 1. Chuyển đổi nội dung HTML thành Text thuần
                         string plainText = string.IsNullOrEmpty(story.Content) ? "" : Regex.Replace(story.Content, "<.*?>", string.Empty);
 
-                        // 2. Tách thành mảng các từ và giới hạn 50 từ
+                        // 2. Tách thành mảng các từ và giới hạn 25 từ
                         string[] words = plainText.Split(new[] { ' ', '\n', '\r', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                        string excerpt = words.Length > 20 ? string.Join(" ", words.Take(20)) + "..." : plainText;
+                        string excerpt = words.Length > 25 ? string.Join(" ", words.Take(25)) + "..." : plainText;
+                        if (excerpt.Length > 150) excerpt = excerpt.Substring(0, 150) + "...";
 
                         <tr>
                             <td>
                                 <div class="user-info">
-                                    <div class="avatar">@(string.IsNullOrEmpty(story.Author) ? "?" : story.Author.Substring(0, 1).ToUpper())</div>
+                                    @if (story.User?.ProfilePicture != null)
+                                    {
+                                        <img src="data:image/*;base64,@(Convert.ToBase64String(story.User.ProfilePicture))" alt="Avatar" class="avatar" style="object-fit: cover;" />
+                                    }
+                                    else
+                                    {
+                                        <div class="avatar">@(string.IsNullOrEmpty(story.User?.FullName ?? story.Author) ? "?" : (story.User?.FullName ?? story.Author).Substring(0, 1).ToUpper())</div>
+                                    }
                                     <div class="user-details">
-                                        <strong>@(string.IsNullOrEmpty(story.Author) ? "Ẩn danh" : story.Author)</strong>
+                                        <strong>@(string.IsNullOrEmpty(story.User?.FullName) ? (string.IsNullOrEmpty(story.Author) ? "Ẩn danh" : story.Author) : story.User.FullName)</strong>
                                         <span>@story.CreatedAt.ToString("dd.MM.yyyy")</span>
                                     </div>
                                 </div>
@@ -112,16 +127,17 @@
                             <td><span class="badge">@(story.Category?.Name ?? "Chưa rõ")</span></td>
                             <td>
                                 <div class="post-content">
-                                    <h4>@story.Title</h4>
+                                    <h4>@(story.Title?.Length > 20 ? story.Title.Substring(0, 20) + "..." : story.Title)</h4>
 
-                                    <!-- Hiển thị bản trích dẫn 50 từ -->
-                                    <div class="post-summary-box" id="summary-@index">
+                                    <!-- Hiển thị bản trích dẫn 25 từ -->
+                                    <div class="post-summary-box" id="summary-@index" style="word-break: break-word;">
                                         @Html.Raw(excerpt)
                                     </div>
 
                                     <button class="btn-view-more btn-open-modal"
                                             data-title="@story.Title"
-                                            data-author="@(story.Author ?? "Ẩn danh")"
+                                            data-author="@(string.IsNullOrEmpty(story.User?.FullName) ? (story.Author ?? "Ẩn danh") : story.User.FullName)"
+                                            data-issuenumber="@(story.IssueNumber ?? "None")"
                                             data-time="@story.CreatedAt.ToString("dd/MM/yyyy HH:mm")"
                                             data-image="@(string.IsNullOrEmpty(story.ImagePath) ? "/images/Default_Images/Blog.png" : story.ImagePath)"
                                             data-target="content-data-@index">
@@ -180,6 +196,28 @@
     </div>
 
 
+    @* =====================PodCast========================================== *@
+    <div id="podcast" class="tab-content">
+        <h2 class="section-title">Những Thanh Âm Chạm Đến Trái Tim</h2>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">Hình ảnh</th>
+                    <th style="width: 40%;">Tiêu đề</th>
+                    <th style="width: 15%;">Danh mục</th>
+                    <th style="width: 15%;">Ngày đăng</th>
+                    <th style="width: 15%; text-align: right;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="5" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 30px;">
+                        Chưa có bài viết nào được xuất bản trên tạp chí. Phần này sẽ code chức năng sau.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     @* =====================Danh Mục========================================== *@
     <div id="categories" class="tab-content">
@@ -217,26 +255,121 @@
                 </tbody>
             </table>
         </div>
-    </div>
+        </div>
+
+        @* =====================ManageUsers========================================== *@
+        <div id="manageusers" class="tab-content">
+            <h2 class="section-title">Quản lý phân quyền hệ thống</h2>
+
+            <!-- Form thêm người dùng mới -->
+            <div class="add-user-container">
+                <h3 class="subsection-title">Thêm người dùng mới</h3>
+                <form asp-controller="Admin" asp-action="CreateUser" method="post" class="add-user-form">
+                    @Html.AntiForgeryToken()
+                    <div class="form-row">
+                        <div class="form-col">
+                            <input type="text" name="fullName" class="input-field" placeholder="Họ và tên..." required style="width: 100%; height: 48px;" />
+                        </div>
+                        <div class="form-col">
+                            <input type="email" name="email" class="input-field" placeholder="Địa chỉ email..." required style="width: 100%; height: 48px;" />
+                        </div>
+                        <div class="form-col">
+                            <input type="password" name="password" class="input-field" placeholder="Mật khẩu..." required style="width: 100%; height: 48px;" />
+                        </div>
+                        <div class="form-col select-col">
+                            <select name="role" class="select-field">
+                                <option value="Reader">Độc giả</option>
+                                <option value="Admin">Quản trị viên (Admin)</option>
+                            </select>
+                        </div>
+                        <div class="form-col action-col">
+                            <button type="submit" class="btn primary btn-add-user"><i class="fa-solid fa-user-plus"></i> Thêm</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="lang-table-wrapper">
+                <table class="lang-table">
+                    <thead>
+                        <tr>
+                            <th>Tài khoản</th>
+                            <th>Email</th>
+                            <th>Vai trò</th>
+                            <th style="text-align: right;">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model.Users)
+                        {
+                            <tr>
+                                <td class="user-name-cell">@user.UserName</td>
+                                <td style="color: #555;">@user.Email</td>
+                                <td>
+                                    @if (user.IsAdmin)
+                                    {
+                                        <span class="badge-role badge-admin">
+                                            <i class="fa-solid fa-user-shield" style="margin-right: 4px; font-size: 11px;"></i> Admin
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-role badge-reader">Độc giả</span>
+                                    }
+                                </td>
+                                <td style="text-align: right;">
+                                    <form asp-action="ToggleAdminRole" method="post" style="display: inline;" onsubmit="return confirm('Bạn có chắc chắn muốn thay đổi quyền của tài khoản này không?');">
+                                        <input type="hidden" name="userId" value="@user.UserId" />
+                                        @if (user.IsAdmin)
+                                        {
+                                            <button type="submit" class="btn-action btn-revoke">
+                                                <i class="fa-solid fa-user-minus" style="font-size: 12px;"></i> Gỡ quyền
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn-action btn-grant">
+                                                <i class="fa-solid fa-user-plus" style="font-size: 12px;"></i> Cấp quyền Admin
+                                            </button>
+                                        }
+                                    </form>
+
+                                    <form asp-action="DeleteUser" method="post" style="display: inline; margin-left: 8px;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa vĩnh viễn tài khoản này không?');">
+                                        <input type="hidden" name="userId" value="@user.UserId" />
+                                        <button type="submit" class="btn-action btn-delete-user">
+                                            <i class="fa-solid fa-trash-can" style="font-size: 12px;"></i> Xóa
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
 </div>
-
-
-@* =====================...========================================== *@
+@* =====================Blog Details========================================== *@
 <div id="storyModal" class="story-modal" style="display: none;" onclick="closeStoryModal(event)">
     <div class="story-modal-content">
         <div class="story-modal-header">
             <div>
                 <h3 id="modalTitle">Tiêu đề bài viết</h3>
-                <div class="story-modal-meta">
-                    <span><i class="fa-regular fa-user"></i> Tác giả: <strong id="modalAuthor" style="color:var(--primary-deep)"></strong></span>
-                    <span style="margin-left: 15px;"><i class="fa-regular fa-clock"></i> Thời gian: <span id="modalTime"></span></span>
+                <div class="story-modal-meta" style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
+                    <div>
+                        <span><i class="fa-regular fa-user"></i> Tác giả: <strong id="modalAuthor" style="color:var(--primary-deep)"></strong></span>
+                        <span style="margin-left: 15px;"><i class="fa-regular fa-clock"></i> Thời gian: <span id="modalTime"></span></span>
 
-                    <!-- 💡 NÚT XEM ẢNH BÌA THÊM VÀO ĐÂY (KẾ BÊN THỜI GIAN) -->
-                    <span id="modalImageWrapper" style="margin-left: 15px;">
-                        <a id="modalImageLink" href="#" target="_blank" style="color: #B29B84; text-decoration: none; font-weight: 600; transition: color 0.2s;">
-                            <i class="fa-regular fa-image"></i> Xem ảnh bìa
-                        </a>
-                    </span>
+                        <!-- 💡 NÚT XEM ẢNH BÌA THÊM VÀO ĐÂY (KẾ BÊN THỜI GIAN) -->
+                        <span id="modalImageWrapper" style="margin-left: 15px;">
+                            <a id="modalImageLink" href="#" target="_blank" style="color: #B29B84; text-decoration: none; font-weight: 600; transition: color 0.2s;">
+                                <i class="fa-regular fa-image"></i> Xem ảnh bìa
+                            </a>
+                        </span>
+                    </div>
+                    <div style="margin-top: 2px;">
+                        <span><i class="fa-solid fa-hashtag"></i> Số phát hành: <strong id="modalIssueNumber" style="color:var(--primary-deep)"></strong></span>
+                    </div>
                 </div>
             </div>
             <button class="close-modal-btn" onclick="document.getElementById('storyModal').style.display = 'none'">&times;</button>
@@ -266,7 +399,22 @@
             buttons.forEach(btn => btn.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             evt.currentTarget.classList.add('active');
+            
+            // Cập nhật URL hash bằng history.replaceState để tránh trình duyệt tự động cuộn màn hình
+            history.replaceState(null, null, '#' + tabId);
         }
+
+        // Tự động khôi phục tab đang chọn từ URL hash khi tải trang
+        window.addEventListener("DOMContentLoaded", function () {
+            const hash = window.location.hash;
+            if (hash) {
+                const tabId = hash.substring(1); // Bỏ dấu '#'
+                const targetBtn = document.querySelector(`.tab-btn[onclick*="'${tabId}'"]`);
+                if (targetBtn) {
+                    openTab({ currentTarget: targetBtn }, tabId);
+                }
+            }
+        });
 
         // Tự động bắt sự kiện khi click vào nút "Đọc toàn bộ nội dung"
         document.addEventListener("DOMContentLoaded", function () {
@@ -277,12 +425,14 @@
                     // Đọc dữ liệu an toàn từ các thuộc tính data-*
                     const title = this.getAttribute("data-title");
                     const author = this.getAttribute("data-author");
+                    const issueNumber = this.getAttribute("data-issuenumber");
                     const time = this.getAttribute("data-time");
                     const imageSrc = this.getAttribute("data-image"); // Lấy link ảnh bìa từ data-image
                     const targetId = this.getAttribute("data-target");
 
                     document.getElementById('modalTitle').innerText = title;
                     document.getElementById('modalAuthor').innerText = author;
+                    document.getElementById('modalIssueNumber').innerText = issueNumber;
                     document.getElementById('modalTime').innerText = time;
 
                     // 💡 XỬ LÝ NÚT XEM ẢNH BÌA KẾ BÊN THỜI GIAN

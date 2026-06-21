@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore; // SỬA LỖI: Thiếu thư viện này sẽ không gọi được ToListAsync()
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.IO;
 using System.Linq;
@@ -9,148 +9,150 @@ using System.Threading.Tasks;
 using Lang_Blog_Podcast_Website_ASPdotNET.Data;
 using Lang_Blog_Podcast_Website_ASPdotNET.Models;
 
-
 namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
 {
+    /// <summary>
+    /// Controller quản lý luồng hiển thị câu chuyện của cộng đồng, gửi bài mới và xem chi tiết câu chuyện.
+    /// </summary>
     public class StoryController : Controller
     {
         private readonly ApplicationDbContext _db;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> _userManager;
 
-        public StoryController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment)
+        public StoryController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment, Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> userManager)
         {
             _db = db;
             _webHostEnvironment = webHostEnvironment;
+            _userManager = userManager;
         }
 
-        // =================================================================
-        // 1. GET: /Story/Submit (SỬA LỖI ĐÃ THÊM ASYNC TASK)
-        // =================================================================
-        [HttpGet]
-        public async Task<IActionResult> Submit()
-        {
-            // Đổ danh sách danh mục từ DB vào ViewBag để bên View có dữ liệu render Dropdown
-            ViewBag.Categories = await _db.Categories.ToListAsync();
-            return View();
-        }
-
-        // =================================================================
-        // GET: /Story/ (HIỂN THỊ DANH SÁCH BÀI VIẾT + LỌC DANH MỤC)
-        // =================================================================
+        /// <summary>
+        /// GET: /Story/
+        /// Hiển thị danh sách các câu chuyện đã được duyệt công khai kèm bộ lọc danh mục và tìm kiếm.
+        /// </summary>
+        /// <param name="categoryId">ID danh mục để lọc bài viết (tùy chọn)</param>
+        /// <param name="searchString">Từ khóa tìm kiếm tiêu đề bài viết (tùy chọn)</param>
         public async Task<IActionResult> Index(int? categoryId, string searchString)
         {
-            // 1. Lấy danh sách danh mục truyền sang View để nạp vào Dropdown list
+            // 1. Tải danh sách danh mục đổ vào Dropdown chọn lọc trên giao diện
             ViewBag.Categories = await _db.Categories.ToListAsync();
-
-            // Lưu lại giá trị đã chọn để hiển thị lại trên giao diện sau khi tải lại trang
             ViewBag.CurrentCategoryId = categoryId;
             ViewBag.CurrentSearch = searchString;
 
-            // 2. Query danh sách bài viết (bạn có thể thêm điều kiện trạng thái đã duyệt tùy logic của bạn)
-            var storiesQuery = _db.Stories.Include(s => s.Category).AsQueryable();
+            // 2. Khởi tạo Query chỉ truy vấn những câu chuyện đã được duyệt (Approved) để tối ưu hiệu năng
+            var storiesQuery = _db.Stories
+                .Include(s => s.Category)
+                .Include(s => s.User)
+                .Where(s => s.Status == StoryStatus.Approved);
 
-            // 3. Lọc theo Danh mục (nếu người dùng có chọn)
+            // 3. Lọc theo danh mục nếu người dùng yêu cầu
             if (categoryId.HasValue)
             {
                 storiesQuery = storiesQuery.Where(s => s.CategoryId == categoryId.Value);
             }
 
-            // 4. Lọc theo Tên bài viết (nếu người dùng có nhập từ khóa)
-            if (!string.IsNullOrEmpty(searchString))
+            // 4. Lọc theo từ khóa tìm kiếm tiêu đề
+            if (!string.IsNullOrWhiteSpace(searchString))
             {
-                // Lọc không phân biệt chữ hoa chữ thường
                 storiesQuery = storiesQuery.Where(s => s.Title.Contains(searchString));
             }
 
-            // Sắp xếp bài viết mới nhất lên đầu (tùy chọn)
+            // Sắp xếp bài viết mới nhất lên đầu tiên
             storiesQuery = storiesQuery.OrderByDescending(s => s.CreatedAt);
 
             return View(await storiesQuery.ToListAsync());
         }
 
-        // =================================================================
-        // 3. POST: /Story/Submit (XỬ LÝ LƯU CÂU CHUYỆN)
-        // =================================================================
+        /// <summary>
+        /// GET: /Story/Submit
+        /// Hiển thị trang để người dùng soạn thảo và gửi câu chuyện mới lên ban biên tập.
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> Submit()
+        {
+            ViewBag.Categories = await _db.Categories.ToListAsync();
+            return View();
+        }
+
+        /// <summary>
+        /// POST: /Story/Submit
+        /// Xử lý dữ liệu form người dùng gửi câu chuyện mới lên (kèm tải ảnh bìa lên server).
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Submit(StoryUploadViewModel model)
         {
+            // Loại bỏ kiểm tra độ hợp lệ của IssueNumber vì thuộc tính này do Admin gán khi duyệt bài
             ModelState.Remove("IssueNumber");
-            // 💡 ĐÃ XÓA: ModelState.Remove("ImageFile"); (Không được xóa lỗi ảnh nữa vì bây giờ ảnh là bắt buộc)
 
-            // 1. RÀNG BUỘC BẮT BUỘC CÓ ẢNH BÌA
+            // 1. Kiểm tra bắt buộc phải chọn ảnh bìa
             if (model.ImageFile == null || model.ImageFile.Length == 0)
             {
                 ModelState.AddModelError("ImageFile", "Vui lòng chọn ảnh bìa cho câu chuyện của bạn!");
             }
 
-            // 2. RÀNG BUỘC KIỂM TRA TRÙNG TÊN TIÊU ĐỀ
+            // 2. Kiểm tra trùng lặp tiêu đề bài viết trong cơ sở dữ liệu
             if (!string.IsNullOrWhiteSpace(model.Title))
             {
-                // Kiểm tra xem trong DB đã có tiêu đề này chưa (so sánh không phân biệt hoa thường và bỏ khoảng trắng thừa)
                 bool isTitleExist = await _db.Stories.AnyAsync(s => s.Title.Trim().ToLower() == model.Title.Trim().ToLower());
-
                 if (isTitleExist)
                 {
-                    ModelState.AddModelError("Title", "Tiêu đề này đã tồn tại, vui lòng đặt một tên khác!");
+                    ModelState.AddModelError("Title", "Tiêu đề này đã tồn tại, vui lòng chọn tiêu đề khác!");
                 }
             }
 
+            // 3. Nếu dữ liệu đầu vào hợp lệ, tiến hành lưu trữ
             if (ModelState.IsValid)
             {
                 try
                 {
-                    string stringFileName = "#";
-
+                    string uploadedFileName = "#";
                     if (model.ImageFile != null && model.ImageFile.Length > 0)
                     {
-                        stringFileName = UploadFile(model.ImageFile, "uploads/images");
+                        uploadedFileName = UploadFile(model.ImageFile, "uploads/images");
                     }
 
-                    Story newStory = new Story
+                    var newStory = new Story
                     {
                         Title = model.Title,
                         Content = model.Content,
-                        Author = model.Author.Trim(),
+                        Author = model.Author?.Trim() ?? "Ẩn danh",
+                        UserId = _userManager.GetUserId(User), // Gán UserId của người đang đăng nhập
+                        IssueNumber = string.IsNullOrWhiteSpace(model.IssueNumber) ? "None" : model.IssueNumber.Trim(),
                         CategoryId = model.CategoryId,
-                        ImagePath = stringFileName,
-                        Status = StoryStatus.Pending,
+                        ImagePath = uploadedFileName,
+                        Status = StoryStatus.Pending, // Mặc định ở trạng thái chờ duyệt
                         CreatedAt = DateTime.Now
                     };
 
                     _db.Stories.Add(newStory);
                     await _db.SaveChangesAsync();
 
-                    // THÀNH CÔNG: Gán thông báo vào ViewBag để hiển thị trên trang này
                     ViewBag.SuccessMessage = "Mảnh ghép của bạn đã được gửi thành công và đang chờ ban biên tập LẶNG. đón nhận.";
-
-                    // Nạp lại danh mục và trả về View để hiển thị Popup (JS sẽ lo phần chuyển trang sau)
-                    ViewBag.Categories = await _db.Categories.ToListAsync();
-                    return View(model);
+                    
+                    // Xóa trắng form sau khi gửi thành công để tránh gửi lặp dữ liệu
+                    ModelState.Clear();
+                    model = new StoryUploadViewModel();
                 }
                 catch (Exception)
                 {
-                    // LỖI HỆ THỐNG (Rớt mạng, lỗi DB...): Giữ nguyên trang và thông báo
-                    ViewBag.ErrorMessage = "Đã xảy ra sự cố. Lời tự sự của bạn chưa thể gửi đi lúc này, xin hãy thử lại sau.";
+                    ViewBag.ErrorMessage = "Đã xảy ra sự cố hệ thống. Lời tự sự chưa thể gửi đi lúc này, vui lòng thử lại sau.";
                 }
             }
             else
             {
-                // LỖI NHẬP LIỆU (Thiếu trường bắt buộc hoặc trùng tên): Giữ nguyên trang và thông báo
-                // 💡 Cập nhật nhẹ câu chữ báo lỗi để bao quát được cả lỗi trùng tên
-                ViewBag.ErrorMessage = "Vui lòng kiểm tra lại. Một vài thông tin quan trọng đang bị bỏ trống hoặc không hợp lệ.";
+                ViewBag.ErrorMessage = "Vui lòng kiểm tra lại. Một vài thông tin quan trọng bị trống hoặc không hợp lệ.";
             }
 
-            // BẮT BUỘC: Khi trả về lại Form do lỗi, nạp lại Categories
             ViewBag.Categories = await _db.Categories.ToListAsync();
-
-            // Trả về View cùng với 'model' hiện tại -> Toàn bộ text người dùng gõ sẽ ĐƯỢC GIỮ NGUYÊN
             return View(model);
         }
 
-        // =================================================================
-        // GET: /Story/Details/5 (HIỂN THỊ CHI TIẾT BÀI VIẾT)
-        // =================================================================
+        /// <summary>
+        /// GET: /Story/Details/5
+        /// Xem chi tiết nội dung của một câu chuyện. Chỉ cho phép xem nếu câu chuyện đã được phê duyệt.
+        /// </summary>
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -158,9 +160,11 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 return NotFound();
             }
 
+            // 🛡️ BẢO MẬT: Chỉ cho phép công chúng xem bài viết có trạng thái Approved
             var story = await _db.Stories
                 .Include(s => s.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(s => s.User)
+                .FirstOrDefaultAsync(m => m.Id == id && m.Status == StoryStatus.Approved);
                 
             if (story == null)
             {
@@ -170,28 +174,28 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             return View(story);
         }
 
-        // =================================================================
-        // HÀM HELPER: XỬ LÝ UPLOAD FILE (ẢNH)
-        // =================================================================
+        /// <summary>
+        /// Phương thức nội bộ hỗ trợ tải tệp tin (Ảnh) lên server vật lý.
+        /// </summary>
         private string UploadFile(IFormFile file, string folderPath)
         {
-            string fileName = null;
-            if (file != null)
+            if (file == null || file.Length == 0) return null;
+
+            string uploadDir = Path.Combine(_webHostEnvironment.WebRootPath, folderPath);
+            if (!Directory.Exists(uploadDir))
             {
-                string uploadDir = Path.Combine(_webHostEnvironment.WebRootPath, folderPath);
-                if (!Directory.Exists(uploadDir))
-                {
-                    Directory.CreateDirectory(uploadDir);
-                }
-                fileName = Guid.NewGuid().ToString() + "-" + file.FileName;
-                string filePath = Path.Combine(uploadDir, fileName);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    file.CopyTo(fileStream);
-                }
-                fileName = "/" + folderPath + "/" + fileName; // Trả về đường dẫn tương đối chuẩn chỉnh để lưu DB
+                Directory.CreateDirectory(uploadDir);
             }
-            return fileName;
+
+            string uniqueFileName = $"{Guid.NewGuid()}-{Path.GetFileName(file.FileName)}";
+            string filePath = Path.Combine(uploadDir, uniqueFileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                file.CopyTo(fileStream);
+            }
+
+            return $"/{folderPath}/{uniqueFileName}";
         }
     }
 }

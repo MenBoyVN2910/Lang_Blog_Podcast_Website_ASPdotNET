@@ -19,6 +19,20 @@
             <p class="podcast-header-desc animate-podcast-text p-delay-3">
                 Bật tai nghe lên, nhắm mắt lại và để những âm thanh dẫn lối bạn trở về với sự bình lặng sâu thẳm nhất.
             </p>
+            <div class="podcast-header-action animate-podcast-text p-delay-4" style="margin-top: 30px;">
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <a asp-controller="#" asp-action="#" class="btn-gui-podcast">
+                        LAN TOA TIẾNG NÓI CỦA BẠN
+                    </a>
+                }
+                else
+                {
+                    <a href="javascript:void(0);" onclick="showLoginAlert()" class="btn-gui-podcast">
+                        LAN TOA TIẾNG NÓI CỦA BẠN
+                    </a>
+                }
+            </div>
         </div>
     </header>
 
@@ -67,12 +81,30 @@
 @* ======================================================================================================================================================== *@
 @section Scripts {
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     AOS.init({
     once: true,             // Hiệu ứng chỉ kích hoạt 1 lần duy nhất khi cuộn tới
     offset: 80,             // Điểm kích hoạt cách mép dưới màn hình 80px
     easing: 'ease-out-cubic'// Gia tốc chuyển động mềm mại
     });
+
+    function showLoginAlert() {
+        Swal.fire({
+            title: 'Một chút nhịp ngưng...',
+            text: 'Bạn cần đăng nhập để có thể gửi gắm câu chuyện của mình. Hãy đăng nhập và trở lại đây nhé!',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#111',
+            cancelButtonColor: '#8C847D',
+            confirmButtonText: 'Đăng nhập',
+            cancelButtonText: 'Lúc khác'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/Identity/Account/Login';
+            }
+        });
+    }
 </script>
 }
 @* ======================================================================================================================================================== *@

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
 {
@@ -13,5 +13,8 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
         public int PendingCount { get; set; }
         public int ApprovedCount { get; set; }
         public int TotalCategoriesCount { get; set; }
+
+        // 3. Danh sách người dùng để phân quyền
+        public List<UserRoleViewModel> Users { get; set; } = new();
     }
 }

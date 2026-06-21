@@ -111,10 +111,12 @@
                         </div>
                         <div class="story-meta">
                             <span>@story.CreatedAt.ToString("dd.MM.yyyy")</span>
-                            <span>•</span>
-                            <span style="text-transform: uppercase;">@(string.IsNullOrEmpty(story.Author) ? "Ẩn danh" : story.Author)</span>
+                            <span>.</span>
+                            <span style="text-transform: uppercase;">@(string.IsNullOrEmpty(story.User?.FullName) ? (string.IsNullOrEmpty(story.Author) ? "Ẩn danh" : story.Author) : story.User.FullName)</span>
+                            <span>.</span>
+                            <span style="text-transform: uppercase;">@(string.IsNullOrEmpty(story.IssueNumber) ? "None" : story.IssueNumber)</span>
                         </div>
-                        <h3 class="story-title">@story.Title</h3>
+                        <h3 class="story-title">@(story.Title?.Length > 20 ? story.Title.Substring(0, 20) + "..." : story.Title)</h3>
                         <p class="story-excerpt">
                             @Html.Raw(excerpt)
                         </p>

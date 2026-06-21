@@ -33,6 +33,21 @@
                 <span class="header-meta dot"></span>
                 <span>Summer 2024</span>
             </div>
+
+            <div class="magazine-header-action animate-journal j-delay-5" style="margin-top: 30px;">
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <a asp-controller="#" asp-action="#" class="btn-gui-magazine">
+                        GÓC CHIA SẺ ẤN PHẨM
+                    </a>
+                }
+                else
+                {
+                    <a href="javascript:void(0);" onclick="showLoginAlert()" class="btn-gui-magazine">
+                        GÓC CHIA SẺ ẤN PHẨM
+                    </a>
+                }
+            </div>
         </div>
     </header>
 
@@ -133,6 +148,7 @@
 @* ======================================================================================================================================================== *@
 @section Scripts {
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     AOS.init({
     once: true,
@@ -140,6 +156,23 @@
     duration: 1000,
     easing: 'ease-out-cubic'
     });
+
+    function showLoginAlert() {
+        Swal.fire({
+            title: 'Một chút nhịp ngưng...',
+            text: 'Bạn cần đăng nhập để có thể gửi gắm câu chuyện của mình. Hãy đăng nhập và trở lại đây nhé!',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#111',
+            cancelButtonColor: '#8C847D',
+            confirmButtonText: 'Đăng nhập',
+            cancelButtonText: 'Lúc khác'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/Identity/Account/Login';
+            }
+        });
+    }
 </script>
 }
 @* ======================================================================================================================================================== *@
