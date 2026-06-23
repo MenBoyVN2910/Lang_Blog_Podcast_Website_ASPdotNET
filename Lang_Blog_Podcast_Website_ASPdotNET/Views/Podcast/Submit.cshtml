@@ -1,0 +1,190 @@
+
+@model Lang_Blog_Podcast_Website_ASPdotNET.Models.PodCastUploadViewModel
+
+@{
+    ViewData["Title"] = "Tạo số phát sóng Podcast";
+}
+
+@* ======================================================================================================================================================== *@
+<link rel="stylesheet" href="~/css/Story/Submit.css" />
+@* ======================================================================================================================================================== *@
+
+<div class="lang-form-wrapper">
+    <div class="text-center">
+        <h1 class="editorial-title">Thanh Âm Ký Ức.</h1>
+        <p class="editorial-subtitle">"Lắng đọng những cảm xúc qua từng thanh âm, để kể câu chuyện của bạn."</p>
+    </div>
+
+    <form asp-action="Submit" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Duration" id="audio-duration-input" />
+        <div class="form-row">
+            <div class="form-col" style="flex: 100%;">
+                <label class="lang-label"><i class="fa-solid fa-heading"></i> Tiêu đề Podcast</label>
+                <input asp-for="Title" class="form-control-lang" placeholder="Nhập tiêu đề Podcast..." maxlength="40" />
+                <span asp-validation-for="Title" class="text-danger small mt-1"></span>
+            </div>
+        </div>
+        @* ================================================Mô Tả============================================================ *@
+        <div class="form-row">
+            <div class="form-col">
+                <label class="lang-label"><i class="fa-solid fa-pen-nib"></i> Người dẫn (Host) <span class="text-danger">*</span></label>
+                <input asp-for="Author" class="form-control-lang" placeholder="Nhập tên người dẫn..." maxlength="30" />
+                <span asp-validation-for="Author" class="text-danger small mt-1"></span>
+            </div>
+        </div>
+
+        @* ================================================Số Tập============================================================ *@
+        <div class="form-row">
+            <div class="form-col">
+                <label class="lang-label"><i class="fa-solid fa-hashtag"></i> Số tập (Episode) <span style="font-size: 11px; font-weight: 400; color: #9E9590;">&mdash; Bỏ trống sẽ hiển thị là <em>None</em></span></label>
+                <input asp-for="EpisodeNumber" class="form-control-lang" type="number" min="1" placeholder="Nhập số tập (tùy chọn)..." />
+                <span asp-validation-for="EpisodeNumber" class="text-danger small mt-1"></span>
+            </div>
+        </div>
+
+        @* ================================================Danh Mục============================================================ *@
+        <div class="form-col">
+            <label class="lang-label"><i class="fa-solid fa-layer-group"></i> Danh mục</label>
+            <select asp-for="CategoryId" class="form-control-lang" asp-items="@(new SelectList(ViewBag.Categories, "Id", "Name"))">
+                <option value="">-- Chọn danh mục Podcast --</option>
+            </select>
+            <span asp-validation-for="CategoryId" class="text-danger small mt-1"></span>
+        </div>
+
+
+        @* ================================================Ảnh Bìa============================================================ *@
+        <div class="form-row">
+            <div class="form-col">
+                <label class="lang-label"><i class="fa-regular fa-image"></i> Ảnh bìa Podcast</label>
+                <label for="image-upload" class="custom-file-upload">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> <span>Nhấn để chọn ảnh...</span>
+                </label>
+                <input id="image-upload" asp-for="ImageFile" type="file" style="display:none;" accept="image/*" onchange="updateFileName(this, 'file-name-img')" />
+                <div id="file-name-img" class="small text-muted mt-2"></div>
+                <div id="image-preview-container" class="text-center" style="display: none; margin-top: 15px;"></div>
+                <span asp-validation-for="ImageFile" class="text-danger small mt-1 d-block"></span>
+            </div>
+        </div>
+
+
+        @* ================================================Audio============================================================ *@
+        <div class="form-row mt-3">
+            <div class="form-col" style="flex: 100%;">
+                <label class="lang-label"><i class="fa-solid fa-music"></i> File âm thanh Podcast (.mp3, .wav)</label>
+                <label for="audio-upload" class="custom-file-upload" style="background: var(--surface-light); border: 2px dashed #B29B84;">
+                    <i class="fa-solid fa-file-audio"></i> <span>Nhấn để chọn file âm thanh...</span>
+                </label>
+                <input id="audio-upload" asp-for="AudioFile" type="file" style="display:none;" accept="audio/*" onchange="updateFileName(this, 'file-name-audio')" />
+                <div id="file-name-audio" class="small text-muted mt-2"></div>
+                <div id="audio-preview-container" class="text-center" style="display: none; margin-top: 15px;">
+                    <audio id="audio-preview" controls style="width: 100%; border-radius: 8px;"></audio>
+                </div>
+                <span asp-validation-for="AudioFile" class="text-danger small mt-1 d-block"></span>
+            </div>
+        </div>
+
+
+        @* ================================================Mô Tả============================================================ *@
+        <div class="form-row">
+            <div class="form-col" style="flex: 100%;">
+                <label class="lang-label"><i class="fa-solid fa-align-left"></i> Mô tả ngắn</label>
+                <textarea asp-for="Description" class="form-control-lang" rows="5" placeholder="Nhập mô tả cho Podcast..."></textarea>
+                <span asp-validation-for="Description" class="text-danger small mt-1"></span>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn-submit-lang">PHÁT SÓNG NGAY <i class="fa-solid fa-satellite-dish ms-2"></i></button>
+        </div>
+    </form>
+</div>
+
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        function updateFileName(input, targetId) {
+            if (input.files && input.files.length > 0) {
+                var file = input.files[0];
+                var fileName = file.name;
+
+                document.getElementById(targetId).innerHTML = "<i class='fa-solid fa-check text-success'></i> Đã chọn: <strong>" + fileName + "</strong>";
+
+                if (input.id === 'image-upload') {
+                    var imgContainer = document.getElementById('image-preview-container');
+                    if (imgContainer && file.type.match('image.*')) {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            imgContainer.innerHTML = '<img src="' + e.target.result + '" style="max-width: 100%; max-height: 200px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 2px solid #fff;" />';
+                            imgContainer.style.display = 'block';
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                } else if (input.id === 'audio-upload') {
+                    var audioContainer = document.getElementById('audio-preview-container');
+                    var audioPreview = document.getElementById('audio-preview');
+                    if (audioContainer && file.type.match('audio.*')) {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            audioPreview.src = e.target.result;
+                            audioContainer.style.display = 'block';
+                        }
+                        reader.readAsDataURL(file);
+
+                        audioPreview.onloadedmetadata = function () {
+                            var seconds = Math.floor(audioPreview.duration);
+                            var h = Math.floor(seconds / 3600);
+                            var m = Math.floor((seconds % 3600) / 60);
+                            var s = seconds % 60;
+                            var durationStr = "";
+                            if (h > 0) {
+                                durationStr += h + ":" + (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+                            } else {
+                                durationStr += m + ":" + (s < 10 ? "0" : "") + s;
+                            }
+                            document.getElementById('audio-duration-input').value = durationStr;
+                        };
+                    }
+                }
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            @if (ViewBag.SuccessMessage != null)
+            {
+                <text>
+                    Swal.fire({
+                        title: 'Đã gửi thành công.',
+                        html: '@Html.Raw(ViewBag.SuccessMessage)',
+                        icon: 'success',
+                        confirmButtonColor: '#111',
+                        confirmButtonText: 'Về trang chủ',
+                        allowOutsideClick: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '@Url.Action("Index", "Home")';
+                        }
+                    });
+                </text>
+            }
+
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <text>
+                    Swal.fire({
+                        title: 'Chưa thể gửi!',
+                        html: '@Html.Raw(ViewBag.ErrorMessage)',
+                        icon: 'error',
+                        confirmButtonColor: '#111',
+                        confirmButtonText: 'Tôi sẽ kiểm tra lại'
+                    });
+                </text>
+            }
+        });
+    </script>
+}

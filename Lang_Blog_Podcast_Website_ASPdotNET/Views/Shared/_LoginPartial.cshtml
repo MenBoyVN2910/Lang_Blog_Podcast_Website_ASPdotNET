@@ -1,9 +1,10 @@
-﻿@* Khai báo thư viện và tiêm các dịch vụ quản lý tài khoản của Identity *@
+@* Khai báo thư viện và tiêm các dịch vụ quản lý tài khoản của Identity *@
 @using Microsoft.AspNetCore.Identity
 @using Lang_Blog_Podcast_Website_ASPdotNET.Data
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
+    
 
 @* ======================================================================================================================================================== *@
 @* Kiểm tra nếu người dùng đã đăng nhập *@
@@ -14,7 +15,7 @@
 
     <div class="header-user">
         @* Nút mở menu thả xuống của người dùng *@
-        <button type="button" class="user-menu-btn" aria-haspopup="true" aria-expanded="false" title="Menu người dùng" style="display: flex; align-items: center; gap: 8px; border: 1px solid #ddd; padding: 6px 12px; border-radius: 25px; background: white; cursor: pointer;">
+        <button type="button" class="user-menu-btn" aria-haspopup="true" aria-expanded="false" title="Menu người dùng">
 
             @* KIỂM TRA XEM ĐÃ CÓ ẢNH CHƯA *@
             @if (currentUser?.ProfilePicture != null)
@@ -27,14 +28,14 @@
             else
             {
                 @* Nếu chưa có ảnh, hiển thị icon mặc định (SVG) *@
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5z" fill="#111" />
-                    <path d="M2 22c0-3.866 4.03-7 10-7s10 3.134 10 7v1H2v-1z" fill="#111" />
+                <svg class="default-avatar-svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5z" />
+                    <path d="M2 22c0-3.866 4.03-7 10-7s10 3.134 10 7v1H2v-1z" />
                 </svg>
             }
 
             @* Hiển thị Tên đầy đủ của người dùng *@
-            <span class="user-name" style="font-weight: 500; font-family: 'Montserrat', sans-serif; font-size: 14px; color: #111;">
+            <span class="user-name">
                 @currentUser?.FullName
             </span>
         </button>
@@ -43,7 +44,7 @@
         <div class="user-dropdown" role="menu" aria-hidden="true">
             <ul class="dropdown-list">
                 @* Liên kết tới trang quản lý hồ sơ *@
-                <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Hồ sơ cá nhân</a></li>
+                <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Cài Đặt</a></li>
 
                 @* Dòng kẻ phân cách *@
                 <li class="dropdown-separator" aria-hidden="true"></li>
@@ -51,7 +52,7 @@
                 @* Nút đăng xuất *@
                 <li>
                     <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home")" method="post" class="logout-form">
-                        <button type="submit" class="dropdown-item logout">ĐĂNG XUẤT</button>
+                        <button type="submit" class="dropdown-item logout ">ĐĂNG XUẤT</button>
                     </form>
                 </li>
             </ul>
@@ -62,10 +63,10 @@
 else
 {
     @* Hiển thị nút dẫn đến trang Đăng nhập *@
-    <a class="btn-join"
+    <a class="user-menu-btn"
        asp-area="Identity"
        asp-page="/Account/Login">
-        THAM GIA
+        <span class="user-name">THAM GIA</span>
     </a>
 }
 @* ======================================================================================================================================================== *@

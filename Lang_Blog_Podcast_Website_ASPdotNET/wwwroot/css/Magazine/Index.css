@@ -1,361 +1,385 @@
-/* TUYỆT CHIÊU MỚI: Dùng 'clip' thay vì 'hidden' để triệt tiêu hoàn toàn dòng chảy ngang */
-html, body {
-    overflow-x: clip;
-    width: 100%;
-}
+/* ==========================================================================
+   MAGAZINE INDEX — AVANT-GARDE EDITORIAL THEME
+   Phong cách tạp chí thời trang và nghệ thuật vị lai (High Contrast).
+   ========================================================================== */
 
 :root {
-    --bg-cream: #F5F3ED;
-    --bg-white: #FFFFFF;
-    --primary-deep: #2A2927;
-    --primary-soft: #8E8373;
-    --border-main: #E5E1D8;
-    --text-muted: #7A746D;
+    --mag-bg-white: #FFFFFF;
+    --mag-bg-black: #000000;
+    --mag-text-main: #000000;
+    --mag-text-light: #FFFFFF;
+    --mag-text-muted: #666666;
+    --mag-accent: #8B0000; /* Đỏ đun mờ ảo (Deep Crimson) */
+    --mag-border: #000000; /* Viền đen tuyền sắc nét */
 }
 
-.magazine-wrapper {
+body, html {
+    background-color: var(--mag-bg-white);
+    color: var(--mag-text-main);
+}
+
+.lang-magazine-avant-container {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    max-width: 1280px;
-    margin: 0 auto;
-    background-color: var(--bg-white);
-    border-left: 1px solid var(--border-main);
-    border-right: 1px solid var(--border-main);
+    background-color: var(--mag-bg-white);
+    color: var(--mag-text-main);
     min-height: 100vh;
-    color: var(--primary-deep);
-    overflow-x: clip; /* Khóa chặt khung viền nội bộ */
+    padding-bottom: 100px;
+    overflow-x: hidden;
 }
 
-/* --- HEADER SECTION --- */
-.magazine-header {
-    padding: 80px 20px 60px 20px;
-    border-bottom: 1px solid var(--border-main);
-    text-align: center;
+/* ==========================================================================
+   AVANT-GARDE HERO SECTION
+   ========================================================================== */
+.magazine-hero {
     position: relative;
+    padding: 160px 40px 100px 40px;
+    border-bottom: 2px solid var(--mag-border);
     overflow: hidden;
-    background-color: var(--bg-white);
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
 }
 
-@media (min-width: 1024px) {
-    .magazine-header {
-        padding: 120px 40px 80px 40px;
-    }
-}
-
-/* --- THAY ĐỔI HIỆU ỨNG TẠI ĐÂY: Chỉ thay đổi độ mờ (Opacity), không đổi kích thước (Scale) --- */
-@keyframes issueBreathePure {
-    0% {
-        opacity: 0.01;
-    }
-
-    50% {
-        opacity: 0.04;
-    }
-
-    100% {
-        opacity: 0.01;
-    }
-}
-
-.header-bg-text {
+/* Watermark khổng lồ chạy phía sau */
+.hero-watermark {
     position: absolute;
-    top: 40px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     font-family: 'Playfair Display', serif;
-    /* Giới hạn kích cỡ chữ bằng clamp() để không bị phình to vô hạn trên màn hình lớn */
-    font-size: clamp(6rem, 16vw, 13rem);
+    font-size: clamp(8rem, 22vw, 20rem);
     font-weight: 900;
     text-transform: uppercase;
-    color: var(--primary-deep);
-    letter-spacing: -0.03em;
-    line-height: 1;
+    color: var(--mag-bg-black);
+    opacity: 0.03;
     pointer-events: none;
-    user-select: none;
-    z-index: 1;
-    animation: issueBreathePure 12s ease-in-out infinite; /* Nhịp thở mờ ảo mượt mà */
+    z-index: 0;
+    white-space: nowrap;
+    letter-spacing: -0.05em;
 }
 
-.header-content {
+.hero-content {
     position: relative;
     z-index: 2;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-/* --- HIỆU ỨNG HIỆN CHỮ TẠP CHÍ LÚC TẢI TRANG --- */
-@keyframes journalFadeUp {
+@keyframes magFadeUp {
     from {
         opacity: 0;
-        transform: translateY(15px);
+        transform: translateY(40px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-.animate-journal {
+.animate-mag {
     opacity: 0;
-    animation: journalFadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: magFadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.j-delay-1 {
-    animation-delay: 0.1s;
-}
+.m-delay-1 { animation-delay: 0.1s; }
+.m-delay-2 { animation-delay: 0.3s; }
+.m-delay-3 { animation-delay: 0.5s; }
 
-.j-delay-2 {
-    animation-delay: 0.25s;
-}
-
-.j-delay-3 {
-    animation-delay: 0.4s;
-}
-
-.j-delay-4 {
-    animation-delay: 0.55s;
-}
-
-.header-badge {
+.hero-top-meta {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 32px;
+    gap: 20px;
+    margin-bottom: 40px;
 }
 
-    .header-badge .line {
-        width: 48px;
-        height: 1px;
-        background-color: var(--border-main);
-    }
-
-    .header-badge .text {
-        font-size: 10px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.4em;
-        color: var(--primary-soft);
-    }
-
-.header-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 3.5rem;
-    font-weight: 400;
-    letter-spacing: -0.03em;
-    line-height: 1;
-    margin: 0 0 40px 0;
-    color: var(--primary-deep);
+.hero-top-meta .meta-line {
+    width: 80px;
+    height: 1px;
+    background-color: var(--mag-border);
 }
 
-@media (min-width: 768px) {
-    .header-title {
-        font-size: 6.5rem;
-    }
-}
-
-.header-title em, .header-title .italic {
-    font-style: italic;
-    font-weight: 400;
-}
-
-.header-quote {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: 1.15rem;
-    line-height: 1.7;
-    color: var(--text-muted);
-    max-width: 600px;
-    margin: 0 auto 48px auto;
-}
-
-.header-meta {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 48px;
-    font-size: 10px;
+.hero-top-meta .meta-text {
+    font-size: 11px;
     font-weight: 800;
-    text-transform: uppercase;
     letter-spacing: 0.3em;
-    color: #A6A096;
+    text-transform: uppercase;
 }
 
-    .header-meta .dot {
-        width: 6px;
-        height: 6px;
-        background-color: var(--border-main);
-        border-radius: 50%;
-    }
-
-
-/* --- POST LIST SECTION (LƯỚI BÀI VIẾT) --- */
-.magazine-body {
-    padding: 40px 20px;
-    overflow: hidden; /* Chặn đứng mọi tia dịch chuyển ngang từ thư viện AOS */
+.hero-title {
+    font-family: 'Playfair Display', serif;
+    margin: 0 0 60px 0;
+    line-height: 0.85;
+    letter-spacing: -0.04em;
 }
 
-@media (min-width: 1024px) {
-    .magazine-body {
-        padding: 80px 60px;
-    }
+.hero-title .title-main {
+    font-size: clamp(5rem, 12vw, 9rem);
+    font-weight: 400;
+    color: var(--mag-text-main);
 }
 
-.posts-grid {
+.hero-title .title-sub {
+    font-size: clamp(3rem, 7vw, 5rem);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--mag-accent);
+}
+
+.hero-bottom-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 60px 40px;
+    gap: 40px;
+    align-items: end;
+    border-top: 1px solid var(--mag-border);
+    padding-top: 40px;
 }
 
 @media (min-width: 768px) {
-    .posts-grid {
-        grid-template-columns: repeat(3, 1fr);
+    .hero-bottom-grid {
+        grid-template-columns: 1fr auto;
     }
 }
 
-.post-card {
+.hero-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-style: italic;
+    color: var(--mag-text-muted);
+    line-height: 1.6;
+    max-width: 500px;
+}
+
+.btn-avant-garde {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    background-color: var(--mag-bg-black);
+    color: var(--mag-text-light) !important;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    padding: 20px 40px;
+    text-decoration: none !important;
+    border: 1px solid var(--mag-bg-black);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-avant-garde i {
+    transition: transform 0.4s ease;
+}
+
+.btn-avant-garde:hover {
+    background-color: var(--mag-bg-white);
+    color: var(--mag-text-main) !important;
+}
+
+.btn-avant-garde:hover i {
+    transform: translateX(10px);
+}
+
+/* ==========================================================================
+   ASYMMETRICAL EDITORIAL GRID
+   ========================================================================== */
+.magazine-body {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 80px 40px;
+}
+
+@media (max-width: 768px) {
+    .magazine-body {
+        padding: 40px 20px;
+    }
+}
+
+.editorial-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 60px;
+}
+
+/* Grid Phức tạp cho màn hình lớn (Bất đối xứng) */
+@media (min-width: 1024px) {
+    .editorial-grid {
+        grid-template-columns: repeat(12, 1fr);
+        grid-auto-rows: minmax(100px, auto);
+        gap: 40px;
+    }
+
+    .card-tall {
+        grid-column: 1 / 6;
+        grid-row: span 2;
+    }
+
+    .card-short {
+        grid-column: 7 / 13;
+        grid-row: span 1;
+        margin-top: 80px;
+    }
+
+    .card-minimal {
+        grid-column: 7 / 11;
+        grid-row: span 1;
+    }
+
+    .card-wide {
+        grid-column: 2 / 12;
+        grid-row: span 1;
+        margin-top: 60px;
+        border-top: 1px solid var(--mag-border);
+        padding-top: 60px;
+    }
+
+    .card-tall-offset {
+        grid-column: 8 / 13;
+        grid-row: span 2;
+        margin-top: -120px;
+    }
+}
+
+/* Base Card Styling */
+.mag-card {
+    display: block;
+}
+
+.mag-card-link {
     display: flex;
     flex-direction: column;
-    text-decoration: none;
+    text-decoration: none !important;
     color: inherit;
-    background: transparent;
-    padding: 12px;
-    border: 1px solid transparent;
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s ease, background-color 0.6s ease;
+    height: 100%;
 }
 
-    .post-card:hover {
-        background-color: #FAF9F6;
-        border-color: var(--border-main);
-        transform: translateY(-6px);
-        box-shadow: 0 16px 35px rgba(42, 41, 39, 0.04);
-    }
+.mag-card:hover .mag-title {
+    color: var(--mag-accent);
+}
 
-.post-image-container {
+.mag-img-wrapper {
     position: relative;
     width: 100%;
-    aspect-ratio: 3 / 4;
     overflow: hidden;
     margin-bottom: 24px;
-    border: 1px solid rgba(0,0,0,0.02);
+    border: 1px solid var(--mag-border); /* Viền đen bao ảnh tạo chất tạp chí */
 }
 
-.post-image {
+/* Tùy chỉnh tỉ lệ ảnh tùy theo loại card */
+.card-tall .mag-img-wrapper { aspect-ratio: 3 / 4; }
+.card-short .mag-img-wrapper { aspect-ratio: 16 / 9; }
+.card-minimal .mag-img-wrapper { aspect-ratio: 1 / 1; }
+.card-wide .mag-img-wrapper { aspect-ratio: 21 / 9; }
+.card-tall-offset .mag-img-wrapper { aspect-ratio: 4 / 5; }
+
+.mag-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    filter: grayscale(100%); /* Ảnh mặc định trắng đen */
+    transition: filter 0.8s ease, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.post-card:hover .post-image {
-    transform: scale(1.04); /* Phóng nhẹ, an toàn tuyệt đối */
+/* Hover: Trở lại ảnh màu và zoom cực nhẹ */
+.mag-card:hover .mag-img {
+    filter: grayscale(0%);
+    transform: scale(1.03);
 }
 
-.post-category-tag {
+.mag-category {
     position: absolute;
-    top: 12px;
-    left: 12px;
-    background-color: #8C6239;
-    color: #FFFFFF;
+    bottom: 0;
+    left: 0;
+    background-color: var(--mag-bg-black);
+    color: var(--mag-text-light);
     font-size: 9px;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
-    padding: 4px 10px;
-    letter-spacing: 0.1em;
-    pointer-events: none;
+    letter-spacing: 0.2em;
+    padding: 12px 20px;
     transition: background-color 0.3s ease;
 }
 
-.post-card:hover .post-category-tag {
-    background-color: var(--primary-deep);
+.mag-card:hover .mag-category {
+    background-color: var(--mag-accent);
 }
 
-.post-card-meta {
-    font-size: 11px;
-    color: #A39E96;
-    margin-bottom: 12px;
+.mag-info {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    letter-spacing: 0.05em;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
-.post-card-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.65rem;
-    font-weight: 400;
-    line-height: 1.35;
-    margin: 0 0 14px 0;
-    color: var(--primary-deep);
-    letter-spacing: -0.01em;
+.mag-meta {
+    font-size: 10px;
+    font-weight: 700;
     text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--mag-text-muted);
+    margin-bottom: 16px;
+    border-bottom: 1px solid #EEEEEE;
+    padding-bottom: 12px;
+}
+
+.mag-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--mag-text-main);
+    margin: 0 0 16px 0;
     transition: color 0.4s ease;
 }
 
-.post-card:hover .post-card-title {
-    color: var(--primary-soft);
+.card-tall .mag-title, .card-wide .mag-title {
+    font-size: 2.8rem;
 }
 
-.post-card-excerpt {
-    font-size: 0.88rem;
-    line-height: 1.65;
-    color: var(--text-muted);
-    margin: 0 0 20px 0;
+.mag-excerpt {
+    font-size: 0.95rem;
+    color: var(--mag-text-muted);
+    line-height: 1.7;
+    margin: 0 0 32px 0;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
-.post-card-action {
+.mag-readmore {
     font-size: 10px;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--primary-deep);
+    letter-spacing: 0.2em;
+    color: var(--mag-text-main);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     margin-top: auto;
 }
 
-    .post-card-action::after {
-        content: "";
-        display: inline-block;
-        width: 16px;
-        height: 1px;
-        background-color: var(--primary-deep);
-        transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease;
-    }
-
-.post-card:hover .post-card-action::after {
-    width: 32px;
-    background-color: var(--primary-soft);
-}
-
-/* --- NÚT GỬI CÂU CHUYỆN (PHÙ HỢP GIAO DIỆN SÁNG) --- */
-.btn-gui-magazine {
+.mag-readmore::before {
+    content: "";
     display: inline-block;
-    background-color: var(--primary-deep);
-    color: var(--bg-white) !important;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 14px 36px;
-    border: none;
-    text-decoration: none !important;
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-    cursor: pointer;
+    width: 24px;
+    height: 1px;
+    background-color: var(--mag-text-main);
+    transition: width 0.4s ease, background-color 0.4s ease;
 }
 
-.btn-gui-magazine:hover {
-    background-color: #000000;
-    color: var(--bg-white) !important;
-    letter-spacing: 3px;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+.mag-card:hover .mag-readmore::before {
+    width: 48px;
+    background-color: var(--mag-accent);
 }
 
-.btn-gui-magazine:active {
-    transform: translateY(1px);
+.mag-card:hover .mag-readmore {
+    color: var(--mag-accent);
+}
+
+/* ==========================================================================
+   SWEET ALERT OVERRIDES
+   ========================================================================== */
+.avant-swal-popup {
+    border: 2px solid var(--mag-border) !important;
+    border-radius: 0 !important; /* Vuông vức, sắc bén */
+    box-shadow: 10px 10px 0px rgba(0,0,0,1) !important; /* Brutalism Shadow */
 }

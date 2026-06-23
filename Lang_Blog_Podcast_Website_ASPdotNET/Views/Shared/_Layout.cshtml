@@ -11,11 +11,11 @@
     @* Tối ưu hóa tốc độ tải font từ Google Fonts bằng cách kết nối sớm (Preconnect) *@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Playfair+Display+SC&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Playfair+Display+SC&family=Montserrat:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     @* Nhúng file CSS chính của trang web, tự động tạo chuỗi định danh phiên bản (v=...) để tránh lỗi bộ nhớ đệm (Cache) *@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/GlobalPlayer.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
     @* Cấu hình ảnh biểu tượng thu nhỏ (Favicon) hiển thị trên tab trình duyệt *@
     <link rel="icon"
@@ -29,9 +29,20 @@
 
 @* ======================================================================================================================================================== *@
 <body>
-
+    @{
+        var controllerName = ViewContext.RouteData.Values["Controller"]?.ToString();
+        var headerClass = "header-theme-default";
+        
+        if (controllerName == "Podcast") {
+            headerClass = "header-theme-dark";
+        } else if (controllerName == "Story") {
+            headerClass = "header-theme-light";
+        } else if (controllerName == "Magazine") {
+            headerClass = "header-theme-avant";
+        }
+    }
     @* =================================HEADER==============================================(Phần Đầu Trang) *@
-    <header class="main-header">
+    <header class="main-header @headerClass">
         <div class="header-container">
             @* Logo dạng chữ, khi bấm vào sẽ dẫn về trang chủ *@
             <a class="logo-text" asp-area="" asp-controller="Home" asp-action="Index">LẶNG.</a>
@@ -66,7 +77,7 @@
     </main>
 
     @* =================================FOOTER==============================================(Phần Đuôi Trang) *@
-    <footer class="site-footer">
+    <footer class="site-footer @(headerClass.Replace("header-", "footer-"))">
         <div class="footer-top-border"></div>
         <div class="footer-container">
 
@@ -110,6 +121,62 @@
             <a href="#" class="back-to-top">VỀ ĐẦU TRANG &uarr;</a>
         </div>
     </footer>
+
+    @* =================================GLOBAL AUDIO PLAYER================================== *@
+    <div class="lang-global-player" id="lang-global-player">
+        <audio id="gp-audio" preload="metadata"></audio>
+
+        @* --- Cột trái: Ảnh bìa + Thông tin bài --- *@
+        <div class="gp-left">
+            <img id="gp-cover" class="gp-cover" src="" alt="" />
+            <div class="gp-track-info">
+                <span id="gp-title" class="gp-track-title">—</span>
+                <span id="gp-author" class="gp-track-author">—</span>
+            </div>
+        </div>
+
+        @* --- Cột giữa: Điều khiển + Thanh tiến trình --- *@
+        <div class="gp-center">
+            <div class="gp-controls">
+                <button class="gp-btn gp-btn-skip" id="gp-btn-skip-back" title="Tua lùi 15s">
+                    <i class="fa-solid fa-backward"></i>
+                </button>
+                <button class="gp-btn gp-btn-play" id="gp-btn-play" title="Phát / Tạm dừng">
+                    <i class="fa-solid fa-play" style="transform: translateX(1px);"></i>
+                </button>
+                <button class="gp-btn gp-btn-skip" id="gp-btn-skip-forward" title="Tua tiến 15s">
+                    <i class="fa-solid fa-forward"></i>
+                </button>
+            </div>
+            <div class="gp-progress-row">
+                <span class="gp-time" id="gp-time-current">0:00</span>
+                <div class="gp-seekbar-container" id="gp-seekbar">
+                    <div class="gp-seekbar-track">
+                        <div class="gp-seekbar-fill" id="gp-seekbar-fill"></div>
+                    </div>
+                </div>
+                <span class="gp-time" id="gp-time-total">0:00</span>
+            </div>
+        </div>
+
+        @* --- Cột phải: Volume + Speed + Đóng --- *@
+        <div class="gp-right">
+            <button class="gp-btn gp-speed-btn" id="gp-speed-btn" title="Tốc độ phát">1x</button>
+            <div class="gp-volume-group">
+                <button class="gp-btn" id="gp-volume-btn" title="Tắt/Bật âm">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+                <div class="gp-volume-slider-container" id="gp-volume-slider">
+                    <div class="gp-volume-track">
+                        <div class="gp-volume-fill" id="gp-volume-fill"></div>
+                    </div>
+                </div>
+            </div>
+            <button class="gp-btn gp-btn-close" id="gp-btn-close" title="Đóng player">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+    </div>
 
     @* =================================JAVASCRIPT=========================================== *@
     <script>
@@ -166,6 +233,7 @@
                 });
             })();
     </script>
+    <script src="~/js/GlobalPlayer.js" asp-append-version="true"></script>
     @* Vùng cho phép các View con nhúng bổ sung các đoạn mã Script riêng lẻ vào cuối trang Layout *@
     @await RenderSectionAsync("Scripts", required: false)
 </body>

@@ -55,6 +55,29 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 .OrderByDescending(s => s.PublishDate)
                 .ToListAsync();
 
+            // Tải danh sách Podcast chờ duyệt
+            var pendingPodcasts = await _db.PodCasts
+                .Include(p => p.Category)
+                .Include(p => p.User)
+                .Where(p => p.Status == StoryStatus.Pending)
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync();
+
+            // Tải danh sách Podcast đã duyệt
+            var approvedPodcasts = await _db.PodCasts
+                .Include(p => p.Category)
+                .Include(p => p.User)
+                .Where(p => p.Status == StoryStatus.Approved)
+                .OrderByDescending(p => p.PublishDate)
+                .ToListAsync();
+
+            // Tải danh sách Magazine Issues
+            var magazineIssues = await _db.MagazineIssues
+                .Include(m => m.Editor)
+                .Include(m => m.Articles)
+                .OrderByDescending(m => m.Id)
+                .ToListAsync();
+
             // Tải danh sách toàn bộ danh mục bài viết
             var categories = await _db.Categories.ToListAsync();
 
@@ -74,10 +97,16 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             {
                 PendingStories = pendingStories,
                 ApprovedStories = approvedStories,
+                PendingPodCasts = pendingPodcasts,
+                ApprovedPodCasts = approvedPodcasts,
+                MagazineIssues = magazineIssues,
                 Categories = categories,
                 PendingCount = pendingStories.Count,
                 ApprovedCount = approvedStories.Count,
+                PendingPodCastsCount = pendingPodcasts.Count,
+                MagazineIssuesCount = magazineIssues.Count,
                 TotalCategoriesCount = categories.Count,
+                TotalPublishedCount = approvedStories.Count + approvedPodcasts.Count,
                 Users = userRolesViewModel
             };
 
@@ -340,6 +369,409 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             TempData["AdminMessage"] = $"Đã xóa bài viết '{story.Title}' và dọn dẹp các tệp liên quan.";
 
             return RedirectToAction(nameof(Index));
+        }
+
+        /// <summary>
+        /// POST: /Admin/ApprovePodcast
+        /// Phê duyệt Podcast để xuất bản.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApprovePodcast(int id)
+        {
+            if (await _db.PodCasts.FindAsync(id) is not { } podcast)
+            {
+                return NotFound();
+            }
+
+            podcast.Status = StoryStatus.Approved;
+            podcast.PublishDate = DateTime.Now;
+
+            await _db.SaveChangesAsync();
+            TempData["AdminMessage"] = $"Đã duyệt và xuất bản Podcast '{podcast.Title}' thành công!";
+
+            return Redirect("/Admin#podcast");
+        }
+
+        /// <summary>
+        /// POST: /Admin/RejectPodcast
+        /// Từ chối Podcast: Xóa khỏi cơ sở dữ liệu và dọn dẹp tệp tin ảnh bìa và âm thanh vật lý.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectPodcast(int id)
+        {
+            if (await _db.PodCasts.FindAsync(id) is not { } podcast)
+            {
+                return NotFound();
+            }
+
+            string imagePath = podcast.ImagePath;
+            string audioPath = podcast.AudioPath;
+
+            _db.PodCasts.Remove(podcast);
+            await _db.SaveChangesAsync();
+
+            // Xóa tệp vật lý sau khi DB cập nhật thành công
+            DeletePhysicalFile(imagePath);
+            DeletePhysicalFile(audioPath);
+
+            TempData["AdminMessage"] = $"Đã xóa Podcast '{podcast.Title}' và dọn dẹp các tệp liên quan.";
+
+            return Redirect("/Admin#podcast");
+        }
+
+        // =========================================================================================
+        // QUẢN LÝ BÀI VIẾT ĐÃ XUẤT BẢN (KHO LƯU TRỮ)
+        // =========================================================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteApprovedStory(int id)
+        {
+            if (await _db.Stories.FindAsync(id) is not { } story)
+            {
+                return NotFound();
+            }
+
+            string imagePath = story.ImagePath;
+
+            _db.Stories.Remove(story);
+            await _db.SaveChangesAsync();
+
+            DeletePhysicalFile(imagePath);
+
+            TempData["AdminMessage"] = $"Đã gỡ bài viết '{story.Title}' khỏi hệ thống thành công.";
+            return Redirect("/Admin#published");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteApprovedPodcast(int id)
+        {
+            if (await _db.PodCasts.FindAsync(id) is not { } podcast)
+            {
+                return NotFound();
+            }
+
+            string imagePath = podcast.ImagePath;
+            string audioPath = podcast.AudioPath;
+
+            _db.PodCasts.Remove(podcast);
+            await _db.SaveChangesAsync();
+
+            DeletePhysicalFile(imagePath);
+            DeletePhysicalFile(audioPath);
+
+            TempData["AdminMessage"] = $"Đã gỡ Podcast '{podcast.Title}' khỏi hệ thống thành công.";
+            return Redirect("/Admin#published");
+        }
+
+        // =========================================================================================
+        // QUẢN LÝ TẠP CHÍ (MAGAZINE ISSUES)
+        // =========================================================================================
+
+        [HttpGet]
+        public IActionResult CreateIssue()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateIssue(MagazineIssue model, IFormFile coverImage)
+        {
+            // Loại trừ các navigation property khỏi kiểm tra validation
+            ModelState.Remove("EditorId");
+            ModelState.Remove("Editor");
+            ModelState.Remove("Articles");
+            ModelState.Remove("CoverImagePath");
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            if (coverImage != null && coverImage.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "magazine");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(coverImage.FileName);
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await coverImage.CopyToAsync(fileStream);
+                }
+                model.CoverImagePath = "/images/magazine/" + uniqueFileName;
+            }
+            else
+            {
+                TempData["AdminError"] = "Vui lòng chọn ảnh bìa cho Ấn phẩm!";
+                return View(model);
+            }
+
+            model.EditorId = _userManager.GetUserId(User);
+            model.Status = StoryStatus.Pending; // Nháp
+
+            _db.MagazineIssues.Add(model);
+            await _db.SaveChangesAsync();
+
+            TempData["AdminMessage"] = "Đã tạo Ấn phẩm mới thành công!";
+            return Redirect("/Admin#magazine");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditIssue(int id)
+        {
+            var issue = await _db.MagazineIssues.FindAsync(id);
+            if (issue == null) return NotFound();
+            return View(issue);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditIssue(int id, MagazineIssue model, IFormFile? coverImage)
+        {
+            if (id != model.Id) return NotFound();
+
+            var existingIssue = await _db.MagazineIssues.FindAsync(id);
+            if (existingIssue == null) return NotFound();
+
+            ModelState.Remove("EditorId");
+            ModelState.Remove("Editor");
+            ModelState.Remove("Articles");
+            ModelState.Remove("CoverImagePath");
+
+            if (!ModelState.IsValid) return View(model);
+
+            existingIssue.IssueNumber = model.IssueNumber;
+            existingIssue.Title = model.Title;
+            existingIssue.Description = model.Description;
+            existingIssue.Season = model.Season;
+
+            if (coverImage != null && coverImage.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "magazine");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(coverImage.FileName);
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await coverImage.CopyToAsync(fileStream);
+                }
+                
+                if (!string.IsNullOrEmpty(existingIssue.CoverImagePath))
+                {
+                    DeletePhysicalFile(existingIssue.CoverImagePath);
+                }
+                
+                existingIssue.CoverImagePath = "/images/magazine/" + uniqueFileName;
+            }
+
+            await _db.SaveChangesAsync();
+            TempData["AdminMessage"] = $"Đã cập nhật Ấn phẩm '{existingIssue.Title}'!";
+            return Redirect("/Admin#magazine");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PublishIssue(int id)
+        {
+            var issue = await _db.MagazineIssues.FindAsync(id);
+            if (issue == null) return NotFound();
+
+            issue.Status = StoryStatus.Approved;
+            issue.PublishDate = DateTime.Now;
+            
+            await _db.SaveChangesAsync();
+            TempData["AdminMessage"] = $"Đã xuất bản Ấn phẩm '{issue.Title}'!";
+            return Redirect("/Admin#magazine");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteIssue(int id)
+        {
+            var issue = await _db.MagazineIssues.FindAsync(id);
+            if (issue == null) return NotFound();
+
+            DeletePhysicalFile(issue.CoverImagePath);
+            _db.MagazineIssues.Remove(issue);
+            await _db.SaveChangesAsync();
+
+            TempData["AdminMessage"] = $"Đã xóa Ấn phẩm '{issue.Title}'!";
+            return Redirect("/Admin#magazine");
+        }
+
+        // =========================================================================================
+        // QUẢN LÝ BÀI VIẾT TẠP CHÍ (MAGAZINE ARTICLES)
+        // =========================================================================================
+
+        [HttpGet]
+        public async Task<IActionResult> CreateArticle(int issueId)
+        {
+            var issue = await _db.MagazineIssues.FindAsync(issueId);
+            if (issue == null) return NotFound();
+
+            ViewBag.IssueId = issue.Id;
+            ViewBag.IssueTitle = issue.Title;
+            ViewBag.Categories = await _db.Categories.ToListAsync();
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateArticle(MagazineArticle model, IFormFile image)
+        {
+            var issue = await _db.MagazineIssues.FindAsync(model.IssueId);
+            ViewBag.IssueTitle = issue?.Title ?? "Không rõ";
+            ViewBag.IssueId = model.IssueId;
+            ViewBag.Categories = await _db.Categories.ToListAsync();
+
+            // Loại trừ các navigation property và trường được gán tự động
+            ModelState.Remove("Issue");
+            ModelState.Remove("Category");
+            ModelState.Remove("ImagePath");
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            if (image != null && image.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "magazine");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(image.FileName);
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await image.CopyToAsync(fileStream);
+                }
+                model.ImagePath = "/images/magazine/" + uniqueFileName;
+            }
+            else
+            {
+                TempData["AdminError"] = "Vui lòng chọn ảnh minh họa cho Bài viết!";
+                return View(model);
+            }
+
+            model.CreatedAt = DateTime.Now;
+            _db.MagazineArticles.Add(model);
+            await _db.SaveChangesAsync();
+
+            TempData["AdminMessage"] = "Đã thêm Bài viết mới vào Ấn phẩm!";
+            return Redirect("/Admin#magazine");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditArticle(int id)
+        {
+            var article = await _db.MagazineArticles.Include(a => a.Issue).FirstOrDefaultAsync(a => a.Id == id);
+            if (article == null) return NotFound();
+
+            ViewBag.IssueId = article.IssueId;
+            ViewBag.IssueTitle = article.Issue?.Title ?? "Không rõ";
+            ViewBag.Categories = await _db.Categories.ToListAsync();
+
+            return View(article);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditArticle(int id, MagazineArticle model, IFormFile? image)
+        {
+            if (id != model.Id) return NotFound();
+
+            var existingArticle = await _db.MagazineArticles.Include(a => a.Issue).FirstOrDefaultAsync(a => a.Id == id);
+            if (existingArticle == null) return NotFound();
+
+            ViewBag.IssueId = existingArticle.IssueId;
+            ViewBag.IssueTitle = existingArticle.Issue?.Title ?? "Không rõ";
+            ViewBag.Categories = await _db.Categories.ToListAsync();
+
+            ModelState.Remove("Issue");
+            ModelState.Remove("Category");
+            ModelState.Remove("ImagePath");
+
+            if (!ModelState.IsValid) return View(model);
+
+            existingArticle.Title = model.Title;
+            existingArticle.Content = model.Content;
+            existingArticle.CategoryId = model.CategoryId;
+            existingArticle.LayoutType = model.LayoutType;
+
+            if (image != null && image.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "magazine");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(image.FileName);
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await image.CopyToAsync(fileStream);
+                }
+
+                if (!string.IsNullOrEmpty(existingArticle.ImagePath))
+                {
+                    DeletePhysicalFile(existingArticle.ImagePath);
+                }
+
+                existingArticle.ImagePath = "/images/magazine/" + uniqueFileName;
+            }
+
+            await _db.SaveChangesAsync();
+            TempData["AdminMessage"] = $"Đã cập nhật Bài viết '{existingArticle.Title}'!";
+            return Redirect("/Admin#magazine");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteArticle(int id)
+        {
+            var article = await _db.MagazineArticles.FindAsync(id);
+            if (article == null) return NotFound();
+
+            DeletePhysicalFile(article.ImagePath);
+            _db.MagazineArticles.Remove(article);
+            await _db.SaveChangesAsync();
+
+            TempData["AdminMessage"] = $"Đã xóa Bài viết '{article.Title}'!";
+            return Redirect("/Admin#magazine");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PreviewIssue(int id)
+        {
+            var issue = await _db.MagazineIssues
+                .Include(m => m.Articles)
+                .ThenInclude(a => a.Category)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (issue == null) return NotFound();
+
+            return View(issue);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PreviewArticle(int id)
+        {
+            var article = await _db.MagazineArticles
+                .Include(a => a.Category)
+                .Include(a => a.Issue)
+                .FirstOrDefaultAsync(a => a.Id == id);
+
+            if (article == null) return NotFound();
+
+            return View(article);
         }
 
         /// <summary>

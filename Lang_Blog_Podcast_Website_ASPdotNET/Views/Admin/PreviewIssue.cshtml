@@ -1,0 +1,270 @@
+@model Lang_Blog_Podcast_Website_ASPdotNET.Models.MagazineIssue
+@using System.Text.RegularExpressions
+
+@{
+    ViewData["Title"] = "[Preview] " + Model.Title;
+}
+
+<link rel="stylesheet" href="~/css/Magazine/Index.css" asp-append-version="true" />
+<style>
+    body {
+        background-color: #f4f4f4; /* Nền xám nhạt để làm nổi bật cuốn tạp chí */
+    }
+
+    /* Flipbook Container */
+    .flipbook-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 50px 20px;
+    }
+
+    .flipbook {
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+
+    .page {
+        background-color: #fff;
+        overflow: hidden;
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.05); /* Bóng đổ nếp gấp trang */
+    }
+
+    .page-content {
+        padding: 40px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Bìa cứng */
+    .page.hard {
+        background-color: #111;
+        border: solid 1px #333;
+    }
+
+    /* Trang Bìa trước */
+    .cover-page {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+    .cover-page img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.8;
+    }
+    .cover-text {
+        position: absolute;
+        top: 10%;
+        left: 0;
+        right: 0;
+        text-align: center;
+        color: #fff;
+        padding: 20px;
+    }
+    .cover-text h1 {
+        font-family: var(--font-serif-header);
+        font-size: 50px;
+        margin-bottom: 10px;
+    }
+
+    /* Ruột tạp chí */
+    .article-page h2 {
+        font-family: var(--font-serif-header);
+        font-size: 32px;
+        color: #000;
+        margin-bottom: 15px;
+    }
+    .article-page img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        margin-bottom: 20px;
+        filter: grayscale(100%);
+    }
+    .article-page .excerpt {
+        font-family: var(--font-sans);
+        font-size: 14px;
+        line-height: 1.8;
+        color: #333;
+        flex-grow: 1;
+    }
+
+    .read-more-btn {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        border: 1px solid #000;
+        color: #000;
+        text-decoration: none;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        transition: all 0.3s;
+    }
+    .read-more-btn:hover {
+        background-color: #000;
+        color: #fff;
+    }
+
+    /* Nút lật trang manual */
+    .flip-nav {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .flip-nav button {
+        background: transparent;
+        border: 1px solid #000;
+        padding: 8px 15px;
+        margin: 0 5px;
+        cursor: pointer;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .flip-nav button:hover {
+        background: #000;
+        color: #fff;
+    }
+
+    .preview-badge {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #dc3545;
+        color: #fff;
+        padding: 8px 16px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 2px;
+        border-radius: 4px;
+        z-index: 9999;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+</style>
+
+<div class="lang-magazine-avant-container">
+    <div class="preview-badge"><i class="fa-solid fa-eye"></i> CHẾ ĐỘ XEM TRƯỚC (PREVIEW)</div>
+    
+    <div style="padding: 20px 40px;">
+        <a href="/Admin#magazine" style="color: #000; text-decoration: none; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1px;">
+            <i class="fa-solid fa-arrow-left"></i> TRỞ VỀ QUẢN LÝ TẠP CHÍ
+        </a>
+    </div>
+
+    <div class="flipbook-wrapper">
+        <div id="flipbook" class="flipbook">
+            
+            <!-- Trang bìa cứng (Cover) -->
+            <div class="page hard">
+                <div class="cover-page">
+                    <img src="@Model.CoverImagePath" alt="Cover" />
+                    <div class="cover-text">
+                        <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; letter-spacing: 4px; margin-bottom: 20px;">@Model.IssueNumber</div>
+                        <h1>@Model.Title</h1>
+                        <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; letter-spacing: 2px; margin-top: 40px; text-transform: uppercase;">
+                            @Model.Season
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lời tựa (Trang trong 1) -->
+            <div class="page">
+                <div class="page-content" style="justify-content: center; text-align: center;">
+                    <h3 style="font-family: var(--font-serif-header); font-size: 24px; margin-bottom: 30px;">Lời Tựa</h3>
+                    <p style="font-family: var(--font-serif-body); font-size: 16px; line-height: 2; font-style: italic; color: #555; padding: 0 30px;">
+                        "@Model.Description"
+                    </p>
+                    <div style="margin-top: 40px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; letter-spacing: 2px; font-size: 12px;">
+                        - THE EDITOR -
+                    </div>
+                </div>
+            </div>
+
+            <!-- Các bài viết -->
+            @if(Model.Articles != null)
+            {
+                foreach(var article in Model.Articles)
+                {
+                    string plainText = string.IsNullOrEmpty(article.Content) ? "" : Regex.Replace(article.Content, "<.*?>", string.Empty);
+                    string excerpt = plainText.Length > 400 ? plainText.Substring(0, 400) + "..." : plainText;
+
+                    <div class="page article-page">
+                        <div class="page-content">
+                            <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; color: #999; letter-spacing: 2px; margin-bottom: 15px; text-transform: uppercase;">
+                                @(article.Category?.Name ?? "Editorial")
+                            </div>
+                            
+                            <h2>@article.Title</h2>
+                            <img src="@article.ImagePath" alt="@article.Title" />
+                            
+                            <div class="excerpt">
+                                @Html.Raw(excerpt)
+                            </div>
+                            
+                            <div style="text-align: right; margin-top: auto;">
+                                <a href="/Admin/PreviewArticle/@article.Id" class="read-more-btn">Xem Thử Bài Viết</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+
+            <!-- Bìa sau (Back cover) -->
+            <div class="page hard">
+                <div style="background-color: #111; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; flex-direction: column;">
+                    <div style="font-family: var(--font-serif-header); font-size: 30px; letter-spacing: 5px;">LẶNG.</div>
+                    <div style="margin-top: 20px; width: 50px; height: 1px; background: #fff;"></div>
+                    <div style="margin-top: 20px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; letter-spacing: 3px;">END OF ISSUE</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="flip-nav">
+        <button id="btn-prev"><i class="fa-solid fa-chevron-left"></i> Lật trang trước</button>
+        <span id="page-counter" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; margin: 0 15px;"></span>
+        <button id="btn-next">Lật trang sau <i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const pageFlip = new St.PageFlip(document.getElementById('flipbook'), {
+                width: 450,
+                height: 600,
+                size: "stretch",
+                minWidth: 315,
+                maxWidth: 1000,
+                minHeight: 420,
+                maxHeight: 1350,
+                drawShadow: true,
+                showCover: true,
+                mobileScrollSupport: false
+            });
+
+            pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+
+            document.getElementById('btn-prev').addEventListener('click', () => {
+                pageFlip.flipPrev();
+            });
+
+            document.getElementById('btn-next').addEventListener('click', () => {
+                pageFlip.flipNext();
+            });
+
+            pageFlip.on('flip', (e) => {
+                const totalPages = pageFlip.getPageCount();
+                document.getElementById('page-counter').innerText = `${e.data + 1} / ${totalPages}`;
+            });
+
+            document.getElementById('page-counter').innerText = `1 / ${document.querySelectorAll('.page').length}`;
+        });
+    </script>
+}

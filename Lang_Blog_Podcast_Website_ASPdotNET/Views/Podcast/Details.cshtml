@@ -1,0 +1,201 @@
+@model Lang_Blog_Podcast_Website_ASPdotNET.Models.PodCast
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+@* ======================================================================================================================================================== *@
+<link rel="stylesheet" href="~/css/Podcast/Details.css" asp-append-version="true" />
+@* ======================================================================================================================================================== *@
+
+
+@* ============================== HERO SECTION — Immersive Spotify-inspired ============================== *@
+<section class="pd-hero" id="pd-hero">
+    @* Background mờ lấy từ ảnh bìa *@
+    <div class="pd-hero-bg" style="background-image: url('@Model.ImagePath');"></div>
+    <div class="pd-hero-gradient"></div>
+
+    <div class="pd-hero-content">
+        @* Ảnh bìa chính *@
+        <div class="pd-cover-wrapper">
+            <img src="@Model.ImagePath" alt="@Model.Title" class="pd-cover-img" />
+            <div class="pd-cover-reflection">
+                <img src="@Model.ImagePath" alt="" aria-hidden="true" />
+            </div>
+        </div>
+
+        @* Thông tin bài *@
+        <div class="pd-hero-info">
+            <span class="pd-episode-label">PODCAST EPISODE</span>
+
+            <h1 class="pd-title">@Model.Title</h1>
+
+            <div class="pd-series-row">
+                <div class="pd-author-avatar">
+                    <i class="fa-solid fa-podcast"></i>
+                </div>
+                <span class="pd-series-name">@(Model.Category?.Name ?? "Podcast")</span>
+            </div>
+
+            <div class="pd-meta-row">
+                @if (Model.PublishDate.HasValue)
+                {
+                    <span class="pd-meta-item">@Model.PublishDate?.ToString("dd 'tháng' MM, yyyy")</span>
+                }
+                @if (!string.IsNullOrEmpty(Model.Duration))
+                {
+                    <span class="pd-meta-dot"></span>
+                    <span class="pd-meta-item">@Model.Duration</span>
+                }
+                @if (Model.EpisodeNumber.HasValue)
+                {
+                    <span class="pd-meta-dot"></span>
+                    <span class="pd-meta-item">Tập @Model.EpisodeNumber</span>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@* ============================== ACTION BAR — Play / Share ============================== *@
+<section class="pd-actions-section">
+    <div class="pd-actions-container">
+        <div class="pd-actions-left">
+            <button class="pd-btn-play" id="btn-play-details"
+                    data-audio-url="@Model.AudioPath"
+                    data-audio-title="@Model.Title"
+                    data-audio-author="@(Model.User?.FullName ?? Model.Author)"
+                    data-audio-image="@Model.ImagePath"
+                    data-podcast-id="@Model.Id"
+                    onclick="playFromDetails(this);"
+                    title="Phát ngay">
+                <i class="fa-solid fa-play pd-play-icon"></i>
+            </button>
+
+            <div class="pd-stats-group">
+                <div class="pd-stat">
+                    <i class="fa-solid fa-headphones"></i>
+                    <span>@Model.ViewCount lượt nghe</span>
+                </div>
+                <div class="pd-stat">
+                    <i class="fa-solid fa-microphone-lines"></i>
+                    <span>@(Model.User?.FullName ?? Model.Author)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@* ============================== DESCRIPTION BODY ============================== *@
+<section class="pd-body-section">
+    <div class="pd-body-container">
+        <div class="pd-description-block">
+            <h2 class="pd-section-heading">
+                <span class="pd-heading-accent"></span>
+                Nội dung tập Podcast
+            </h2>
+            <div class="pd-description-text" id="pd-desc-text">
+                @Model.Description
+            </div>
+            <button class="pd-btn-showmore" id="pd-btn-showmore" onclick="toggleDescription()" style="display: none;">
+                <span id="pd-showmore-text">Xem thêm</span>
+                <i class="fa-solid fa-chevron-down" id="pd-showmore-icon"></i>
+            </button>
+        </div>
+
+        @* ====== Thông tin chi tiết sidebar ====== *@
+        <aside class="pd-sidebar">
+            <div class="pd-sidebar-card">
+                <h4 class="pd-sidebar-title">Thông tin chi tiết</h4>
+                <ul class="pd-detail-list">
+                    <li>
+                        <span class="pd-detail-label">Người dẫn</span>
+                        <span class="pd-detail-value">@(Model.User?.FullName ?? Model.Author)</span>
+                    </li>
+                    <li>
+                        <span class="pd-detail-label">Danh mục</span>
+                        <span class="pd-detail-value pd-detail-badge">@(Model.Category?.Name ?? "Podcast")</span>
+                    </li>
+                    @if (Model.EpisodeNumber.HasValue)
+                    {
+                        <li>
+                            <span class="pd-detail-label">Số tập</span>
+                            <span class="pd-detail-value">Tập @Model.EpisodeNumber</span>
+                        </li>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Duration))
+                    {
+                        <li>
+                            <span class="pd-detail-label">Thời lượng</span>
+                            <span class="pd-detail-value">@Model.Duration</span>
+                        </li>
+                    }
+                    <li>
+                        <span class="pd-detail-label">Ngày phát sóng</span>
+                        <span class="pd-detail-value">@((Model.PublishDate ?? Model.CreatedAt).ToString("dd/MM/yyyy"))</span>
+                    </li>
+                    <li>
+                        <span class="pd-detail-label">Lượt nghe</span>
+                        <span class="pd-detail-value">@Model.ViewCount</span>
+                    </li>
+                </ul>
+            </div>
+
+            @* Nút quay lại danh sách *@
+            <a asp-controller="Podcast" asp-action="Index" class="pd-btn-back">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Xem tất cả tập</span>
+            </a>
+        </aside>
+    </div>
+</section>
+
+
+@section Scripts {
+<script>
+    // Phát nhạc qua Global Player
+    function playFromDetails(btn) {
+        var audioUrl = btn.getAttribute('data-audio-url');
+        var title = btn.getAttribute('data-audio-title');
+        var author = btn.getAttribute('data-audio-author');
+        var image = btn.getAttribute('data-audio-image');
+        var podcastId = btn.getAttribute('data-podcast-id');
+        if (typeof LangPlayer !== 'undefined') {
+            LangPlayer.play(audioUrl, title, author, image, podcastId);
+        }
+    }
+
+    // Xử lý "Xem thêm" cho mô tả dài
+    (function () {
+        var descEl = document.getElementById('pd-desc-text');
+        var btnMore = document.getElementById('pd-btn-showmore');
+        if (!descEl || !btnMore) return;
+
+        // Đợi render xong rồi kiểm tra chiều cao
+        requestAnimationFrame(function () {
+            if (descEl.scrollHeight > descEl.clientHeight + 10) {
+                btnMore.style.display = 'inline-flex';
+            }
+        });
+    })();
+
+    var descExpanded = false;
+    function toggleDescription() {
+        var descEl = document.getElementById('pd-desc-text');
+        var btnText = document.getElementById('pd-showmore-text');
+        var btnIcon = document.getElementById('pd-showmore-icon');
+        descExpanded = !descExpanded;
+        if (descExpanded) {
+            descEl.classList.add('is-expanded');
+            btnText.textContent = 'Thu gọn';
+            btnIcon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+        } else {
+            descEl.classList.remove('is-expanded');
+            btnText.textContent = 'Xem thêm';
+            btnIcon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+        }
+    }
+</script>
+}

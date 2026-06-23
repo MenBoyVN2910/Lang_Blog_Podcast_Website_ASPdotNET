@@ -51,14 +51,60 @@ body {
    2. THANH ĐIỀU HƯỚNG TRÊN CÙNG (HEADER & NAVIGATION)
    ========================================================================== */
 .main-header {
-    background-color: var(--color-cream);
-    border-bottom: 1px solid var(--border-color);
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     z-index: 1000;
+    transition: background-color 0.4s ease, border-color 0.4s ease;
 }
+
+/* ==========================================================================
+   DYNAMIC HEADER THEMES
+   ========================================================================== */
+.header-theme-default {
+    background-color: var(--color-cream);
+    border-bottom: 1px solid var(--border-color);
+}
+.header-theme-default .logo-text, .header-theme-default .main-nav a { color: var(--color-dark); }
+.header-theme-default .main-nav a.active::after, .header-theme-default .main-nav a:hover::after { background-color: var(--color-dark); }
+.header-theme-default .user-menu-btn { background: #fff; border: 1px solid var(--border-color); color: var(--color-dark); }
+.header-theme-default .user-menu-btn .user-name { color: var(--color-dark); }
+
+.header-theme-dark {
+    background-color: rgba(26, 24, 23, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.header-theme-dark .logo-text, .header-theme-dark .main-nav a { color: #FFFFFF; }
+.header-theme-dark .main-nav a.active::after, .header-theme-dark .main-nav a:hover::after { background-color: #B29B84; }
+.header-theme-dark .user-menu-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #FFFFFF; }
+.header-theme-dark .user-menu-btn .user-name { color: #FFFFFF; }
+.header-theme-dark .user-menu-btn:hover { background: rgba(255, 255, 255, 0.15); }
+
+.header-theme-light {
+    background-color: rgba(244, 241, 234, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(44, 44, 44, 0.1);
+}
+.header-theme-light .logo-text, .header-theme-light .main-nav a { color: #2A2825; }
+.header-theme-light .main-nav a.active::after, .header-theme-light .main-nav a:hover::after { background-color: #B29B84; }
+.header-theme-light .user-menu-btn { background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(44, 44, 44, 0.1); color: #2A2825; }
+.header-theme-light .user-menu-btn .user-name { color: #2A2825; }
+.header-theme-light .user-menu-btn:hover { background: rgba(255, 255, 255, 1); }
+
+.header-theme-avant {
+    background-color: #FFFFFF;
+    border-bottom: 2px solid #000000;
+}
+.header-theme-avant .logo-text, .header-theme-avant .main-nav a { color: #000000; }
+.header-theme-avant .main-nav a.active::after, .header-theme-avant .main-nav a:hover::after { background-color: #8B0000; height: 2px; }
+.header-theme-avant .user-menu-btn { background: #000000; border: 1px solid #000000; color: #FFFFFF; border-radius: 0; }
+.header-theme-avant .user-menu-btn .user-name { color: #FFFFFF; }
+.header-theme-avant .user-menu-btn:hover { background: #FFFFFF; color: #000000; }
+.header-theme-avant .user-menu-btn:hover .user-name { color: #000000; }
 
 .header-container {
     display: flex;
@@ -84,14 +130,15 @@ body {
 }
 
     .main-nav a {
-        font-size: 13px;
-        color: var(--color-dark);
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        font-size: 11px;
         text-decoration: none;
-        font-weight: 500;
+        font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.15em;
         position: relative;
-        padding-bottom: 4px;
+        padding-bottom: 6px;
+        transition: color 0.3s ease;
     }
 
         /* Hiệu ứng gạch chân khi hover các mục menu */
@@ -146,14 +193,11 @@ button.btn-join {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: #fff;
-    border: 1px solid var(--border-color);
-    padding: 6px 10px;
+    padding: 8px 14px;
     border-radius: 4px;
     cursor: pointer;
-    font-weight: 600;
-    color: var(--color-dark);
     text-decoration: none;
+    transition: all 0.3s ease;
 }
 
 .user-menu-btn svg { display: block; }
@@ -195,6 +239,7 @@ button.btn-join {
     padding: 8px 14px;
     font: inherit;
     cursor: pointer;
+    color: #ff0000 !important;
 }
 
 /* override link defaults for dropdown links */
@@ -205,7 +250,7 @@ button.btn-join {
 .header-right .header-user .dropdown-list li.dropdown-separator { height: 1px; background: #eee; margin: 6px 0; }
 
 /* Ensure user menu uses project's fonts and spacing */
-.user-menu-btn, .user-menu-btn .user-name { font-family: var(--font-sans); font-size: 14px; }
+.user-menu-btn, .user-menu-btn .user-name { font-family: 'Plus Jakarta Sans', sans-serif !important; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
 
 /* Manage account page styles */
 .manage-account {
@@ -252,10 +297,57 @@ button.btn-join {
    3. CHÂN TRANG HỆ THỐNG (SITE FOOTER)
    ========================================================================== */
 .site-footer {
-    background-color: #FFFFFF;
     margin-top: 100px;
     padding: 60px 40px 30px 40px;
+    transition: background-color 0.4s ease, border-color 0.4s ease;
 }
+
+/* ==========================================================================
+   DYNAMIC FOOTER THEMES
+   ========================================================================== */
+.footer-theme-default { background-color: #FFFFFF; }
+.footer-theme-default .footer-top-border { border-top: 1px solid var(--border-color); }
+.footer-theme-default .logo-text-footer { color: var(--color-dark); }
+.footer-theme-default .footer-slogan { color: #9A9187; }
+.footer-theme-default .social-links a { color: #BDB5AE; }
+.footer-theme-default .footer-heading { color: #BDB5AE; }
+.footer-theme-default .footer-links a { color: var(--color-dark); }
+.footer-theme-default .footer-links .email-link a { color: #BDB5AE; }
+.footer-theme-default .footer-bottom { border-top: 1px solid var(--border-color); color: #BDB5AE; }
+.footer-theme-default .back-to-top { color: var(--color-dark); }
+
+.footer-theme-dark { background-color: #12100E; }
+.footer-theme-dark .footer-top-border { border-top: 1px solid rgba(255,255,255,0.05); }
+.footer-theme-dark .logo-text-footer { color: #FFFFFF; }
+.footer-theme-dark .footer-slogan { color: #8C8276; }
+.footer-theme-dark .social-links a { color: #665D55; }
+.footer-theme-dark .footer-heading { color: #665D55; }
+.footer-theme-dark .footer-links a { color: #FFFFFF; }
+.footer-theme-dark .footer-links .email-link a { color: #B29B84; }
+.footer-theme-dark .footer-bottom { border-top: 1px solid rgba(255,255,255,0.05); color: #665D55; }
+.footer-theme-dark .back-to-top { color: #FFFFFF; }
+
+.footer-theme-light { background-color: #F5F1EE; }
+.footer-theme-light .footer-top-border { border-top: 1px solid rgba(44,44,44,0.1); }
+.footer-theme-light .logo-text-footer { color: #2A2825; }
+.footer-theme-light .footer-slogan { color: #736E67; }
+.footer-theme-light .social-links a { color: #99938B; }
+.footer-theme-light .footer-heading { color: #99938B; }
+.footer-theme-light .footer-links a { color: #2A2825; }
+.footer-theme-light .footer-links .email-link a { color: #99938B; }
+.footer-theme-light .footer-bottom { border-top: 1px solid rgba(44,44,44,0.1); color: #99938B; }
+.footer-theme-light .back-to-top { color: #2A2825; }
+
+.footer-theme-avant { background-color: #000000; }
+.footer-theme-avant .footer-top-border { border-top: 2px solid #FFFFFF; }
+.footer-theme-avant .logo-text-footer { color: #FFFFFF; }
+.footer-theme-avant .footer-slogan { color: #CCCCCC; }
+.footer-theme-avant .social-links a { color: #FFFFFF; }
+.footer-theme-avant .footer-heading { color: #FFFFFF; }
+.footer-theme-avant .footer-links a { color: #FFFFFF; }
+.footer-theme-avant .footer-links .email-link a { color: #FFFFFF; font-family: 'Plus Jakarta Sans', sans-serif !important; letter-spacing: 2px; }
+.footer-theme-avant .footer-bottom { border-top: 1px solid #333333; color: #999999; }
+.footer-theme-avant .back-to-top { color: #FFFFFF; }
 
 .footer-top-border {
     border-top: 1px solid var(--border-color);
@@ -393,3 +485,8 @@ button.btn-join {
     .btn-gui-cau-chuyen:active {
         transform: translateY(1px); /* Lún nhẹ xuống tạo cảm giác vật lý khi nhấn nút */
     }
+
+
+.dropdown-item .logout {
+    color: red !important;
+}

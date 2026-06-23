@@ -1,322 +1,539 @@
-/* Khởi tạo biến màu sắc đồng bộ hệ sinh thái Lặng. */
+/* ==========================================================================
+   PODCAST INDEX — PREMIUM DARK THEME
+   Lấy cảm hứng từ Spotify kết hợp thiết kế tạp chí (Editorial Design).
+   ========================================================================== */
+
 :root {
-    --bg-cream: #F4F1EA; /* Màu nền kem đặc trưng */
-    --bg-white: #FFFFFF;
-    --primary-deep: #2A2825; /* Màu nâu đen trầm lắng */
-    --primary-soft: #8C8275; /* Màu chữ phụ, nhãn tập */
-    --border-color: #E2DDD5; /* Đường kẻ mảnh tinh tế */
+    --pd-bg-dark: #1A1817;
+    --pd-bg-card: #201D1A;
+    --pd-text-main: #F5F1EE;
+    --pd-text-muted: #9A9187;
+    --pd-accent: #B29B84;
+    --pd-accent-hover: #D4B896;
+    --pd-border: rgba(178, 155, 132, 0.15);
+    --pd-glass: rgba(26, 24, 23, 0.7);
 }
 
-.lang-podcast-container {
+body, html {
+    background-color: var(--pd-bg-dark); /* Đảm bảo background tổng thể không bị chớp sáng */
+}
+
+.lang-podcast-dark-container {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    background-color: var(--bg-cream);
-    color: var(--primary-deep);
+    background-color: var(--pd-bg-dark);
+    color: var(--pd-text-main);
     min-height: 100vh;
-    padding-bottom: 60px;
-    overflow-x: hidden; /* Ngăn hiện tượng vỡ khung khi chạy hiệu ứng */
+    padding-bottom: 80px;
 }
 
-/* Vùng Header tối */
-.podcast-header {
-    background-color: var(--primary-deep);
-    color: var(--bg-cream);
-    padding: 100px 20px;
-    text-align: center;
+/* ==========================================================================
+   HERO SECTION TỐI MỜ (CINEMATIC)
+   ========================================================================== */
+.podcast-hero {
     position: relative;
+    padding: 120px 20px 80px 20px;
+    text-align: center;
     overflow: hidden;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
-/* --- HIỆU ỨNG TRÔI NỔI CHẬM CHO CHỮ AUDIO --- */
-@keyframes audioFloat {
-    0% {
-        transform: rotate(-8deg) scale(1) translateY(0);
-    }
-
-    50% {
-        transform: rotate(-6deg) scale(1.02) translateY(-10px);
-    }
-
-    100% {
-        transform: rotate(-8deg) scale(1) translateY(0);
-    }
+/* Background gradient blur mờ ảo */
+.podcast-hero-background {
+    position: absolute;
+    inset: -20%;
+    background: radial-gradient(circle at 50% 0%, rgba(178, 155, 132, 0.15) 0%, rgba(26, 24, 23, 1) 70%);
+    filter: blur(60px);
+    z-index: 0;
 }
 
-.podcast-header-bg-text {
+.podcast-hero-overlay {
     position: absolute;
     inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Playfair Display', serif;
-    font-size: 16vw;
-    font-weight: 900;
-    text-transform: uppercase;
-    color: var(--bg-cream);
-    opacity: 0.03;
-    transform: rotate(-8deg);
-    pointer-events: none;
-    user-select: none;
-    animation: audioFloat 15s ease-in-out infinite; /* Chuyển động lặp vô tận */
+    background: linear-gradient(to bottom, transparent 0%, var(--pd-bg-dark) 100%);
+    z-index: 1;
 }
 
-/* --- HIỆU ỨNG HIỆN CHỮ THANH THOÁT --- */
-@keyframes fadeUpText {
+.podcast-hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    width: 100%;
+}
+
+/* Hiệu ứng mờ dần hiện lên (Fade Up) */
+@keyframes heroFadeUp {
     from {
         opacity: 0;
-        transform: translateY(25px);
+        transform: translateY(30px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-.animate-podcast-text {
+.animate-hero {
     opacity: 0;
-    animation: fadeUpText 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    animation: heroFadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.p-delay-1 {
-    animation-delay: 0.2s;
-}
-
-.p-delay-2 {
-    animation-delay: 0.4s;
-}
-
-.p-delay-3 {
-    animation-delay: 0.6s;
-}
-
-.podcast-header-sub {
-    font-size: 10px;
+.hero-subtitle {
+    font-size: 11px;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.5em;
-    margin-bottom: 20px;
+    letter-spacing: 0.4em;
+    color: var(--pd-accent);
     display: block;
-    opacity: 0.6;
-}
-
-.podcast-header-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 3.5rem;
-    font-style: italic;
-    font-weight: 400;
     margin-bottom: 24px;
 }
 
-.podcast-header-desc {
-    max-width: 500px;
-    margin: 0 auto;
-    font-size: 0.9rem;
+.hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--pd-text-main);
+    margin: 0 0 24px 0;
+    line-height: 1.1;
+}
+
+.hero-desc {
+    font-size: 1rem;
     font-weight: 300;
-    line-height: 1.7;
-    opacity: 0.7;
+    color: var(--pd-text-muted);
+    line-height: 1.8;
+    max-width: 600px;
+    margin: 0 auto 40px auto;
 }
 
-/* Danh sách hiển thị dạng lưới 2 cột */
-.podcast-grid {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 60px 20px;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 40px;
-}
-
-@media (min-width: 768px) {
-    .podcast-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 30px;
-    }
-}
-
-/* Khối thẻ từng tập Podcast */
-.podcast-card {
-    background-color: var(--bg-white);
-    border: 1px solid var(--border-color);
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    transition: background-color 0.5s ease, border-color 0.5s ease, transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.5s ease;
+.btn-primary-gold {
+    display: inline-block;
+    background-color: var(--pd-accent);
+    color: #1A1817 !important;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 16px 36px;
+    border-radius: 4px;
+    text-decoration: none !important;
+    transition: all 0.3s ease;
+    border: none;
     cursor: pointer;
 }
 
-@media (min-width: 576px) {
-    .podcast-card {
+.btn-primary-gold:hover {
+    background-color: var(--pd-accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(178, 155, 132, 0.2);
+}
+
+/* ==========================================================================
+   GLASSMORPHISM FILTER TOOLBAR
+   ========================================================================== */
+.podcast-toolbar {
+    position: relative;
+    z-index: 10;
+    max-width: 1100px;
+    margin: -30px auto 40px auto;
+    padding: 0 20px;
+}
+
+.glass-filter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: var(--pd-glass);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--pd-border);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+@media (min-width: 768px) {
+    .glass-filter-form {
+        flex-direction: row;
+        align-items: center;
+        padding: 12px;
+    }
+}
+
+.search-box {
+    position: relative;
+    flex-grow: 1;
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--pd-text-muted);
+    font-size: 14px;
+}
+
+.glass-input {
+    width: 100%;
+    padding: 14px 16px 14px 44px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--pd-text-main);
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.glass-input::placeholder {
+    color: var(--pd-text-muted);
+}
+
+.glass-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--pd-border);
+}
+
+.category-box {
+    min-width: 220px;
+}
+
+.glass-select {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--pd-text-main);
+    font-family: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239A9187' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.glass-select:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--pd-border);
+}
+
+.glass-select option {
+    background-color: var(--pd-bg-card);
+    color: var(--pd-text-main);
+}
+
+.btn-glass-search {
+    background-color: transparent;
+    color: var(--pd-text-main);
+    border: 1px solid var(--pd-border);
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.btn-glass-search:hover {
+    background-color: var(--pd-accent);
+    color: var(--pd-bg-dark);
+    border-color: var(--pd-accent);
+}
+
+.btn-glass-clear {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid var(--pd-border);
+    color: var(--pd-text-muted);
+    text-decoration: none !important;
+    transition: all 0.3s ease;
+}
+
+.btn-glass-clear:hover {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #E74C3C;
+    border-color: rgba(231, 76, 60, 0.3);
+}
+
+/* ==========================================================================
+   PREMIUM PODCAST GRID & CARDS
+   ========================================================================== */
+.podcast-grid-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.podcast-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+/* Chuyển sang 2 cột cho màn hình desktop, nhưng mỗi card là layout dọc */
+@media (min-width: 850px) {
+    .podcast-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px;
+    }
+}
+
+.premium-podcast-card {
+    background-color: var(--pd-bg-card);
+    border: 1px solid var(--pd-border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.premium-podcast-card:hover {
+    background-color: #262320;
+    border-color: rgba(178, 155, 132, 0.4);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.card-link-wrapper {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none !important;
+    color: inherit;
+    height: 100%;
+}
+
+@media (min-width: 500px) and (max-width: 849px) {
+    .card-link-wrapper {
         flex-direction: row;
     }
-}
-
-.podcast-card:hover {
-    background-color: #ECE8DE;
-    border-color: var(--primary-soft);
-    transform: translateY(-5px); /* Nhấc nhẹ thẻ lên cao hơn */
-    box-shadow: 0 15px 35px rgba(42, 40, 37, 0.04);
-}
-
-/* Phần ảnh bìa tập */
-.podcast-img-wrapper {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    position: relative;
-    overflow: hidden;
-    border: 1px solid var(--border-color);
-    flex-shrink: 0;
-}
-
-@media (min-width: 576px) {
-    .podcast-img-wrapper {
-        width: 160px;
+    .card-image-section {
+        width: 220px;
+        flex-shrink: 0;
     }
 }
 
-.podcast-img {
+/* Nửa trên: Ảnh bìa cinematic */
+.card-image-section {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+}
+
+@media (min-width: 500px) and (max-width: 849px) {
+    .card-image-section {
+        aspect-ratio: 1 / 1;
+    }
+}
+
+.card-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: grayscale(100%);
-    transition: filter 0.8s ease, transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.podcast-card:hover .podcast-img {
-    filter: grayscale(0%);
-    transform: scale(1.06); /* Phóng nhẹ ảnh bìa nghệ thuật */
+.premium-podcast-card:hover .card-image {
+    transform: scale(1.08);
 }
 
-/* Nút bấm Play hiển thị khi hover */
-.podcast-play-overlay {
+.card-image-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(42, 40, 37, 0.25);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.4s ease;
+    background: linear-gradient(to top, var(--pd-bg-card) 0%, transparent 60%);
+    opacity: 0.8;
 }
 
-.podcast-card:hover .podcast-play-overlay {
-    opacity: 1;
+.card-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background-color: rgba(26, 24, 23, 0.7);
+    backdrop-filter: blur(8px);
+    color: var(--pd-text-main);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Nút Play nổi bật */
+.card-play-button {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    z-index: 10;
 }
 
 .play-btn-circle {
-    width: 50px;
-    height: 50px;
-    border: 2px solid var(--bg-white);
+    width: 44px;
+    height: 44px;
+    background-color: var(--pd-accent);
+    color: var(--pd-bg-dark);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(42, 40, 37, 0.2);
-    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.3s ease;
+    font-size: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transform: translateY(15px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.podcast-card:hover .play-btn-circle {
-    transform: scale(1.08); /* Phóng to nhẹ vòng tròn Play */
-    background-color: var(--primary-deep);
-    border-color: var(--primary-deep);
+.play-btn-circle i {
+    transform: translateX(1px); /* Căn chỉnh icon play cho chuẩn giữa */
 }
 
-/* Phần nội dung chữ */
-.podcast-info {
+.premium-podcast-card:hover .play-btn-circle {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.card-play-button:hover .play-btn-circle {
+    background-color: var(--pd-text-main);
+    transform: scale(1.1) translateY(0);
+}
+
+.card-play-button.is-clicked .play-btn-circle {
+    transform: scale(0.9);
+}
+
+/* Nửa dưới: Thông tin */
+.card-info-section {
+    padding: 24px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    flex-grow: 1;
 }
 
-.podcast-meta {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--primary-soft);
+.card-meta {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--pd-text-muted);
+    margin-bottom: 16px;
 }
 
-.podcast-dot {
-    width: 4px;
-    height: 4px;
-    background-color: var(--primary-soft);
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.meta-dot {
+    width: 3px;
+    height: 3px;
     border-radius: 50%;
-    display: inline-block;
+    background-color: var(--pd-text-muted);
+    opacity: 0.5;
 }
 
-.podcast-title {
+.card-title {
     font-family: 'Playfair Display', serif;
     font-size: 1.4rem;
-    font-weight: 400;
+    font-weight: 500;
+    color: var(--pd-text-main);
     line-height: 1.4;
-    color: var(--primary-deep);
     margin: 0 0 12px 0;
     transition: color 0.3s ease;
 }
 
-.podcast-desc {
-    font-size: 0.85rem;
+.premium-podcast-card:hover .card-title {
+    color: var(--pd-accent);
+}
+
+.card-desc {
+    font-size: 0.9rem;
+    color: var(--pd-text-muted);
     line-height: 1.6;
-    color: #6E6861;
-    margin-bottom: 16px;
+    margin: 0 0 24px 0;
+    flex-grow: 1;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
-.podcast-action {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
+.card-footer {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 16px;
     margin-top: auto;
 }
 
-.podcast-line {
-    width: 30px;
-    height: 1px;
-    background-color: var(--primary-deep);
-    display: inline-block;
-    transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.4s ease;
+.card-date {
+    font-size: 12px;
+    color: var(--pd-text-muted);
+    font-weight: 500;
 }
 
-.podcast-card:hover .podcast-line {
-    width: 50px; /* Kéo dài thanh ngang mượt mà */
-}
-
-/* --- NÚT GỬI CÂU CHUYỆN (PHÙ HỢP GIAO DIỆN TỐI) --- */
-.btn-gui-podcast {
-    display: inline-block;
-    background-color: transparent;
-    color: var(--bg-cream) !important;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.75rem;
+.card-action-text {
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 2px;
     text-transform: uppercase;
-    padding: 14px 36px;
-    border: 1px solid var(--bg-cream);
-    text-decoration: none !important;
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-    cursor: pointer;
+    letter-spacing: 0.1em;
+    color: var(--pd-accent);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: gap 0.3s ease;
 }
 
-.btn-gui-podcast:hover {
-    background-color: var(--bg-cream);
-    color: var(--primary-deep) !important;
-    letter-spacing: 3px;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+.premium-podcast-card:hover .card-action-text {
+    gap: 10px;
 }
 
-.btn-gui-podcast:active {
-    transform: translateY(1px);
+/* ==========================================================================
+   EMPTY STATE & SWEET ALERT OVERRIDES
+   ========================================================================== */
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--pd-text-muted);
+    grid-column: 1 / -1;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 24px;
+    opacity: 0.2;
+}
+
+.empty-state p {
+    font-size: 1.1rem;
+    font-weight: 300;
+    font-style: italic;
+}
+
+.dark-swal-popup {
+    border: 1px solid var(--pd-border) !important;
+    border-radius: 12px !important;
 }

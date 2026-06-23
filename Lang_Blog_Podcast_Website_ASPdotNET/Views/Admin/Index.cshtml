@@ -33,8 +33,9 @@
         @* =====================Navigation Menu========================================== *@
         <nav class="admin-tabs">
             <button class="tab-btn active" onclick="openTab(event, 'stories')"><i class="fa-solid fa-book-open"></i> Mảnh ghép ký ức</button>
-            <button class="tab-btn" onclick="openTab(event, 'posts')"><i class="fa-regular fa-newspaper"></i> Bài viết tạp chí</button>
+            <button class="tab-btn" onclick="openTab(event, 'magazine')"><i class="fa-regular fa-newspaper"></i> Quản lý Tạp chí</button>
             <button class="tab-btn" onclick="openTab(event, 'podcast')"><i class="fa-solid fa-headphones"></i> PodCast Series</button>
+            <button class="tab-btn" onclick="openTab(event, 'published')"><i class="fa-solid fa-layer-group"></i> Kho bài viết</button>
             <button class="tab-btn" onclick="openTab(event, 'categories')"><i class="fa-solid fa-list"></i> Quản lý danh mục</button>
             <button class="tab-btn" onclick="openTab(event, 'manageusers')"><i class="fa-solid fa-list"></i> Quản lý người dùng</button>
         </nav>
@@ -59,8 +60,8 @@
             <div class="stat-card">
                 <span class="stat-title">Ấn phẩm tạp chí</span>
                 <div class="stat-number">
-                    @Model.ApprovedCount.ToString("D2")
-                    <span class="stat-unit">bài viết</span>
+                    @Model.MagazineIssuesCount.ToString("D2")
+                    <span class="stat-unit">số phát hành</span>
                 </div>
             </div>
             <div class="stat-card">
@@ -70,11 +71,18 @@
                     <span class="stat-unit">chủ đề</span>
                 </div>
             </div>
+            <div class="stat-card">
+                <span class="stat-title">Bài viết đã xuất bản</span>
+                <div class="stat-number">
+                    @Model.TotalPublishedCount.ToString("D2")
+                    <span class="stat-unit">bài đăng</span>
+                </div>
+            </div>
         </section>
 
 
     @* =====================Blog========================================== *@
-    <div id="stories" class="tab-content active">
+    <div id="tab-stories" class="tab-content active">
         <h2 class="section-title">Phê duyệt tâm sự từ độc giả</h2>
         <table class="data-table">
             <thead>
@@ -173,54 +181,325 @@
 
 
     @* =====================Magazine========================================== *@
-    <div id="posts" class="tab-content">
-        <h2 class="section-title">Danh sách bài viết tạp chí</h2>
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th style="width: 15%;">Hình ảnh</th>
-                    <th style="width: 40%;">Tiêu đề</th>
-                    <th style="width: 15%;">Danh mục</th>
-                    <th style="width: 15%;">Ngày đăng</th>
-                    <th style="width: 15%; text-align: right;">Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="5" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 30px;">
-                        Chưa có bài viết nào được xuất bản trên tạp chí. Phần này sẽ code chức năng sau.
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <div id="tab-magazine" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 class="section-title" style="margin-bottom: 0;">Quản lý Ấn Phẩm Tạp Chí</h2>
+            <a href="/Admin/CreateIssue" class="btn primary"><i class="fa-solid fa-plus"></i> Tạo Ấn Phẩm Mới</a>
+        </div>
+        
+        @if (Model.MagazineIssuesCount == 0)
+        {
+            <div style="text-align: center; color: var(--text-muted); font-style: italic; padding: 30px;">
+                Chưa có Ấn phẩm nào được tạo. Hãy tạo số phát hành đầu tiên!
+            </div>
+        }
+        else
+        {
+            @foreach (var issue in Model.MagazineIssues)
+            {
+                <div class="card" style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;">
+                        <div style="display: flex; gap: 15px;">
+                            <img src="@issue.CoverImagePath" alt="Cover" style="width: 80px; height: 110px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);" />
+                            <div>
+                                <h3 style="font-family: var(--font-serif-header); margin: 0 0 5px 0;">@issue.Title <span style="font-size: 14px; font-family: var(--font-sans); color: #888;">(@issue.IssueNumber)</span></h3>
+                                <p style="font-size: 13px; color: #666; margin: 0 0 5px 0;">Kỳ phát hành: <strong>@issue.Season</strong> | Người biên tập: @(issue.Editor?.FullName ?? "Admin")</p>
+                                
+                                @if (issue.Status == Lang_Blog_Podcast_Website_ASPdotNET.Models.StoryStatus.Pending)
+                                {
+                                    <span class="badge" style="background: #f0ad4e; color: #fff;">Bản Nháp (Draft)</span>
+                                }
+                                else
+                                {
+                                    <span class="badge" style="background: #5cb85c; color: #fff;">Đã Xuất Bản</span>
+                                }
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 10px;">
+                            <a href="/Admin/CreateArticle?issueId=@issue.Id" class="btn outline" style="padding: 6px 12px; font-size: 13px;"><i class="fa-solid fa-plus"></i> Thêm Bài</a>
+                            <a href="/Admin/EditIssue/@issue.Id" class="btn outline" style="padding: 6px 12px; font-size: 13px; color: #111; border-color: #ddd;"><i class="fa-solid fa-pen"></i> Chỉnh Sửa</a>
+                            <a href="/Admin/PreviewIssue/@issue.Id" class="btn outline" style="padding: 6px 12px; font-size: 13px; color: #111; border-color: #ddd;" title="Xem trước Ấn phẩm"><i class="fa-solid fa-eye"></i> Xem Chi Tiết</a>
+                            
+                            @if (issue.Status == Lang_Blog_Podcast_Website_ASPdotNET.Models.StoryStatus.Pending)
+                            {
+                                <form asp-action="PublishIssue" method="post" style="margin: 0;" onsubmit="return confirm('Bạn có chắc chắn muốn xuất bản Ấn phẩm này không?');">
+                                    <input type="hidden" name="id" value="@issue.Id" />
+                                    <button type="submit" class="btn primary" style="padding: 6px 12px; font-size: 13px;"><i class="fa-solid fa-paper-plane"></i> Xuất Bản</button>
+                                </form>
+                            }
+
+                            <form asp-action="DeleteIssue" method="post" style="margin: 0;" onsubmit="return confirm('Chú ý: Xóa Ấn phẩm sẽ xóa TOÀN BỘ bài viết bên trong. Bạn có chắc chắn không?');">
+                                <input type="hidden" name="id" value="@issue.Id" />
+                                <button type="submit" class="btn reject" style="padding: 6px 12px; font-size: 13px;"><i class="fa-solid fa-trash"></i> Xóa</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 10px;">Danh sách bài viết (@issue.Articles.Count)</h4>
+                        @if (issue.Articles.Count == 0)
+                        {
+                            <p style="font-size: 13px; color: #aaa; font-style: italic;">Chưa có bài viết nào trong số này.</p>
+                        }
+                        else
+                        {
+                            <table class="data-table" style="font-size: 13px; margin: 0;">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40%;">Tiêu đề</th>
+                                        <th style="width: 20%;">Danh mục</th>
+                                        <th style="width: 20%;">Layout</th>
+                                        <th style="width: 20%; text-align: right;">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var article in issue.Articles)
+                                    {
+                                        <tr>
+                                            <td><strong>@article.Title</strong></td>
+                                            <td>@(article.Category?.Name ?? "N/A")</td>
+                                            <td><span class="badge" style="background: #eee; color: #333;">@article.LayoutType</span></td>
+                                            <td style="text-align: right;">
+                                                <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                                                    <a href="/Admin/PreviewArticle/@article.Id" class="btn-action" style="background: none; border: none; color: #111; padding: 6px; border-radius: 4px; transition: background 0.3s; cursor: pointer;" title="Xem chi tiết bài viết"><i class="fa-solid fa-eye"></i></a>
+                                                    <a href="/Admin/EditArticle/@article.Id" class="btn-action" style="background: none; border: none; color: #111; padding: 6px; border-radius: 4px; transition: background 0.3s; cursor: pointer;" title="Chỉnh sửa"><i class="fa-solid fa-pen"></i></a>
+                                                    <form asp-action="DeleteArticle" method="post" style="margin: 0;" onsubmit="return confirm('Bạn có chắc muốn xóa bài viết này khỏi Ấn phẩm?');">
+                                                        <input type="hidden" name="id" value="@article.Id" />
+                                                        <button type="submit" class="btn-action reject" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                </div>
+            }
+        }
     </div>
 
 
     @* =====================PodCast========================================== *@
-    <div id="podcast" class="tab-content">
+    <div id="tab-podcast" class="tab-content">
         <h2 class="section-title">Những Thanh Âm Chạm Đến Trái Tim</h2>
         <table class="data-table">
             <thead>
                 <tr>
-                    <th style="width: 15%;">Hình ảnh</th>
-                    <th style="width: 40%;">Tiêu đề</th>
-                    <th style="width: 15%;">Danh mục</th>
-                    <th style="width: 15%;">Ngày đăng</th>
-                    <th style="width: 15%; text-align: right;">Thao tác</th>
+                    <th style="width: 18%;">Người gửi</th>
+                    <th style="width: 15%;">Chủ đề</th>
+                    <th style="width: 47%;">Thông tin Podcast</th>
+                    <th style="width: 20%; text-align: right;">Hành động</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td colspan="5" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 30px;">
-                        Chưa có bài viết nào được xuất bản trên tạp chí. Phần này sẽ code chức năng sau.
-                    </td>
-                </tr>
+                @if (Model.PendingPodCastsCount == 0)
+                {
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--text-muted); font-style: italic;">
+                            Hiện tại không có Podcast nào đang chờ duyệt.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    int index_pod = 0;
+                    @foreach (var podcast in Model.PendingPodCasts)
+                    {
+                        <tr>
+                            <td>
+                                <div class="user-info">
+                                    @if (podcast.User?.ProfilePicture != null)
+                                    {
+                                        <img src="data:image/*;base64,@(Convert.ToBase64String(podcast.User.ProfilePicture))" alt="Avatar" class="avatar" style="object-fit: cover;" />
+                                    }
+                                    else
+                                    {
+                                        <div class="avatar">@(string.IsNullOrEmpty(podcast.User?.FullName ?? podcast.Author) ? "?" : (podcast.User?.FullName ?? podcast.Author).Substring(0, 1).ToUpper())</div>
+                                    }
+                                    <div class="user-details">
+                                        <strong>@(string.IsNullOrEmpty(podcast.User?.FullName) ? (string.IsNullOrEmpty(podcast.Author) ? "Ẩn danh" : podcast.Author) : podcast.User.FullName)</strong>
+                                        <span>@podcast.CreatedAt.ToString("dd.MM.yyyy")</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge">@(podcast.Category?.Name ?? "Chưa rõ")</span></td>
+                            <td>
+                                <div class="post-content">
+                                    <h4>@(podcast.Title?.Length > 30 ? podcast.Title.Substring(0, 30) + "..." : podcast.Title) (Tập @podcast.EpisodeNumber)</h4>
+                                    
+                                    <button class="btn-view-more btn-open-modal"
+                                            data-title="@podcast.Title"
+                                            data-author="@(string.IsNullOrEmpty(podcast.User?.FullName) ? (podcast.Author ?? "Ẩn danh") : podcast.User.FullName)"
+                                            data-issuenumber="@(podcast.EpisodeNumber?.ToString() ?? "None")"
+                                            data-time="@podcast.CreatedAt.ToString("dd/MM/yyyy HH:mm")"
+                                            data-image="@(string.IsNullOrEmpty(podcast.ImagePath) ? "/images/Default_Images/Blog.png" : podcast.ImagePath)"
+                                            data-target="content-data-podcast-@index_pod">
+                                        <i class="fa-regular fa-eye"></i> <span>Xem chi tiết</span>
+                                    </button>
+
+                                    <!-- Dữ liệu ẩn cho Modal -->
+                                    <div id="content-data-podcast-@index_pod" style="display:none;">
+                                        <div style="margin-bottom: 20px;">
+                                            <audio controls style="width: 100%; outline: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                                                <source src="@podcast.AudioPath" type="audio/mpeg">
+                                                Trình duyệt không hỗ trợ thẻ audio.
+                                            </audio>
+                                        </div>
+                                        <p style="white-space: pre-wrap; font-size: 15px; color: #555; line-height: 1.8;">@podcast.Description</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="action-group">
+                                    <form asp-controller="Admin" asp-action="ApprovePodcast" asp-route-id="@podcast.Id" method="post" style="margin:0;">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn-action approve"><i class="fa-solid fa-check me-1"></i> Duyệt</button>
+                                    </form>
+                                    <form asp-controller="Admin" asp-action="RejectPodcast" asp-route-id="@podcast.Id" method="post" style="margin:0;" onsubmit="return confirm('Bạn có chắc muốn xóa Podcast này vĩnh viễn?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn-action reject"><i class="fa-solid fa-trash-can me-1"></i> Bỏ</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        index_pod++;
+                    }
+                }
             </tbody>
         </table>
     </div>
 
+    @* =====================Kho Bài Viết (Published Posts)========================================== *@
+    <div id="tab-published" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
+            <h2 class="section-title" style="margin-bottom: 0;">Kho lưu trữ bài viết đã xuất bản</h2>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <input type="text" id="publishedSearchInput" class="input-field" placeholder="Tìm kiếm theo tiêu đề..." style="width: 260px; height: 40px; font-size: 13px;" onkeyup="filterPublishedPosts()" />
+            </div>
+        </div>
+
+        @* --- Sub-Tabs: Story / PodCast --- *@
+        <div style="display: flex; gap: 0; margin-bottom: 25px; border-bottom: 2px solid #eee;">
+            <button class="pub-sub-tab active" onclick="switchPubSubTab(event, 'pub-stories')" style="background: none; border: none; padding: 12px 24px; font-family: inherit; font-size: 14px; font-weight: 700; color: #999; cursor: pointer; position: relative; transition: all 0.3s;">
+                <i class="fa-solid fa-book-open" style="margin-right: 6px;"></i> Câu Chuyện <span style="font-size: 11px; background: #f0f0f0; padding: 2px 8px; border-radius: 10px; margin-left: 5px;">@Model.ApprovedCount</span>
+            </button>
+            <button class="pub-sub-tab" onclick="switchPubSubTab(event, 'pub-podcasts')" style="background: none; border: none; padding: 12px 24px; font-family: inherit; font-size: 14px; font-weight: 700; color: #999; cursor: pointer; position: relative; transition: all 0.3s;">
+                <i class="fa-solid fa-headphones" style="margin-right: 6px;"></i> PodCast <span style="font-size: 11px; background: #f0f0f0; padding: 2px 8px; border-radius: 10px; margin-left: 5px;">@Model.ApprovedPodCasts.Count</span>
+            </button>
+        </div>
+
+        @* --- Sub-Tab 1: Approved Stories --- *@
+        <div id="pub-stories" class="pub-sub-content active">
+            @if (Model.ApprovedStories.Count == 0)
+            {
+                <div style="text-align: center; color: var(--text-muted); font-style: italic; padding: 40px 0;">
+                    <i class="fa-regular fa-folder-open" style="font-size: 32px; color: #ddd; display: block; margin-bottom: 12px;"></i>
+                    Chưa có câu chuyện nào được xuất bản.
+                </div>
+            }
+            else
+            {
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;" id="publishedStoriesGrid">
+                    @foreach (var story in Model.ApprovedStories)
+                    {
+                        string storyPlainText = string.IsNullOrEmpty(story.Content) ? "" : Regex.Replace(story.Content, "<.*?>", string.Empty);
+                        string storyExcerpt = storyPlainText.Length > 120 ? storyPlainText.Substring(0, 120) + "..." : storyPlainText;
+
+                        <div class="published-card" data-title="@story.Title?.ToLower()">
+                            <div style="display: flex; gap: 14px;">
+                                <div style="width: 80px; height: 80px; flex-shrink: 0; border-radius: 8px; overflow: hidden; background: #f5f5f5;">
+                                    <img src="@(string.IsNullOrEmpty(story.ImagePath) ? "/images/Default_Images/Blog.png" : story.ImagePath)" alt="@story.Title" style="width: 100%; height: 100%; object-fit: cover;" />
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                                        <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: var(--primary-deep); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">@story.Title</h4>
+                                        <span class="badge" style="background: var(--accent-green-bg); color: var(--accent-green); font-size: 10px; padding: 3px 8px;">Đã duyệt</span>
+                                    </div>
+                                    <div style="font-size: 11px; color: #999; margin-bottom: 6px; display: flex; gap: 12px; flex-wrap: wrap;">
+                                        <span><i class="fa-regular fa-user"></i> @(string.IsNullOrEmpty(story.User?.FullName) ? (string.IsNullOrEmpty(story.Author) ? "Ẩn danh" : story.Author) : story.User.FullName)</span>
+                                        <span><i class="fa-regular fa-clock"></i> @story.PublishDate?.ToString("dd/MM/yyyy")</span>
+                                        <span><i class="fa-regular fa-eye"></i> @story.ViewCount</span>
+                                    </div>
+                                    <p style="margin: 0; font-size: 12px; color: #888; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">@storyExcerpt</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px solid #f5f5f5;">
+                                <span class="badge" style="font-size: 10px;">@(story.Category?.Name ?? "Chưa rõ")</span>
+                                <div style="display: flex; gap: 6px;">
+                                    <a href="/Story/Details/@story.Id" target="_blank" style="padding: 5px 10px; font-size: 11px; border: 1px solid #eee; border-radius: 4px; text-decoration: none; color: #666; transition: all 0.2s;" title="Xem bài viết" onmouseover="this.style.borderColor='#B29B84'; this.style.color='#B29B84';" onmouseout="this.style.borderColor='#eee'; this.style.color='#666';"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                    <form asp-action="DeleteApprovedStory" method="post" style="margin: 0;" onsubmit="return confirm('Bạn có chắc chắn muốn gỡ bài viết này khỏi hệ thống?');">
+                                        <input type="hidden" name="id" value="@story.Id" />
+                                        <button type="submit" style="padding: 5px 10px; font-size: 11px; border: 1px solid #fdd; border-radius: 4px; background: none; color: var(--accent-red); cursor: pointer; transition: all 0.2s;" title="Gỡ bài" onmouseover="this.style.background='var(--accent-red-bg)';" onmouseout="this.style.background='none';"><i class="fa-solid fa-trash-can"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        @* --- Sub-Tab 2: Approved Podcasts --- *@
+        <div id="pub-podcasts" class="pub-sub-content">
+            @if (Model.ApprovedPodCasts.Count == 0)
+            {
+                <div style="text-align: center; color: var(--text-muted); font-style: italic; padding: 40px 0;">
+                    <i class="fa-solid fa-podcast" style="font-size: 32px; color: #ddd; display: block; margin-bottom: 12px;"></i>
+                    Chưa có Podcast nào được xuất bản.
+                </div>
+            }
+            else
+            {
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;" id="publishedPodcastsGrid">
+                    @foreach (var pc in Model.ApprovedPodCasts)
+                    {
+                        string pcDesc = pc.Description?.Length > 120 ? pc.Description.Substring(0, 120) + "..." : (pc.Description ?? "");
+
+                        <div class="published-card" data-title="@pc.Title?.ToLower()">
+                            <div style="display: flex; gap: 14px;">
+                                <div style="width: 80px; height: 80px; flex-shrink: 0; border-radius: 8px; overflow: hidden; background: #f5f5f5; position: relative;">
+                                    <img src="@(string.IsNullOrEmpty(pc.ImagePath) ? "/images/Default_Images/Blog.png" : pc.ImagePath)" alt="@pc.Title" style="width: 100%; height: 100%; object-fit: cover;" />
+                                    <div style="position: absolute; bottom: 4px; right: 4px; background: rgba(0,0,0,0.7); color: #fff; font-size: 9px; padding: 2px 5px; border-radius: 3px;"><i class="fa-solid fa-headphones"></i></div>
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                                        <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: var(--primary-deep); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">@pc.Title</h4>
+                                        <span style="font-size: 10px; background: #E8F0FF; color: #4A7ADB; padding: 3px 8px; border-radius: 10px; font-weight: 600; white-space: nowrap;">Tập @(pc.EpisodeNumber ?? 0)</span>
+                                    </div>
+                                    <div style="font-size: 11px; color: #999; margin-bottom: 6px; display: flex; gap: 12px; flex-wrap: wrap;">
+                                        <span><i class="fa-regular fa-user"></i> @(string.IsNullOrEmpty(pc.User?.FullName) ? (string.IsNullOrEmpty(pc.Author) ? "Ẩn danh" : pc.Author) : pc.User.FullName)</span>
+                                        <span><i class="fa-regular fa-clock"></i> @pc.PublishDate?.ToString("dd/MM/yyyy")</span>
+                                        <span><i class="fa-regular fa-eye"></i> @pc.ViewCount</span>
+                                        @if (!string.IsNullOrEmpty(pc.Duration))
+                                        {
+                                            <span><i class="fa-solid fa-stopwatch"></i> @pc.Duration</span>
+                                        }
+                                    </div>
+                                    <p style="margin: 0; font-size: 12px; color: #888; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">@pcDesc</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px solid #f5f5f5;">
+                                <span class="badge" style="font-size: 10px;">@(pc.Category?.Name ?? "Chưa rõ")</span>
+                                <div style="display: flex; gap: 6px;">
+                                    <a href="/PodCast/Details/@pc.Id" target="_blank" style="padding: 5px 10px; font-size: 11px; border: 1px solid #eee; border-radius: 4px; text-decoration: none; color: #666; transition: all 0.2s;" title="Xem Podcast" onmouseover="this.style.borderColor='#B29B84'; this.style.color='#B29B84';" onmouseout="this.style.borderColor='#eee'; this.style.color='#666';"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                    <form asp-action="DeleteApprovedPodcast" method="post" style="margin: 0;" onsubmit="return confirm('Bạn có chắc chắn muốn gỡ Podcast này khỏi hệ thống?');">
+                                        <input type="hidden" name="id" value="@pc.Id" />
+                                        <button type="submit" style="padding: 5px 10px; font-size: 11px; border: 1px solid #fdd; border-radius: 4px; background: none; color: var(--accent-red); cursor: pointer; transition: all 0.2s;" title="Gỡ bài" onmouseover="this.style.background='var(--accent-red-bg)';" onmouseout="this.style.background='none';"><i class="fa-solid fa-trash-can"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
     @* =====================Danh Mục========================================== *@
-    <div id="categories" class="tab-content">
+    <div id="tab-categories" class="tab-content">
         <h2 class="section-title">Cấu trúc danh mục hiện tại</h2>
 
         <form asp-controller="Admin" asp-action="CreateCategory" method="post" class="input-group">
@@ -258,7 +537,7 @@
         </div>
 
         @* =====================ManageUsers========================================== *@
-        <div id="manageusers" class="tab-content">
+        <div id="tab-manageusers" class="tab-content">
             <h2 class="section-title">Quản lý phân quyền hệ thống</h2>
 
             <!-- Form thêm người dùng mới -->
@@ -397,7 +676,7 @@
             contents.forEach(content => content.classList.remove('active'));
             const buttons = document.querySelectorAll('.tab-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
             evt.currentTarget.classList.add('active');
             
             // Cập nhật URL hash bằng history.replaceState để tránh trình duyệt tự động cuộn màn hình
@@ -461,6 +740,37 @@
         function closeStoryModal(e) {
             if (e.target.id === 'storyModal') {
                 document.getElementById('storyModal').style.display = 'none';
+            }
+        }
+
+        function switchPubSubTab(evt, tabId) {
+            const contents = document.querySelectorAll('.pub-sub-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            const buttons = document.querySelectorAll('.pub-sub-tab');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            evt.currentTarget.classList.add('active');
+            
+            // Re-apply filter when switching tabs
+            filterPublishedPosts();
+        }
+
+        function filterPublishedPosts() {
+            const input = document.getElementById('publishedSearchInput').value.toLowerCase();
+            const activeTab = document.querySelector('.pub-sub-content.active');
+            
+            if (activeTab) {
+                const cards = activeTab.querySelectorAll('.published-card');
+                cards.forEach(card => {
+                    const title = card.getAttribute('data-title') || '';
+                    if (title.includes(input)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
             }
         }
     </script>

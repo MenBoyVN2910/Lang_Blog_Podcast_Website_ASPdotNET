@@ -16,6 +16,6 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
         public ICollection<Story> Stories { get; set; } = new List<Story>();
 
         // Sau này bạn làm thêm bảng nào thì chỉ cần thêm liên kết vào đây:
-        // public ICollection<Podcast> Podcasts { get; set; } = new List<Podcast>();
+        public ICollection<PodCast> Podcasts { get; set; } = new List<PodCast>();
     }
 }

@@ -4,68 +4,69 @@
     ViewData["Title"] = Model.Title;
 }
 
-<link rel="stylesheet" href="~/css/Story/detail.css" />
+<link rel="stylesheet" href="~/css/Story/detail.css" asp-append-version="true" />
 
-<div class="container article-container">
-    <div class="row custom-editorial-layout">
+<div class="lang-story-light-container">
+    <div class="article-container">
+        <div class="custom-editorial-layout">
 
-        <!-- CỘT TRÁI: SIDEBAR THÔNG TIN -->
-        <div class="col-md-3 sidebar-column">
-            <div class="sidebar-meta">
-                <a href="@Url.Action("Index", "Story")" class="back-link">
-                    &mdash; QUAY LẠI CÂU CHUYỆN
-                </a>
+            <!-- CỘT TRÁI: SIDEBAR THÔNG TIN -->
+            <div class="sidebar-column">
+                <div class="sidebar-meta">
+                    <a href="@Url.Action("Index", "Story")" class="back-link">
+                        <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i> QUAY LẠI CÂU CHUYỆN
+                    </a>
 
-                <div class="meta-group">
-                    <span class="meta-label">DANH MỤC</span>
-                    <span class="meta-value font-italic">@(Model.Category?.Name ?? "Tâm sự")</span>
+                    <div class="meta-group">
+                        <span class="meta-label">DANH MỤC</span>
+                        <span class="meta-value font-italic">@(Model.Category?.Name ?? "Tâm sự")</span>
+                    </div>
+
+                    <div class="meta-group">
+                        <span class="meta-label">NGÀY XUẤT BẢN</span>
+                        <span class="meta-value">@Model.CreatedAt.ToString("dd.MM.yyyy")</span>
+                    </div>
+
+                    <div class="meta-group">
+                        <span class="meta-label">TÁC GIẢ</span>
+                        @{
+                            var rawAuthor = string.IsNullOrEmpty(Model.User?.FullName) ? (string.IsNullOrEmpty(Model.Author) ? "Ẩn danh" : Model.Author) : Model.User.FullName;
+                            var displayAuthor = rawAuthor.Length > 20 ? rawAuthor.Substring(0, 20) + "..." : rawAuthor;
+                        }
+                        <span class="meta-value font-italic" title="@rawAuthor">@displayAuthor</span>
+                    </div>
+
+                    <div class="meta-group">
+                        <span class="meta-label">SỐ PHÁT HÀNH</span>
+                        <span class="meta-value font-italic">@(string.IsNullOrEmpty(Model.IssueNumber) ? "None" : Model.IssueNumber)</span>
+                    </div>
                 </div>
-
-                <div class="meta-group">
-                    <span class="meta-label">NGÀY XUẤT BẢN</span>
-                    <span class="meta-value">@Model.CreatedAt.ToString("dd.MM.yyyy")</span>
-                </div>
-
-                <div class="meta-group">
-                    <span class="meta-label">TÁC GIẢ</span>
-                    <span class="meta-value font-italic">@(string.IsNullOrEmpty(Model.User?.FullName) ? (string.IsNullOrEmpty(Model.Author) ? "Ẩn danh" : Model.Author) : Model.User.FullName)</span>
-                </div>
-
-                <div class="meta-group">
-                    <span class="meta-label">SỐ PHÁT HÀNH</span>
-                    <span class="meta-value font-italic">@(string.IsNullOrEmpty(Model.IssueNumber) ? "None" : Model.IssueNumber)</span>
-                </div>
-
-
-                <!-- 💡 ĐÃ XÓA KHỐI ARTICLE-ACTIONS (LƯU TRANG & CHIA SẺ) TẠI ĐÂY -->
-            </div>
-        </div>
-
-        <!-- CỘT PHẢI: NỘI DUNG CHÍNH -->
-        <div class="col-md-9 content-column">
-
-            <div class="article-header">
-                <span class="category-badge">@(Model.Category?.Name?.ToUpper() ?? "TÂM SỰ")</span>
-                <h1 class="article-title">@Model.Title</h1>
-                <!-- 💡 ĐÃ XÓA KHỐI ARTICLE-STATS (LƯỢT XEM & BÌNH LUẬN) TẠI ĐÂY -->
             </div>
 
-            <!-- NỘI DUNG CHỮ CHẠY LIỀN MẠCH NGAY DƯỚI TIÊU ĐỀ -->
-            <div class="article-body">
-                @Html.Raw(Model.Content)
-            </div>
-
-            <hr class="article-divider" />
-
-            <!-- FOOTER BÀI VIẾT -->
-            <div class="article-footer">
-                <div class="author-note">
-                    <span class="note-label">LỜI NGỎ</span>
-                    <p>Cảm ơn bạn đã dành thời gian lắng nghe tâm hồn của mình.<br>Hy vọng bài viết này mang lại cho bạn chút ánh sáng nhỏ bé<br>trong thế giới đầy hối hả này.</p>
+            <!-- CỘT PHẢI: NỘI DUNG CHÍNH -->
+            <div class="content-column">
+                <div class="article-header">
+                    <span class="category-badge">@(Model.Category?.Name?.ToUpper() ?? "TÂM SỰ")</span>
+                    <h1 class="article-title">@Model.Title</h1>
                 </div>
-                <div class="magazine-signature">
-                    <span class="note-label">THỰC HIỆN BỞI</span>
-                    <h4>Lặng. Magazine</h4>
+
+                <!-- NỘI DUNG CHỮ CHẠY LIỀN MẠCH NGAY DƯỚI TIÊU ĐỀ -->
+                <div class="article-body">
+                    @Html.Raw(Model.Content)
+                </div>
+
+                <div class="article-divider"></div>
+
+                <!-- FOOTER BÀI VIẾT -->
+                <div class="article-footer">
+                    <div class="author-note">
+                        <span class="note-label">LỜI NGỎ</span>
+                        <p>Cảm ơn bạn đã dành thời gian lắng nghe tâm hồn của mình.<br>Hy vọng bài viết này mang lại cho bạn chút ánh sáng nhỏ bé<br>trong thế giới đầy hối hả này.</p>
+                    </div>
+                    <div class="magazine-signature">
+                        <span class="note-label">THỰC HIỆN BỞI</span>
+                        <h4>Lặng. Magazine</h4>
+                    </div>
                 </div>
             </div>
 

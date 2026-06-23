@@ -112,6 +112,156 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("Lang_Blog_Podcast_Website_ASPdotNET.Models.MagazineArticle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ImagePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IssueId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LayoutType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ViewCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("IssueId");
+
+                    b.ToTable("MagazineArticles");
+                });
+
+            modelBuilder.Entity("Lang_Blog_Podcast_Website_ASPdotNET.Models.MagazineIssue", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CoverImagePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EditorId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("IssueNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PublishDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Season")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EditorId");
+
+                    b.ToTable("MagazineIssues");
+                });
+
+            modelBuilder.Entity("Lang_Blog_Podcast_Website_ASPdotNET.Models.PodCast", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AudioPath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Duration")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("EpisodeNumber")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImagePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PublishDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ViewCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PodCasts");
+                });
+
             modelBuilder.Entity("Lang_Blog_Podcast_Website_ASPdotNET.Models.Story", b =>
                 {
                     b.Property<int>("Id")
@@ -299,6 +449,51 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Lang_Blog_Podcast_Website_ASPdotNET.Models.MagazineArticle", b =>
+                {
+                    b.HasOne("Lang_Blog_Podcast_Website_ASPdotNET.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Lang_Blog_Podcast_Website_ASPdotNET.Models.MagazineIssue", "Issue")
+                        .WithMany("Articles")
+                        .HasForeignKey("IssueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Issue");
+                });
+
+            modelBuilder.Entity("Lang_Blog_Podcast_Website_ASPdotNET.Models.MagazineIssue", b =>
+                {
+                    b.HasOne("Lang_Blog_Podcast_Website_ASPdotNET.Data.ApplicationUser", "Editor")
+                        .WithMany()
+                        .HasForeignKey("EditorId");
+
+                    b.Navigation("Editor");
+                });
+
+            modelBuilder.Entity("Lang_Blog_Podcast_Website_ASPdotNET.Models.PodCast", b =>
+                {
+                    b.HasOne("Lang_Blog_Podcast_Website_ASPdotNET.Models.Category", "Category")
+                        .WithMany("Podcasts")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Lang_Blog_Podcast_Website_ASPdotNET.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Category");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Lang_Blog_Podcast_Website_ASPdotNET.Models.Story", b =>
                 {
                     b.HasOne("Lang_Blog_Podcast_Website_ASPdotNET.Models.Category", "Category")
@@ -369,7 +564,14 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Migrations
 
             modelBuilder.Entity("Lang_Blog_Podcast_Website_ASPdotNET.Models.Category", b =>
                 {
+                    b.Navigation("Podcasts");
+
                     b.Navigation("Stories");
+                });
+
+            modelBuilder.Entity("Lang_Blog_Podcast_Website_ASPdotNET.Models.MagazineIssue", b =>
+                {
+                    b.Navigation("Articles");
                 });
 #pragma warning restore 612, 618
         }

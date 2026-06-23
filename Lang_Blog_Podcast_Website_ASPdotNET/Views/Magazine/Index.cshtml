@@ -1,178 +1,85 @@
+@model IEnumerable<Lang_Blog_Podcast_Website_ASPdotNET.Models.MagazineIssue>
+
 @{
-    ViewData["Title"] = "";
+    ViewData["Title"] = "Tạp Chí - Kệ Ấn Phẩm";
 }
 
-
-@* ======================================================================================================================================================== *@
 <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-<link rel="stylesheet" href="~/css/Magazine/Index.css" />
-@* ======================================================================================================================================================== *@
+<link rel="stylesheet" href="~/css/Magazine/Index.css" asp-append-version="true" />
 
-
-@* ======================================================================================================================================================== *@
-<div class="magazine-wrapper">
-    <header class="magazine-header">
-        <div class="header-bg-text">ISSUE</div>
-        <div class="header-content">
-            <div class="header-badge animate-journal j-delay-1">
-                <span class="line"></span>
-                <span class="text">Ấn phẩm tập san</span>
-                <span class="line"></span>
-            </div>
-
-            <h1 class="header-title animate-journal j-delay-2">
-                Lặng. <span class="italic">Journal</span>
+<div class="lang-magazine-avant-container">
+    
+    @* --- AVANT-GARDE HEADER --- *@
+    <header class="magazine-hero">
+        <div class="hero-watermark">EDITORIAL</div>
+        
+        <div class="hero-content">
+            <h1 class="hero-title animate-mag m-delay-2" style="font-size: 8vw;">
+                <span class="title-main">LẶNG.</span><br />
+                <span class="title-sub">MAGAZINE</span>
             </h1>
 
-            <p class="header-quote animate-journal j-delay-3">
-                "Định nghĩa về nghệ thuật sống qua lăng kính của sự tĩnh lặng và chiều sâu nội tại."
-            </p>
-
-            <div class="header-meta animate-journal j-delay-4">
-                <span>Quarterly No. 1</span>
-                <span class="header-meta dot"></span>
-                <span>Summer 2024</span>
-            </div>
-
-            <div class="magazine-header-action animate-journal j-delay-5" style="margin-top: 30px;">
-                @if (User.Identity != null && User.Identity.IsAuthenticated)
-                {
-                    <a asp-controller="#" asp-action="#" class="btn-gui-magazine">
-                        GÓC CHIA SẺ ẤN PHẨM
-                    </a>
-                }
-                else
-                {
-                    <a href="javascript:void(0);" onclick="showLoginAlert()" class="btn-gui-magazine">
-                        GÓC CHIA SẺ ẤN PHẨM
-                    </a>
-                }
+            <div class="hero-bottom-grid animate-mag m-delay-3">
+                <div class="hero-quote">
+                    "Tập san của những tâm hồn đồng điệu. Chọn một ấn phẩm và thả mình vào sự tĩnh lặng."
+                </div>
             </div>
         </div>
     </header>
 
-    <main class="magazine-body">
-        <div class="posts-grid">
+    @* --- MAGAZINE SHELF (Kệ tạp chí) --- *@
+    <main class="magazine-body" style="max-width: 1400px; margin: 0 auto; padding: 0 40px 100px 40px;">
+        @if (!Model.Any())
+        {
+            <div style="text-align: center; padding: 100px 0;">
+                <h3 style="font-family: var(--font-serif-header); color: #ccc; font-size: 24px; letter-spacing: 2px;">HIỆN CHƯA CÓ ẤN PHẨM NÀO ĐƯỢC PHÁT HÀNH.</h3>
+            </div>
+        }
+        else
+        {
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 50px;">
+                @foreach (var issue in Model)
+                {
+                    <article data-aos="fade-up" data-aos-duration="1000">
+                        <a href="/Magazine/IssueDetails/@issue.Id" style="text-decoration: none; color: inherit; display: block; group;">
+                            <div style="position: relative; overflow: hidden; border: 1px solid #000; box-shadow: 15px 15px 0px #000; transition: transform 0.3s ease, box-shadow 0.3s ease;" 
+                                 onmouseover="this.style.transform='translate(-5px, -5px)'; this.style.boxShadow='20px 20px 0px #000';"
+                                 onmouseout="this.style.transform='translate(0, 0)'; this.style.boxShadow='15px 15px 0px #000';">
+                                
+                                <img src="@issue.CoverImagePath" alt="@issue.Title" style="width: 100%; aspect-ratio: 3/4; object-fit: cover; filter: grayscale(100%); transition: filter 0.5s ease;"
+                                     onmouseover="this.style.filter='grayscale(0%)';" onmouseout="this.style.filter='grayscale(100%)';" />
+                                
+                                <div style="position: absolute; top: 15px; left: 15px; background: #000; color: #fff; padding: 5px 10px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 2px;">
+                                    @issue.IssueNumber
+                                </div>
+                            </div>
 
-            <a href="#" class="post-card" data-aos="fade-up" data-aos-delay="0">
-                <div class="post-image-container">
-                    <span class="post-category-tag">CHỮA LÀNH</span>
-                    <img src="~/images/logo_website.png" class="post-image" alt="Nghệ thuật của sự chậm rãi" />
-                </div>
-                <div class="post-card-meta">
-                    <span>02.06.2026</span>
-                    <span>•</span>
-                    <span>302 LƯỢT XEM</span>
-                </div>
-                <h3 class="post-card-title">Nghệ thuật của sự chậm rãi</h3>
-                <p class="post-card-excerpt">
-                    Trong một thế giới luôn hối hả, sự chậm rãi đôi khi bị coi là yếu đuối. Nhưng thực tế, chậm lại là cách duy nhất để chúng ta nhìn nhận rõ bản chất...
-                </p>
-                <div class="post-card-action">ĐỌC THÊM</div>
-            </a>
-
-            <a href="#" class="post-card" data-aos="fade-up" data-aos-delay="150">
-                <div class="post-image-container">
-                    <span class="post-category-tag">TÂM SỰ</span>
-                    <img src="~/images/logo_website.png" class="post-image" alt="Tiếng vang trong tĩnh lặng" />
-                </div>
-                <div class="post-card-meta">
-                    <span>08.06.2026</span>
-                    <span>•</span>
-                    <span>421 LƯỢT XEM</span>
-                </div>
-                <h3 class="post-card-title">Tiếng vang trong tĩnh lặng</h3>
-                <p class="post-card-excerpt">
-                    Có những điều chỉ có thể nghe thấy khi ta hoàn toàn im lặng. Im lặng không phải là sự vắng mặt của âm thanh, mà là trạng thái đón nhận trọn vẹn nhất...
-                </p>
-                <div class="post-card-action">ĐỌC THÊM</div>
-            </a>
-
-            <a href="#" class="post-card" data-aos="fade-up" data-aos-delay="300">
-                <div class="post-image-container">
-                    <span class="post-category-tag">KÝ ỨC</span>
-                    <img src="~/images/logo_website.png" class="post-image" alt="Ký ức về những ngày nắng cũ" />
-                </div>
-                <div class="post-card-meta">
-                    <span>18.05.2026</span>
-                    <span>•</span>
-                    <span>719 LƯỢT XEM</span>
-                </div>
-                <h3 class="post-card-title">Ký ức về những ngày nắng cũ</h3>
-                <p class="post-card-excerpt">
-                    Hoài niệm là một phần của tâm hồn. Những ngày nắng cũ mang theo mùi hương của sách mới, vị ngọt của tách trà chiều gieo vào lòng ta những bình lặng lạ kỳ...
-                </p>
-                <div class="post-card-action">ĐỌC THÊM</div>
-            </a>
-
-            <a href="#" class="post-card" data-aos="fade-up" data-aos-delay="0">
-                <div class="post-image-container">
-                    <span class="post-category-tag">TRIẾT LÝ</span>
-                    <img src="~/images/logo_website.png" class="post-image" alt="Vết rêu phong trên thềm cũ" />
-                </div>
-                <div class="post-card-meta">
-                    <span>04.06.2026</span>
-                    <span>•</span>
-                    <span>745 LƯỢT XEM</span>
-                </div>
-                <h3 class="post-card-title">Vết rêu phong trên thềm cũ</h3>
-                <p class="post-card-excerpt">
-                    Thời gian không xóa nhòa mọi thứ, nó chỉ phủ lên một lớp rêu xanh. Những mảng xanh li ti bám trên gạch đá kể câu chuyện về sự trường tồn thầm lặng...
-                </p>
-                <div class="post-card-action">ĐỌC THÊM</div>
-            </a>
-
-            <a href="#" class="post-card" data-aos="fade-up" data-aos-delay="150">
-                <div class="post-image-container">
-                    <span class="post-category-tag">TỰ NHIÊN</span>
-                    <img src="~/images/logo_website.png" class="post-image" alt="Bản giao hưởng của đại ngàn" />
-                </div>
-                <div class="post-card-meta">
-                    <span>24.05.2026</span>
-                    <span>•</span>
-                    <span>291 LƯỢT XEM</span>
-                </div>
-                <h3 class="post-card-title">Bản giao hưởng của đại ngàn</h3>
-                <p class="post-card-excerpt">
-                    Rừng sâu không bao giờ tĩnh mịch hoàn toàn. Đó là một bản giao hưởng phức tạp của hàng triệu sinh linh đang thở, đang chuyển động nhịp nhàng...
-                </p>
-                <div class="post-card-action">ĐỌC THÊM</div>
-            </a>
-
-        </div>
+                            <div style="margin-top: 25px; border-top: 2px solid #000; padding-top: 15px;">
+                                <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #888; margin-bottom: 8px; text-transform: uppercase;">
+                                    @issue.Season &mdash; @(issue.PublishDate?.ToString("MM/yyyy"))
+                                </div>
+                                <h2 style="font-family: var(--font-serif-header); font-size: 28px; line-height: 1.2; margin: 0; color: #000;">
+                                    @issue.Title
+                                </h2>
+                                <p style="font-family: var(--font-sans); font-size: 14px; color: #555; margin-top: 10px; line-height: 1.6;">
+                                    @issue.Description
+                                </p>
+                            </div>
+                        </a>
+                    </article>
+                }
+            </div>
+        }
     </main>
 </div>
-@* ======================================================================================================================================================== *@
 
-
-@* ======================================================================================================================================================== *@
 @section Scripts {
-<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    AOS.init({
-    once: true,
-    offset: 40,
-    duration: 1000,
-    easing: 'ease-out-cubic'
-    });
-
-    function showLoginAlert() {
-        Swal.fire({
-            title: 'Một chút nhịp ngưng...',
-            text: 'Bạn cần đăng nhập để có thể gửi gắm câu chuyện của mình. Hãy đăng nhập và trở lại đây nhé!',
-            icon: 'info',
-            showCancelButton: true,
-            confirmButtonColor: '#111',
-            cancelButtonColor: '#8C847D',
-            confirmButtonText: 'Đăng nhập',
-            cancelButtonText: 'Lúc khác'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = '/Identity/Account/Login';
-            }
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            once: true,
+            offset: 50,
+            easing: 'ease-out-cubic'
         });
-    }
-</script>
+    </script>
 }
-@* ======================================================================================================================================================== *@

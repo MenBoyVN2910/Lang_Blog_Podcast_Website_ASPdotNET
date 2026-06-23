@@ -1,0 +1,447 @@
+@model Lang_Blog_Podcast_Website_ASPdotNET.Models.MagazineArticle
+
+@{
+    ViewData["Title"] = "Thêm Bài Viết Cho Tạp Chí";
+}
+
+<link rel="stylesheet" href="~/css/Admin/Index.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+    .form-container {
+        background: #fff;
+        padding: 48px;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+        max-width: 1100px;
+        margin: 40px auto;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        position: relative;
+        overflow: hidden;
+    }
+    .form-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #B29B84, #8C7B6B, #B29B84);
+    }
+    .form-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 32px;
+        color: #111;
+        margin-bottom: 8px;
+    }
+    .form-title .issue-tag {
+        font-size: 17px;
+        color: #B29B84;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-weight: 400;
+    }
+    .form-subtitle {
+        color: #999;
+        font-size: 14px;
+        margin-bottom: 35px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .form-group {
+        margin-bottom: 24px;
+        position: relative;
+    }
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1.5px solid #e0e0e0;
+        border-radius: 10px;
+        font-family: inherit;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: #fafafa;
+        box-sizing: border-box;
+    }
+    .form-control:focus {
+        border-color: #B29B84;
+        box-shadow: 0 0 0 4px rgba(178, 155, 132, 0.12);
+        outline: none;
+        background: #fff;
+    }
+    .char-counter {
+        position: absolute;
+        right: 4px;
+        bottom: -20px;
+        font-size: 11px;
+        color: #aaa;
+        font-weight: 500;
+        transition: color 0.3s;
+    }
+    .char-counter.warning { color: #e67e22; font-weight: 600; }
+    .char-counter.danger { color: #dc3545; font-weight: 700; }
+    .validation-msg {
+        font-size: 12px;
+        color: #dc3545;
+        margin-top: 6px;
+        display: block;
+        min-height: 18px;
+    }
+
+    /* === FILE UPLOAD === */
+    .file-upload-area {
+        border: 2px dashed #ddd;
+        border-radius: 12px;
+        padding: 24px 16px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #fcfcfc;
+        position: relative;
+    }
+    .file-upload-area:hover { border-color: #B29B84; background: rgba(178,155,132,0.03); }
+    .file-upload-area.has-file { border-color: #B29B84; border-style: solid; background: rgba(178,155,132,0.04); }
+    .file-upload-area i { font-size: 24px; color: #ccc; margin-bottom: 6px; }
+    .file-upload-area:hover i { color: #B29B84; }
+    .file-upload-area p { color: #999; font-size: 12px; margin: 0; }
+    .file-upload-area p strong { color: #B29B84; }
+    .file-upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .img-preview {
+        margin-top: 12px;
+        text-align: center;
+        display: none;
+    }
+    .img-preview img {
+        max-width: 100%;
+        max-height: 180px;
+        border-radius: 8px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        border: 2px solid #fff;
+    }
+    .img-preview .file-name {
+        font-size: 11px;
+        color: #888;
+        margin-top: 6px;
+    }
+
+    /* === BUTTONS === */
+    .btn-submit {
+        background: linear-gradient(135deg, #111 0%, #333 100%);
+        color: #fff;
+        border: none;
+        padding: 16px;
+        width: 100%;
+        border-radius: 10px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.4s ease;
+        text-transform: uppercase;
+        position: relative;
+        overflow: hidden;
+    }
+    .btn-submit::after {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        transition: left 0.6s;
+    }
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #B29B84, #8C7B6B);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(178,155,132,0.3);
+    }
+    .btn-submit:hover::after { left: 100%; }
+    .btn-submit:active { transform: translateY(0); }
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        color: #888;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        transition: color 0.3s;
+    }
+    .back-link:hover { color: #111; }
+
+    .tip-box {
+        background: linear-gradient(135deg, #f8f6f3, #f0ece6);
+        border-left: 3px solid #B29B84;
+        padding: 14px 18px;
+        border-radius: 0 8px 8px 0;
+        margin-bottom: 28px;
+        font-size: 13px;
+        color: #666;
+        line-height: 1.6;
+    }
+    .tip-box i { color: #B29B84; margin-right: 6px; }
+</style>
+
+<div class="admin-container admin-layout" style="background-color: #f9f9f9; min-height: 100vh;">
+    <main class="admin-main" style="margin-left: 0; width: 100%;">
+        <div class="form-container">
+            <h2 class="form-title">@ViewData["Title"] <span class="issue-tag">— Thuộc Ấn phẩm: @ViewBag.IssueTitle</span></h2>
+            <p class="form-subtitle"><i class="fa-solid fa-pen-to-square"></i> Thêm bài viết mới vào ấn phẩm. Tiêu đề tối đa 40 ký tự. Nội dung phải đủ 30 ký tự mới được chèn ảnh.</p>
+
+            <form asp-action="CreateArticle" method="post" enctype="multipart/form-data" id="createArticleForm">
+                <input type="hidden" asp-for="IssueId" value="@ViewBag.IssueId" />
+
+                <div class="row" style="display: flex; flex-wrap: wrap; margin: -15px;">
+                    <div class="col-md-8" style="padding: 15px; width: 66.666%;">
+                        <div class="form-group">
+                            <label asp-for="Title"><i class="fa-solid fa-heading"></i> Tiêu đề bài viết</label>
+                            <input asp-for="Title" class="form-control" placeholder="Tiêu đề bài viết..." maxlength="40" id="inputArticleTitle" />
+                            <span class="char-counter" id="counterArticleTitle">0 / 40</span>
+                            <span asp-validation-for="Title" class="validation-msg"></span>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 35px;">
+                            <label asp-for="Content"><i class="fa-solid fa-book-open"></i> Nội dung bài viết</label>
+                            <textarea asp-for="Content" class="form-control" id="editor" rows="15" placeholder="Viết nội dung bài tạp chí tại đây..."></textarea>
+                            <span asp-validation-for="Content" class="validation-msg"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4" style="padding: 15px; width: 33.333%;">
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-tags"></i> Danh Mục</label>
+                            <select asp-for="CategoryId" class="form-control" asp-items="@(new SelectList(ViewBag.Categories, "Id", "Name"))">
+                                <option value="">-- Chọn danh mục --</option>
+                            </select>
+                            <span asp-validation-for="CategoryId" class="validation-msg"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="LayoutType"><i class="fa-solid fa-table-cells-large"></i> Kiểu Layout hiển thị</label>
+                            <select asp-for="LayoutType" class="form-control">
+                                <option value="">-- Chọn kiểu hiển thị --</option>
+                                <option value="tall">Dọc Lớn (Tall - 3:4)</option>
+                                <option value="wide">Ngang Rộng (Wide - 21:9)</option>
+                                <option value="short">Ngang Nhỏ (Short - 16:9)</option>
+                                <option value="minimal">Vuông (Minimal - 1:1)</option>
+                                <option value="tall-offset">Dọc Lệch (Tall Offset)</option>
+                            </select>
+                            <span asp-validation-for="LayoutType" class="validation-msg"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-image"></i> Ảnh Minh Họa</label>
+                            <div class="file-upload-area" id="articleFileUploadArea">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <p><strong>Nhấn để chọn ảnh</strong></p>
+                                <p style="font-size: 10px; margin-top: 3px; color: #bbb;">JPG, PNG, WEBP — Tối đa 5MB</p>
+                                <input type="file" name="image" accept="image/*" id="articleImageInput" />
+                            </div>
+                            <div class="img-preview" id="articleImgPreview">
+                                <img id="articlePreviewImg" src="" alt="Preview" />
+                                <div class="file-name" id="articleFileName"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 35px;">
+                            <button type="submit" class="btn-submit">
+                                <i class="fa-solid fa-plus"></i> THÊM VÀO ẤN PHẨM
+                            </button>
+                        </div>
+                        
+                        <div class="text-center" style="text-align: center;">
+                            <a href="/Admin#magazine" class="back-link"><i class="fa-solid fa-arrow-left"></i> Hủy và Quay lại</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // =========================================================================
+        // 1. BỘ ĐẾM KÝ TỰ REAL-TIME
+        // =========================================================================
+        function setupCharCounter(inputId, counterId, maxLen) {
+            var input = document.getElementById(inputId);
+            var counter = document.getElementById(counterId);
+            if (!input || !counter) return;
+            function update() {
+                var len = input.value.length;
+                counter.textContent = len + ' / ' + maxLen;
+                counter.classList.remove('warning', 'danger');
+                if (len >= maxLen) counter.classList.add('danger');
+                else if (len >= maxLen * 0.8) counter.classList.add('warning');
+            }
+            input.addEventListener('input', update);
+            update();
+        }
+        setupCharCounter('inputArticleTitle', 'counterArticleTitle', 40);
+
+        // =========================================================================
+        // 2. CẤU HÌNH TINYMCE — Chặn chèn ảnh khi chưa đủ 30 ký tự
+        // =========================================================================
+        tinymce.init({
+            selector: '#editor',
+            plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table wordcount',
+            toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | removeformat | help',
+            height: 500,
+            skin: 'oxide',
+            content_css: 'default',
+            setup: function (editor) {
+                // 2.1 Tự động lưu nội dung vào textarea
+                editor.on('change keyup nodeChange', function () {
+                    editor.save();
+                });
+
+                // 2.2 Chặn nút "Chèn ảnh" nếu chưa đủ 30 ký tự
+                editor.on('BeforeExecCommand', function (e) {
+                    if (e.command === 'mceImage') {
+                        var text = editor.getContent({ format: 'text' });
+                        if (text.length < 30) {
+                            e.preventDefault();
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Chưa đủ nội dung!',
+                                html: 'Bạn cần viết ít nhất <strong>30 ký tự</strong> trước khi chèn ảnh.<br><small style="color:#999;">Hiện tại: ' + text.length + ' ký tự</small>',
+                                confirmButtonColor: '#B29B84',
+                                confirmButtonText: 'Đã hiểu'
+                            });
+                        }
+                    }
+                });
+
+                // 2.3 Chặn kéo-thả ảnh khi chưa đủ 30 ký tự
+                editor.on('drop', function (e) {
+                    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                        var hasImage = false;
+                        for (var i = 0; i < e.dataTransfer.files.length; i++) {
+                            if (e.dataTransfer.files[i].type.match('image.*')) { hasImage = true; break; }
+                        }
+                        if (hasImage) {
+                            var text = editor.getContent({ format: 'text' });
+                            if (text.length < 30) {
+                                e.preventDefault();
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Chưa đủ nội dung!',
+                                    html: 'Bạn cần viết ít nhất <strong>30 ký tự</strong> trước khi chèn ảnh.<br><small style="color:#999;">Hiện tại: ' + text.length + ' ký tự</small>',
+                                    confirmButtonColor: '#B29B84'
+                                });
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        // =========================================================================
+        // 3. PREVIEW ẢNH MINH HỌA
+        // =========================================================================
+        var articleImgInput = document.getElementById('articleImageInput');
+        if (articleImgInput) {
+            articleImgInput.addEventListener('change', function () {
+                var preview = document.getElementById('articleImgPreview');
+                var previewImg = document.getElementById('articlePreviewImg');
+                var fileName = document.getElementById('articleFileName');
+                var uploadArea = document.getElementById('articleFileUploadArea');
+
+                if (this.files && this.files[0]) {
+                    var file = this.files[0];
+                    if (!file.type.match('image.*')) {
+                        Swal.fire({ icon: 'warning', title: 'Định dạng không hỗ trợ', text: 'Vui lòng chọn file ảnh!', confirmButtonColor: '#B29B84' });
+                        this.value = '';
+                        return;
+                    }
+                    if (file.size > 5 * 1024 * 1024) {
+                        Swal.fire({ icon: 'warning', title: 'File quá lớn', text: 'Ảnh không được vượt quá 5MB!', confirmButtonColor: '#B29B84' });
+                        this.value = '';
+                        return;
+                    }
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImg.src = e.target.result;
+                        preview.style.display = 'block';
+                        fileName.innerHTML = '<i class="fa-solid fa-check-circle" style="color:#27ae60;"></i> ' + file.name;
+                        uploadArea.classList.add('has-file');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // =========================================================================
+        // 4. CHẶN SUBMIT NẾU THIẾU ẢNH
+        // =========================================================================
+        var form = document.getElementById('createArticleForm');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                // Đảm bảo TinyMCE đã lưu nội dung
+                if (typeof tinymce !== 'undefined') { tinymce.triggerSave(); }
+
+                var imgInput = document.getElementById('articleImageInput');
+                if (!imgInput || !imgInput.files || imgInput.files.length === 0) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Thiếu ảnh minh họa!',
+                        html: 'Bạn cần chọn ảnh minh họa cho bài viết.',
+                        confirmButtonColor: '#111',
+                        confirmButtonText: 'Đã hiểu'
+                    });
+                    return false;
+                }
+            });
+        }
+
+        // =========================================================================
+        // 5. THÔNG BÁO SWEETALERT2 TỪ SERVER (TempData)
+        // =========================================================================
+        document.addEventListener("DOMContentLoaded", function () {
+            @if (TempData["AdminMessage"] != null)
+            {
+                <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    html: '@Html.Raw(TempData["AdminMessage"])',
+                    confirmButtonColor: '#111',
+                    confirmButtonText: 'Quay về Trang quản lý',
+                    allowOutsideClick: false,
+                    timer: 4000,
+                    timerProgressBar: true
+                }).then(function () {
+                    window.location.href = '/Admin#magazine';
+                });
+                </text>
+            }
+
+            @if (TempData["AdminError"] != null)
+            {
+                <text>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Có lỗi xảy ra!',
+                    html: '@Html.Raw(TempData["AdminError"])',
+                    confirmButtonColor: '#dc3545',
+                    confirmButtonText: 'Tôi sẽ kiểm tra lại'
+                });
+                </text>
+            }
+        });
+    </script>
+}

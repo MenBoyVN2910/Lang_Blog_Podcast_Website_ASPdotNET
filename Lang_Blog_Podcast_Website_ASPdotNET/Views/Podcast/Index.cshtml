@@ -1,92 +1,167 @@
-@{
-    ViewData["Title"] = "";
-}
+@model IEnumerable<Lang_Blog_Podcast_Website_ASPdotNET.Models.PodCast>
 
+@{
+    ViewData["Title"] = "Podcast - ";
+}
 
 @* ======================================================================================================================================================== *@
 <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-<link rel="stylesheet" href="~/css/Podcast/Index.css" />
+<link rel="stylesheet" href="~/css/Podcast/Index.css" asp-append-version="true" />
 @* ======================================================================================================================================================== *@
 
-
-@* ======================================================================================================================================================== *@
-<div class="lang-podcast-container">
-    <header class="podcast-header">
-        <div class="podcast-header-bg-text">AUDIO</div>
-        <div style="position: relative; z-index: 2;">
-            <span class="podcast-header-sub animate-podcast-text p-delay-1">Sóng âm cảm xúc</span>
-            <h1 class="podcast-header-title animate-podcast-text p-delay-2">Podcast Series.</h1>
-            <p class="podcast-header-desc animate-podcast-text p-delay-3">
-                Bật tai nghe lên, nhắm mắt lại và để những âm thanh dẫn lối bạn trở về với sự bình lặng sâu thẳm nhất.
+<div class="lang-podcast-dark-container">
+    @* --- HERO SECTION TỐI MỜ CAO CẤP --- *@
+    <section class="podcast-hero">
+        <div class="podcast-hero-background"></div>
+        <div class="podcast-hero-overlay"></div>
+        <div class="podcast-hero-content">
+            <span class="hero-subtitle animate-hero" style="animation-delay: 0.1s">AUDIO SERIES</span>
+            <h1 class="hero-title animate-hero" style="animation-delay: 0.3s">Sóng Âm Cảm Xúc.</h1>
+            <p class="hero-desc animate-hero" style="animation-delay: 0.5s">
+                Bật tai nghe lên, nhắm mắt lại và để những âm thanh dẫn lối bạn trở về với sự bình lặng sâu thẳm nhất. Một không gian của tạp chí LẶNG.
             </p>
-            <div class="podcast-header-action animate-podcast-text p-delay-4" style="margin-top: 30px;">
+            <div class="hero-actions animate-hero" style="animation-delay: 0.7s">
                 @if (User.Identity != null && User.Identity.IsAuthenticated)
                 {
-                    <a asp-controller="#" asp-action="#" class="btn-gui-podcast">
-                        LAN TOA TIẾNG NÓI CỦA BẠN
+                    <a asp-controller="Podcast" asp-action="Submit" class="btn-primary-gold">
+                        LAN TỎA TIẾNG NÓI CỦA BẠN
                     </a>
                 }
                 else
                 {
-                    <a href="javascript:void(0);" onclick="showLoginAlert()" class="btn-gui-podcast">
-                        LAN TOA TIẾNG NÓI CỦA BẠN
+                    <a href="javascript:void(0);" onclick="showLoginAlert()" class="btn-primary-gold">
+                        LAN TỎA TIẾNG NÓI CỦA BẠN
                     </a>
                 }
             </div>
         </div>
-    </header>
+        <div class="hero-gradient-bottom"></div>
+    </section>
 
-    <div class="podcast-grid">
-        @for (int i = 1; i <= 4; i++)
-        {
-            <div class="podcast-card" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="@((i - 1) * 150)">
-                <div class="podcast-img-wrapper">
-                    <img src="~/images/Logo/logo_website.png" class="podcast-img" alt="Podcast Cover" />
-
-                    <div class="podcast-play-overlay">
-                        <div class="play-btn-circle">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#ffffff" stroke="#ffffff" stroke-width="2" style="transform: translateX(1px);">
-                                <polygon points="6 3 20 12 6 21 6 3"></polygon>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="podcast-info">
-                    <div class="podcast-meta">
-                        <span>Mùa 01 • Tập @i</span>
-                        <span class="podcast-dot"></span>
-                        <span style="opacity: 0.7;">45:00</span>
-                    </div>
-
-                    <h3 class="podcast-title">
-                        Về những ngày mưa và tách trà nóng nghi ngút khói.
-                    </h3>
-
-                    <p class="podcast-desc">
-                        Những ngày mưa thường gợi cho chúng ta nhiều kỷ niệm khó quên, có lẽ vì tiếng mưa rơi luôn làm lòng ta dịu lại giữa nhịp sống hối hả...
-                    </p>
-
-                    <div class="podcast-action">
-                        NGHE NGAY <span class="podcast-line"></span>
-                    </div>
-                </div>
+    @* --- FILTER & SEARCH BAR GLASSMORPHISM --- *@
+    <section class="podcast-toolbar">
+        <form method="get" class="glass-filter-form" data-aos="fade-up" data-aos-duration="1000">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" name="search" value="@ViewBag.Search" placeholder="Tìm kiếm tên tập, người dẫn..." class="glass-input" />
             </div>
-        }
-    </div>
+            
+            <div class="category-box">
+                <select name="categoryId" class="glass-select" onchange="this.form.submit()">
+                    <option value="">Tất cả chủ đề</option>
+                    @if (ViewBag.Categories != null)
+                    {
+                        foreach (var category in ViewBag.Categories)
+                        {
+                            if (ViewBag.CategoryId == category.Id)
+                            {
+                                <option value="@category.Id" selected="selected">@category.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+            
+            <button type="submit" class="btn-glass-search">TÌM KIẾM</button>
+            @if (!string.IsNullOrEmpty(ViewBag.Search) || ViewBag.CategoryId != null)
+            {
+                <a asp-controller="Podcast" asp-action="Index" class="btn-glass-clear" title="Xóa bộ lọc"><i class="fa-solid fa-xmark"></i></a>
+            }
+        </form>
+    </section>
+
+    @* --- PODCAST GRID CAO CẤP --- *@
+    <section class="podcast-grid-section">
+        <div class="podcast-grid">
+            @if (Model != null && Model.Any())
+            {
+                int delay = 0;
+                foreach (var podcast in Model)
+                {
+                    <div class="premium-podcast-card" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="@delay"
+                         data-audio-url="@podcast.AudioPath"
+                         data-audio-title="@podcast.Title"
+                         data-audio-author="@(podcast.User?.FullName ?? podcast.Author)"
+                         data-audio-image="@podcast.ImagePath"
+                         data-podcast-id="@podcast.Id">
+                        
+                        <a asp-controller="Podcast" asp-action="Details" asp-route-id="@podcast.Id" class="card-link-wrapper">
+                            @* Nửa trên: Ảnh bìa cinematic *@
+                            <div class="card-image-section">
+                                <img src="@podcast.ImagePath" class="card-image" alt="@podcast.Title" />
+                                <div class="card-image-overlay"></div>
+                                <span class="card-badge">@(podcast.Category?.Name ?? "Podcast")</span>
+                                
+                                @* Nút play lอย giữa ảnh bìa khi hover *@
+                                <div class="card-play-button" onclick="event.preventDefault(); event.stopPropagation(); playFromCard(this);">
+                                    <div class="play-btn-circle">
+                                        <i class="fa-solid fa-play"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @* Nửa dưới: Thông tin *@
+                            <div class="card-info-section">
+                                <div class="card-meta">
+                                    @{
+                                        var cardAuthor = podcast.User?.FullName ?? podcast.Author ?? "Lặng";
+                                        var displayCardAuthor = cardAuthor.Length > 15 ? cardAuthor.Substring(0, 15) + "..." : cardAuthor;
+                                    }
+                                    <span class="meta-item" title="@cardAuthor">
+                                        <i class="fa-solid fa-microphone"></i> @displayCardAuthor
+                                    </span>
+                                    <span class="meta-dot"></span>
+                                    <span class="meta-item">@(podcast.EpisodeNumber.HasValue ? "Tập " + podcast.EpisodeNumber : "Mới")</span>
+                                    @if (!string.IsNullOrEmpty(podcast.Duration))
+                                    {
+                                        <span class="meta-dot"></span>
+                                        <span class="meta-item"><i class="fa-regular fa-clock"></i> @podcast.Duration</span>
+                                    }
+                                </div>
+
+                                <h3 class="card-title">
+                                    @(podcast.Title.Length > 40 ? podcast.Title.Substring(0, 40) + "..." : podcast.Title)
+                                </h3>
+
+                                <p class="card-desc">
+                                    @(podcast.Description?.Length > 75 ? podcast.Description.Substring(0, 75) + "..." : podcast.Description)
+                                </p>
+
+                                <div class="card-footer">
+                                    <span class="card-date">@((podcast.PublishDate ?? podcast.CreatedAt).ToString("dd/MM/yyyy"))</span>
+                                    <span class="card-action-text">CHI TIẾT <i class="fa-solid fa-arrow-right"></i></span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    delay += 100;
+                    if (delay > 400) delay = 0; // Tránh delay quá lâu cho các item sau
+                }
+            }
+            else
+            {
+                <div class="empty-state" data-aos="fade-up">
+                    <i class="fa-solid fa-headphones empty-icon"></i>
+                    <p>Hiện tại chưa có Podcast nào được phát sóng.</p>
+                </div>
+            }
+        </div>
+    </section>
 </div>
-@* ======================================================================================================================================================== *@
 
-
-@* ======================================================================================================================================================== *@
 @section Scripts {
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    // Init Animate On Scroll
     AOS.init({
-    once: true,             // Hiệu ứng chỉ kích hoạt 1 lần duy nhất khi cuộn tới
-    offset: 80,             // Điểm kích hoạt cách mép dưới màn hình 80px
-    easing: 'ease-out-cubic'// Gia tốc chuyển động mềm mại
+        once: true,
+        offset: 50,
+        easing: 'ease-out-cubic'
     });
 
     function showLoginAlert() {
@@ -95,16 +170,39 @@
             text: 'Bạn cần đăng nhập để có thể gửi gắm câu chuyện của mình. Hãy đăng nhập và trở lại đây nhé!',
             icon: 'info',
             showCancelButton: true,
-            confirmButtonColor: '#111',
-            cancelButtonColor: '#8C847D',
+            confirmButtonColor: '#B29B84',
+            cancelButtonColor: '#2A2825',
             confirmButtonText: 'Đăng nhập',
-            cancelButtonText: 'Lúc khác'
+            cancelButtonText: 'Lúc khác',
+            background: '#1A1817',
+            color: '#F5F1EE',
+            customClass: {
+                popup: 'dark-swal-popup'
+            }
         }).then((result) => {
             if (result.isConfirmed) {
                 window.location.href = '/Identity/Account/Login';
             }
         });
     }
+
+    // Hàm phát nhạc từ Podcast Card qua Global Player
+    function playFromCard(btnEl) {
+        var card = btnEl.closest('.premium-podcast-card');
+        if (!card) return;
+        var audioUrl = card.getAttribute('data-audio-url');
+        var title = card.getAttribute('data-audio-title');
+        var author = card.getAttribute('data-audio-author');
+        var image = card.getAttribute('data-audio-image');
+        var podcastId = card.getAttribute('data-podcast-id');
+        
+        // Thêm hiệu ứng nút scale up khi click
+        btnEl.classList.add('is-clicked');
+        setTimeout(() => btnEl.classList.remove('is-clicked'), 300);
+
+        if (typeof LangPlayer !== 'undefined') {
+            LangPlayer.play(audioUrl, title, author, image, podcastId);
+        }
+    }
 </script>
 }
-@* ======================================================================================================================================================== *@

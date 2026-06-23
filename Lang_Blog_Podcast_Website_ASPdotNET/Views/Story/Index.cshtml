@@ -2,85 +2,89 @@
 @model IEnumerable<Lang_Blog_Podcast_Website_ASPdotNET.Models.Story>
 
 @{
-    ViewData["Title"] = "";
+    ViewData["Title"] = "Câu chuyện - ";
 }
 
 @* ======================================================================================================================================================== *@
 <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-<link rel="stylesheet" href="~/css/Story/Index.css" />
+<link rel="stylesheet" href="~/css/Story/Index.css" asp-append-version="true" />
 @* ======================================================================================================================================================== *@
 
-@* ======================================================================================================================================================== *@
-<div class="stories-wrapper">
-    <header class="stories-header">
-        <div class="header-badge-group animate-story-header s-delay-1">
-            <svg class="heart-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-            </svg>
-            <span class="header-badge-text">Cộng đồng của sự sẻ chia</span>
-            <svg class="heart-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-            </svg>
+<div class="lang-story-light-container">
+    @* --- HERO SECTION (LIGHT EDITORIAL) --- *@
+    <section class="story-hero">
+        <div class="story-hero-background"></div>
+        <div class="story-hero-content">
+            <div class="header-badge-group animate-hero" style="animation-delay: 0.1s">
+                <i class="fa-solid fa-feather-pointed badge-icon"></i>
+                <span class="header-badge-text">Cộng đồng của sự sẻ chia</span>
+            </div>
+
+            <h1 class="hero-title animate-hero" style="animation-delay: 0.3s">
+                Mảnh ghép <br />
+                <span class="italic">Ký ức.</span>
+            </h1>
+
+            <p class="hero-desc animate-hero" style="animation-delay: 0.5s">
+                "Mỗi câu chuyện bạn gửi đi là một nhịp cầu nối liền những tâm hồn cô đơn. Hãy để tiếng lòng của bạn được lắng nghe tại đây."
+            </p>
+
+            <div class="hero-actions animate-hero" style="animation-delay: 0.7s">
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <a asp-controller="Story" asp-action="Submit" class="btn-primary-dark">
+                        GỬI CÂU CHUYỆN CỦA BẠN
+                    </a>
+                }
+                else
+                {
+                    <a href="javascript:void(0);" onclick="showLoginAlert()" class="btn-primary-dark">
+                        GỬI CÂU CHUYỆN CỦA BẠN
+                    </a>
+                }
+            </div>
         </div>
+    </section>
 
-        <h1 class="header-main-title animate-story-header s-delay-2">
-            Mảnh ghép <br /> <span class="italic">Ký ức.</span>
-        </h1>
+    @* --- LIGHT GLASSMORPHISM FILTER BAR --- *@
+    <section class="story-toolbar">
+        <form asp-action="Index" method="get" class="glass-filter-form" data-aos="fade-up" data-aos-duration="1000">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" name="searchString" value="@ViewBag.CurrentSearch" placeholder="Tìm kiếm tên câu chuyện..." class="glass-input" />
+            </div>
 
-        <p class="header-description animate-story-header s-delay-3">
-            "Mỗi câu chuyện bạn gửi đi là một nhịp cầu nối liền những tâm hồn cô đơn. Hãy để tiếng lòng của bạn được lắng nghe tại đây."
-        </p>
-
-        <div class="animate-story-header s-delay-4">
-            @* 💡 TÍNH NĂNG MỚI: Bắt buộc đăng nhập mới được chuyển tới trang Gửi câu chuyện *@
-            @if (User.Identity != null && User.Identity.IsAuthenticated)
-            {
-                <a asp-controller="Story" asp-action="Submit" class="btn-gui-cau-chuyen">
-                    GỬI CÂU CHUYỆN CỦA BẠN
-                </a>
-            }
-            else
-            {
-                <a href="javascript:void(0);" onclick="showLoginAlert()" class="btn-gui-cau-chuyen">
-                    GỬI CÂU CHUYỆN CỦA BẠN
-                </a>
-            }
-        </div>
-    </header>
-
-    <main class="stories-body">
-
-        <form asp-action="Index" method="get" class="story-filter-form">
-            <div class="filter-wrapper">
-
-                <select name="categoryId" class="filter-select" onchange="this.form.submit()">
+            <div class="category-box">
+                <select name="categoryId" class="glass-select" onchange="this.form.submit()">
                     <option value="">Tất cả danh mục</option>
                     @if (ViewBag.Categories != null)
                     {
                         foreach (var cat in ViewBag.Categories)
                         {
-                            <!option value="@cat.Id" @(ViewBag.CurrentCategoryId == cat.Id ? "selected" : "")>
-                                @cat.Name
-                            </!option>
+                            if (ViewBag.CurrentCategoryId == cat.Id)
+                            {
+                                <option value="@cat.Id" selected="selected">@cat.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@cat.Id">@cat.Name</option>
+                            }
                         }
                     }
                 </select>
-
-                <div class="search-group">
-                    <input type="text"
-                           name="searchString"
-                           value="@ViewBag.CurrentSearch"
-                           placeholder="Tìm kiếm tên câu chuyện..."
-                           class="filter-search-input" />
-                    <button type="submit" class="btn-search-submit">
-                        <i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm
-                    </button>
-                </div>
-
             </div>
-        </form>
 
-        <div class="stories-grid">
+            <button type="submit" class="btn-glass-search">TÌM KIẾM</button>
+            @if (!string.IsNullOrEmpty(ViewBag.CurrentSearch) || ViewBag.CurrentCategoryId != null)
+            {
+                <a asp-controller="Story" asp-action="Index" class="btn-glass-clear" title="Xóa bộ lọc"><i class="fa-solid fa-xmark"></i></a>
+            }
+        </form>
+    </section>
+
+    @* --- STORY GRID CAO CẤP --- *@
+    <section class="story-grid-section">
+        <div class="story-grid">
             @{
                 // Lọc ra danh sách các bài viết đã được duyệt
                 var approvedStories = Model.Where(s => s.Status == StoryStatus.Approved).ToList();
@@ -88,8 +92,9 @@
 
             @if (!approvedStories.Any())
             {
-                <div class="empty-state">
-                    Hiện tại chưa có câu chuyện nào trong mục này. Hãy là người đầu tiên chia sẻ nhé!
+                <div class="empty-state" data-aos="fade-up">
+                    <i class="fa-solid fa-book-open empty-icon"></i>
+                    <p>Hiện tại chưa có câu chuyện nào trong mục này. Hãy là người đầu tiên chia sẻ nhé!</p>
                 </div>
             }
             else
@@ -97,73 +102,90 @@
                 int delay = 0;
                 foreach (var story in approvedStories)
                 {
-                    // Lọc HTML tags để hiển thị trích dẫn (Excerpt) không bị lỗi font
+                    // Lọc HTML tags để hiển thị trích dẫn
                     var plainText = string.IsNullOrEmpty(story.Content) ? "" : System.Text.RegularExpressions.Regex.Replace(story.Content, "<.*?>", string.Empty);
-                    var excerpt = plainText.Length > 130 ? plainText.Substring(0, 130) + "..." : plainText;
+                    var excerpt = plainText.Length > 120 ? plainText.Substring(0, 120) + "..." : plainText;
 
-                    // 💡 ĐÃ SỬA: Lấy ảnh Blog.png trong thư mục Default_Images làm ảnh mặc định khi ImagePath trống
+                    // Fallback ảnh mặc định
                     var defaultImg = string.IsNullOrWhiteSpace(story.ImagePath) ? Url.Content("~/images/Default_Images/Blog.png") : story.ImagePath;
 
-                    <a href="@Url.Action("Details", "Story", new { id = story.Id })" class="story-card" data-aos="fade-up" data-aos-delay="@delay">
-                        <div class="story-img-box">
-                            <span class="story-tag">@(story.Category?.Name ?? "Tâm sự")</span>
-                            <img src="@defaultImg" class="story-img" alt="@story.Title" />
-                        </div>
-                        <div class="story-meta">
-                            <span>@story.CreatedAt.ToString("dd.MM.yyyy")</span>
-                            <span>.</span>
-                            <span style="text-transform: uppercase;">@(string.IsNullOrEmpty(story.User?.FullName) ? (string.IsNullOrEmpty(story.Author) ? "Ẩn danh" : story.Author) : story.User.FullName)</span>
-                            <span>.</span>
-                            <span style="text-transform: uppercase;">@(string.IsNullOrEmpty(story.IssueNumber) ? "None" : story.IssueNumber)</span>
-                        </div>
-                        <h3 class="story-title">@(story.Title?.Length > 20 ? story.Title.Substring(0, 20) + "..." : story.Title)</h3>
-                        <p class="story-excerpt">
-                            @Html.Raw(excerpt)
-                        </p>
-                        <div class="story-action-link">ĐỌC THÊM</div>
-                    </a>
+                    <div class="premium-story-card" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="@delay">
+                        <a href="@Url.Action("Details", "Story", new { id = story.Id })" class="card-link-wrapper">
+                            
+                            @* Nửa trên: Ảnh bìa cinematic 16:10 *@
+                            <div class="card-image-section">
+                                <img src="@defaultImg" class="card-image" alt="@story.Title" />
+                                <div class="card-image-overlay"></div>
+                                <span class="card-badge">@(story.Category?.Name ?? "Tâm sự")</span>
+                            </div>
 
-                    delay += 150;
+                            @* Nửa dưới: Thông tin bài viết *@
+                            <div class="card-info-section">
+                                <div class="card-meta">
+                                    @{
+                                        var rawAuthor = string.IsNullOrEmpty(story.User?.FullName) ? (string.IsNullOrEmpty(story.Author) ? "Ẩn danh" : story.Author) : story.User.FullName;
+                                        var displayAuthor = rawAuthor.Length > 15 ? rawAuthor.Substring(0, 15) + "..." : rawAuthor;
+                                    }
+                                    <span class="meta-item">@story.CreatedAt.ToString("dd.MM.yyyy")</span>
+                                    <span class="meta-dot"></span>
+                                    <span class="meta-item" title="@rawAuthor"><i class="fa-solid fa-pen-nib" style="margin-right: 4px; font-size: 10px;"></i>@displayAuthor</span>
+                                    <span class="meta-dot"></span>
+                                    <span class="meta-item">@(string.IsNullOrEmpty(story.IssueNumber) ? "Mới" : story.IssueNumber)</span>
+                                </div>
+
+                                <h3 class="card-title">
+                                    @(story.Title?.Length > 40 ? story.Title.Substring(0, 40) + "..." : story.Title)
+                                </h3>
+
+                                <p class="card-excerpt">
+                                    @Html.Raw(excerpt)
+                                </p>
+
+                                <div class="card-footer">
+                                    <span class="card-action-text">ĐỌC THÊM <i class="fa-solid fa-arrow-right"></i></span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    delay += 100;
+                    if (delay > 400) delay = 0; // Tránh delay quá lâu
                 }
             }
         </div>
-    </main>
+    </section>
 </div>
-@* ======================================================================================================================================================== *@
 
-
-@* ======================================================================================================================================================== *@
 @section Scripts {
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-    @* Thêm thư viện SweetAlert2 *@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         AOS.init({
-        once: true,
-        offset: 40,
-        duration: 1000,
-        easing: 'ease-out-cubic'
+            once: true,
+            offset: 50,
+            easing: 'ease-out-cubic'
         });
 
-        // 💡 TÍNH NĂNG MỚI: Hàm hiển thị popup yêu cầu đăng nhập
         function showLoginAlert() {
-        Swal.fire({
-        title: 'Một chút nhịp ngưng...',
-        text: 'Bạn cần đăng nhập để có thể gửi gắm câu chuyện của mình. Hãy đăng nhập và trở lại đây nhé!',
-        icon: 'info',
-        showCancelButton: true,
-        confirmButtonColor: '#111',
-        cancelButtonColor: '#8C847D',
-        confirmButtonText: 'Đăng nhập',
-        cancelButtonText: 'Lúc khác'
-        }).then((result) => {
-        if (result.isConfirmed) {
-        // CHÚ Ý: Đổi '/Identity/Account/Login' thành đường dẫn trang đăng nhập thực tế của hệ thống bạn
-        window.location.href = '/Identity/Account/Login';
-        }
-        });
+            Swal.fire({
+                title: 'Một chút nhịp ngưng...',
+                text: 'Bạn cần đăng nhập để có thể gửi gắm câu chuyện của mình. Hãy đăng nhập và trở lại đây nhé!',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#2A2825',
+                cancelButtonColor: '#E2DDD5',
+                confirmButtonText: 'Đăng nhập',
+                cancelButtonText: 'Lúc khác',
+                background: '#FAF9F6',
+                color: '#2A2825',
+                customClass: {
+                    popup: 'light-swal-popup'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/Identity/Account/Login';
+                }
+            });
         }
     </script>
 }
-@* ======================================================================================================================================================== *@

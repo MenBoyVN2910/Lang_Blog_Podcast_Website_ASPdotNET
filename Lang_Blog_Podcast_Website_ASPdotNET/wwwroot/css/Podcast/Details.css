@@ -1,0 +1,612 @@
+/* ==========================================================================
+   PODCAST DETAILS — PREMIUM EDITORIAL DESIGN
+   Lấy cảm hứng từ Spotify kết hợp phong cách tạp chí LẶNG.
+   ========================================================================== */
+
+/* ====== HERO SECTION ====== */
+.pd-hero {
+    position: relative;
+    min-height: 420px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    margin-top: -80px; /* Kéo lên che header padding */
+    padding-top: 80px;
+}
+
+/* Background mờ — lấy ảnh bìa làm ambient */
+.pd-hero-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(60px) saturate(1.4) brightness(0.4);
+    transform: scale(1.3);
+    z-index: 0;
+}
+
+/* Gradient overlay — từ nền mờ xuống body */
+.pd-hero-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(26, 24, 23, 0.3) 0%,
+        rgba(26, 24, 23, 0.6) 50%,
+        rgba(26, 24, 23, 0.95) 85%,
+        #1A1817 100%
+    );
+    z-index: 1;
+}
+
+/* Content wrapper */
+.pd-hero-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: flex-end;
+    gap: 36px;
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 50px 40px 40px;
+}
+
+/* ====== COVER ART ====== */
+.pd-cover-wrapper {
+    flex-shrink: 0;
+    position: relative;
+}
+
+.pd-cover-img {
+    width: 240px;
+    height: 240px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.5),
+        0 20px 60px rgba(0, 0, 0, 0.3);
+    display: block;
+}
+
+/* Phản chiếu bên dưới ảnh bìa */
+.pd-cover-reflection {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 240px;
+    height: 60px;
+    overflow: hidden;
+    opacity: 0.12;
+    pointer-events: none;
+}
+
+.pd-cover-reflection img {
+    width: 240px;
+    height: 240px;
+    object-fit: cover;
+    border-radius: 8px;
+    transform: scaleY(-1);
+    filter: blur(4px);
+    margin-top: -180px;
+}
+
+/* ====== HERO INFO ====== */
+.pd-hero-info {
+    flex: 1;
+    min-width: 0;
+    padding-bottom: 8px;
+}
+
+.pd-episode-label {
+    display: inline-block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #B29B84;
+    margin-bottom: 12px;
+}
+
+.pd-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    line-height: 1.15;
+    margin: 0 0 16px 0;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+.pd-series-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.pd-author-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #B29B84;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #FFFFFF;
+}
+
+.pd-series-name {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #F5F1EE;
+}
+
+.pd-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.pd-meta-item {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    color: #9A9187;
+    font-weight: 400;
+}
+
+.pd-meta-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #6E6861;
+    flex-shrink: 0;
+}
+
+
+/* ==========================================================================
+   ACTION BAR
+   ========================================================================== */
+.pd-actions-section {
+    background: #1A1817;
+    padding: 0 40px;
+}
+
+.pd-actions-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(178, 155, 132, 0.08);
+}
+
+.pd-actions-left {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+/* ====== NÚT PLAY LỚN ====== */
+.pd-btn-play {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    background: #B29B84;
+    color: #1A1817;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 16px rgba(178, 155, 132, 0.35);
+    flex-shrink: 0;
+}
+
+.pd-btn-play:hover {
+    transform: scale(1.06);
+    background: #C4AD96;
+    box-shadow: 0 6px 24px rgba(178, 155, 132, 0.5);
+}
+
+.pd-btn-play:active {
+    transform: scale(0.96);
+}
+
+.pd-play-icon {
+    font-size: 20px;
+    transform: translateX(2px);
+}
+
+/* Stats bên cạnh nút Play */
+.pd-stats-group {
+    display: flex;
+    gap: 20px;
+}
+
+.pd-stat {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    color: #9A9187;
+}
+
+.pd-stat i {
+    font-size: 14px;
+    color: #6E6861;
+}
+
+
+/* ==========================================================================
+   BODY SECTION
+   ========================================================================== */
+.pd-body-section {
+    background: linear-gradient(180deg, #1A1817 0%, #F5F1EE 180px);
+    padding: 0 40px 60px;
+}
+
+.pd-body-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 40px;
+    padding-top: 40px;
+}
+
+/* ====== DESCRIPTION ====== */
+.pd-description-block {
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 36px 40px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.04);
+}
+
+.pd-section-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1A1817;
+    margin: 0 0 24px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pd-heading-accent {
+    display: inline-block;
+    width: 4px;
+    height: 24px;
+    background: #B29B84;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.pd-description-text {
+    color: #4A4540;
+    line-height: 1.9;
+    font-size: 0.95rem;
+    font-family: 'Montserrat', sans-serif;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-height: 220px;
+    overflow: hidden;
+    position: relative;
+    transition: max-height 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Gradient fade khi bị cắt */
+.pd-description-text:not(.is-expanded)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: linear-gradient(to top, #FFFFFF, transparent);
+    pointer-events: none;
+}
+
+.pd-description-text.is-expanded {
+    max-height: none;
+}
+
+.pd-description-text.is-expanded::after {
+    display: none;
+}
+
+/* Nút "Xem thêm" */
+.pd-btn-showmore {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: #B29B84;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    padding: 10px 0 0;
+    transition: color 0.2s ease;
+}
+
+.pd-btn-showmore:hover {
+    color: #8A7A68;
+}
+
+.pd-btn-showmore i {
+    font-size: 10px;
+    transition: transform 0.3s ease;
+}
+
+
+/* ==========================================================================
+   SIDEBAR
+   ========================================================================== */
+.pd-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.pd-sidebar-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 28px 28px 20px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.04);
+}
+
+.pd-sidebar-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #BDB5AE;
+    margin: 0 0 20px 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #EDEBE8;
+}
+
+.pd-detail-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.pd-detail-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #F5F3F0;
+}
+
+.pd-detail-list li:last-child {
+    border-bottom: none;
+}
+
+.pd-detail-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    color: #9A9187;
+    font-weight: 400;
+}
+
+.pd-detail-value {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    color: #1A1817;
+    font-weight: 600;
+    text-align: right;
+}
+
+.pd-detail-badge {
+    background: rgba(178, 155, 132, 0.12);
+    color: #8A7A68;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+}
+
+/* ====== NÚT QUAY LẠI ====== */
+.pd-btn-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #1A1817;
+    color: #F5F1EE;
+    text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 16px 24px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.pd-btn-back:hover {
+    background: #2A2520;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    color: #F5F1EE;
+    text-decoration: none;
+}
+
+.pd-btn-back i {
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.pd-btn-back:hover i {
+    transform: translateX(-4px);
+}
+
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .pd-body-container {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .pd-sidebar {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .pd-sidebar-card {
+        flex: 1;
+        min-width: 240px;
+    }
+
+    .pd-btn-back {
+        flex: 0;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 768px) {
+    .pd-hero {
+        min-height: 360px;
+    }
+
+    .pd-hero-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 40px 20px 30px;
+        gap: 24px;
+    }
+
+    .pd-cover-img {
+        width: 180px;
+        height: 180px;
+    }
+
+    .pd-cover-reflection {
+        width: 180px;
+    }
+
+    .pd-cover-reflection img {
+        width: 180px;
+        height: 180px;
+    }
+
+    .pd-title {
+        font-size: 2rem;
+    }
+
+    .pd-series-row {
+        justify-content: center;
+    }
+
+    .pd-meta-row {
+        justify-content: center;
+    }
+
+    .pd-actions-section {
+        padding: 0 20px;
+    }
+
+    .pd-actions-container {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .pd-body-section {
+        padding: 0 20px 40px;
+    }
+
+    .pd-description-block {
+        padding: 24px 20px;
+    }
+
+    .pd-sidebar {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .pd-cover-img {
+        width: 150px;
+        height: 150px;
+    }
+
+    .pd-cover-reflection {
+        display: none;
+    }
+
+    .pd-title {
+        font-size: 1.6rem;
+    }
+
+    .pd-episode-label {
+        font-size: 0.65rem;
+    }
+
+    .pd-btn-play {
+        width: 48px;
+        height: 48px;
+    }
+
+    .pd-play-icon {
+        font-size: 16px;
+    }
+}
+
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+.pd-hero-content {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.pd-actions-container {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+}
+
+.pd-description-block {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
+.pd-sidebar-card {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+}
+
+.pd-btn-back {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
