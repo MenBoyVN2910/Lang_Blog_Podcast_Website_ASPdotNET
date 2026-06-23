@@ -171,6 +171,10 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 return NotFound();
             }
 
+            // Tăng lượt xem cho câu chuyện
+            story.ViewCount++;
+            await _db.SaveChangesAsync();
+
             return View(story);
         }
 

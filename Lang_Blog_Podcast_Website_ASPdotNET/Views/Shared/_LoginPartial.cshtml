@@ -13,7 +13,31 @@
     @* Lấy thông tin người dùng hiện tại từ Database *@
     var currentUser = await UserManager.GetUserAsync(User);
 
-    <div class="header-user">
+    <div class="header-user" style="display:flex; align-items:center; gap: 15px;">
+        <!-- Nút chuông thông báo -->
+        <div class="notification-bell" id="notif-bell">
+            <button type="button" class="bell-btn" title="Thông báo" id="bell-btn-toggle">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
+                </svg>
+                <span class="notif-badge" id="notif-badge" style="display:none;">0</span>
+            </button>
+            
+            <!-- Dropdown preview -->
+            <div class="notif-dropdown" id="notif-dropdown">
+                <div class="notif-dropdown-header">
+                    <strong>Thông Báo</strong>
+                    <button type="button" class="mark-read-btn" id="mark-all-read-btn">Đọc tất cả</button>
+                </div>
+                <div class="notif-dropdown-body" id="notif-list">
+                    <div class="notif-loading" style="padding:15px; text-align:center; color:#888; font-size:0.9rem;">Đang tải...</div>
+                </div>
+                <div class="notif-dropdown-footer">
+                    <a href="/Notification">Xem tất cả thông báo &rarr;</a>
+                </div>
+            </div>
+        </div>
+
         @* Nút mở menu thả xuống của người dùng *@
         <button type="button" class="user-menu-btn" aria-haspopup="true" aria-expanded="false" title="Menu người dùng">
 
@@ -43,6 +67,23 @@
         @* Menu thả xuống chứa các tuỳ chọn cá nhân *@
         <div class="user-dropdown" role="menu" aria-hidden="true">
             <ul class="dropdown-list">
+                @if (User.IsInRole("Admin"))
+                {
+                    @* Trang cá nhân *@
+                    <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">Trang Cá Nhân <i class="fa-solid fa-star" style="color: red; font-size: 0.8rem; margin-left: 5px;" title="Admin"></i></a></li>
+                    
+                    @* Bảng điều khiển admin *@
+                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Index" style="color: var(--secondary-color);">Bảng Điều Khiển</a></li>
+                }
+                else
+                {
+                    @* Trang cá nhân *@
+                    <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">Trang Cá Nhân</a></li>
+
+                    @* Quản lý bài viết *@
+                    <li><a class="dropdown-item" asp-controller="UserDashboard" asp-action="Index" style="color: var(--secondary-color);">Quản Lý Bài Viết</a></li>
+                }
+
                 @* Liên kết tới trang quản lý hồ sơ *@
                 <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Cài Đặt</a></li>
 

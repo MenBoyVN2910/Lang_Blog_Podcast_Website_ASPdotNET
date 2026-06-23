@@ -1,5 +1,7 @@
+using Lang_Blog_Podcast_Website_ASPdotNET.Data;
 using Lang_Blog_Podcast_Website_ASPdotNET.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
@@ -9,11 +11,39 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
     /// </summary>
     public class HomeController : Controller
     {
+        private readonly ApplicationDbContext _db;
+
+        public HomeController(ApplicationDbContext db)
+        {
+            _db = db;
+        }
+
         /// <summary>
         /// GET: /
         /// Hiển thị Trang chủ của website.
         /// </summary>
-        public IActionResult Index() => View();
+        public async Task<IActionResult> Index()
+        {
+            // Top 2 Podcast có lượt xem cao nhất
+            ViewBag.TopPodcasts = await _db.PodCasts
+                .Include(p => p.Category)
+                .Include(p => p.User)
+                .Where(p => p.Status == StoryStatus.Approved)
+                .OrderByDescending(p => p.ViewCount)
+                .Take(2)
+                .ToListAsync();
+
+            // Top 2 Bài Viết (Story) có lượt xem cao nhất
+            ViewBag.TopStories = await _db.Stories
+                .Include(s => s.Category)
+                .Include(s => s.User)
+                .Where(s => s.Status == StoryStatus.Approved)
+                .OrderByDescending(s => s.ViewCount)
+                .Take(2)
+                .ToListAsync();
+
+            return View();
+        }
 
         /// <summary>
         /// GET: /Home/About

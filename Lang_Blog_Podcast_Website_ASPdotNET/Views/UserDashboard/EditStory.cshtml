@@ -1,0 +1,96 @@
+@model Lang_Blog_Podcast_Website_ASPdotNET.Models.StoryUploadViewModel
+
+@{
+    ViewData["Title"] = "Chỉnh sửa mảnh ghép";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var categories = ViewBag.Categories as List<Lang_Blog_Podcast_Website_ASPdotNET.Models.Category>;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/UserDashboard/Index.css" />
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+}
+
+<div class="ud-container">
+    <div class="ud-header" style="display:flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+            <h1>Chỉnh Sửa Câu Chuyện</h1>
+            <p>Cập nhật lại nội dung mảnh ghép của bạn.</p>
+        </div>
+        <a href="/UserDashboard/Index?tab=write-story" class="ud-btn outline"><i class="fa-solid fa-arrow-left"></i> Quay lại</a>
+    </div>
+
+    <div style="background: var(--white); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color);">
+        <form asp-action="EditStory" asp-controller="UserDashboard" asp-route-id="@ViewBag.StoryId" method="post" enctype="multipart/form-data" onsubmit="return prepareStorySubmit()">
+            
+            <div class="ud-form-group">
+                <label>Tiêu đề bài viết</label>
+                <input asp-for="Title" class="ud-input" required />
+            </div>
+            
+            <div style="display: flex; gap: 20px;">
+                <div class="ud-form-group" style="flex: 1;">
+                    <label>Tác giả / Bút danh</label>
+                    <input asp-for="Author" class="ud-input" />
+                </div>
+                <div class="ud-form-group" style="flex: 1;">
+                    <label>Danh mục</label>
+                    <select asp-for="CategoryId" class="ud-input" required>
+                        @foreach (var c in categories)
+                        {
+                            <option value="@c.Id">@c.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="ud-form-group">
+                <label>Ảnh bìa (Tải lên ảnh mới sẽ thay thế ảnh cũ)</label>
+                <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px;">
+                    <img src="@ViewBag.CurrentImagePath" alt="Current Cover" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color);" />
+                    <input type="file" name="ImageFile" class="ud-input" accept="image/*" />
+                </div>
+            </div>
+
+            <div class="ud-form-group">
+                <label>Nội dung câu chuyện</label>
+                <div id="editor-container" style="height: 400px; background: #fff; border-radius: 0 0 8px 8px;">
+                    @Html.Raw(Model.Content)
+                </div>
+                <input type="hidden" name="Content" id="storyContentHidden" />
+            </div>
+
+            <button type="submit" class="ud-btn primary"><i class="fa-solid fa-floppy-disk"></i> Lưu thay đổi & Chờ duyệt</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script>
+        var quill = new Quill('#editor-container', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'align': [] }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            }
+        });
+
+        function prepareStorySubmit() {
+            var content = document.querySelector('#editor-container .ql-editor').innerHTML;
+            if (quill.getText().trim().length === 0) {
+                alert("Vui lòng nhập nội dung bài viết.");
+                return false;
+            }
+            document.getElementById('storyContentHidden').value = content;
+            return true;
+        }
+    </script>
+}

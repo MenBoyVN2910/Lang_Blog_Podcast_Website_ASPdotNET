@@ -1,0 +1,143 @@
+.notification-page-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.notification-header-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
+}
+
+.page-title {
+    font-family: var(--font-serif-header);
+    font-size: 2rem;
+    color: var(--color-dark);
+}
+
+.btn-mark-all {
+    background: none;
+    border: 1px solid var(--border-color);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    color: var(--color-dark);
+    transition: all 0.3s ease;
+}
+
+.btn-mark-all:hover {
+    background: var(--color-dark);
+    color: #fff;
+}
+
+.notification-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.notification-card {
+    display: flex;
+    gap: 20px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    border: 1px solid transparent;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.notification-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+}
+
+.notification-card.unread {
+    background: #fdfaf5;
+    border: 1px solid #ebd9c5;
+}
+
+.notif-icon-wrapper {
+    font-size: 24px;
+    padding-top: 5px;
+}
+
+.notif-content-wrapper {
+    flex: 1;
+}
+
+.notif-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.notif-header h4 {
+    font-family: var(--font-sans);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--color-dark);
+}
+
+.notif-time {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.notif-message {
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.notif-link {
+    display: inline-block;
+    color: #B29B84;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+.notif-link:hover {
+    color: var(--color-dark);
+    text-decoration: underline;
+}
+
+.notif-actions {
+    display: flex;
+    align-items: flex-start;
+}
+
+.btn-delete {
+    background: none;
+    border: none;
+    color: #ccc;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.btn-delete:hover {
+    color: #c62828;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #ddd;
+}

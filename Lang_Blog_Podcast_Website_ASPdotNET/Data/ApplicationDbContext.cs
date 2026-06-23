@@ -20,5 +20,10 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Data
         // Cấu trúc tạp chí
         public DbSet<MagazineIssue> MagazineIssues { get; set; }
         public DbSet<MagazineArticle> MagazineArticles { get; set; }
+        
+        public DbSet<PostRevision> PostRevisions { get; set; }
+        
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<UserFavorite> UserFavorites { get; set; }
     }
 }

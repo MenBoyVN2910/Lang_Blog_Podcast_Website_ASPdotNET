@@ -1,0 +1,79 @@
+@model IEnumerable<Lang_Blog_Podcast_Website_ASPdotNET.Models.Notification>
+@{
+    ViewData["Title"] = "Thông Báo Của Bạn";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Notification/Index.css" asp-append-version="true" />
+}
+
+<div class="notification-page-container">
+    <div class="notification-header-wrapper">
+        <h1 class="page-title">Thông Báo Của Bạn</h1>
+        @if (Model.Any(n => !n.IsRead))
+        {
+            <form asp-action="MarkAllAsRead" method="post" class="d-inline">
+                <button type="submit" class="btn-mark-all">Đánh dấu tất cả đã đọc</button>
+            </form>
+        }
+    </div>
+
+    <div class="notification-list">
+        @if (!Model.Any())
+        {
+            <div class="empty-state">
+                <i class="fa-regular fa-bell-slash"></i>
+                <p>Bạn chưa có thông báo nào.</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                <div class="notification-card @(item.IsRead ? "" : "unread")">
+                    <div class="notif-icon-wrapper">
+                        @if (item.Type == "Approved")
+                        {
+                            <i class="fa-solid fa-circle-check" style="color: #2e7d32;"></i>
+                        }
+                        else if (item.Type == "Rejected")
+                        {
+                            <i class="fa-solid fa-circle-xmark" style="color: #c62828;"></i>
+                        }
+                        else if (item.Type == "NewSubmission")
+                        {
+                            <i class="fa-solid fa-file-signature" style="color: #f57c00;"></i>
+                        }
+                        else if (item.Type == "Welcome")
+                        {
+                            <i class="fa-solid fa-hand-sparkles" style="color: #6a1b9a;"></i>
+                        }
+                        else
+                        {
+                            <i class="fa-solid fa-circle-info" style="color: #258cfb;"></i>
+                        }
+                    </div>
+                    
+                    <div class="notif-content-wrapper">
+                        <div class="notif-header">
+                            <h4>@item.Title</h4>
+                            <span class="notif-time">@item.CreatedAt.ToString("g")</span>
+                        </div>
+                        <p class="notif-message">@item.Message</p>
+                        
+                        @if (!string.IsNullOrEmpty(item.LinkUrl))
+                        {
+                            <a href="@item.LinkUrl" class="notif-link">Xem chi tiết &rarr;</a>
+                        }
+                    </div>
+                    
+                    <div class="notif-actions">
+                        <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa thông báo này?');">
+                            <button type="submit" class="btn-delete" title="Xóa thông báo"><i class="fa-regular fa-trash-can"></i></button>
+                        </form>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

@@ -46,7 +46,7 @@ body {
 .grid-item {
     position: relative;
     width: 100%;
-    overflow: hidden; /* Cần thiết cho hiệu ứng zoom ảnh */
+    overflow: visible;
 }
 
 .grid-image {
@@ -158,7 +158,7 @@ body {
 
 .horiz-image {
     flex: 1;
-    overflow: hidden; /* Cần thiết cho zoom ảnh */
+    overflow: visible;
 }
 
 .horiz-text {
@@ -224,8 +224,12 @@ body {
 .podcast-img-wrapper {
     width: 90px;
     height: 90px;
-    background-color: #E2DDD9;
+    background-color: #FAF8F5;
     overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(90, 70, 52, 0.12);
+    border: 2px solid #FAF8F5;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.4s ease;
 }
 
 .side-card-img {
@@ -265,7 +269,7 @@ body {
     display: flex;
     flex-direction: column;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .post-meta {
@@ -415,6 +419,69 @@ body {
             color: var(--color-editorial-brown);
         }
 
+        .podcast-card-side:hover .podcast-img-wrapper {
+            transform: scale(1.06) rotate(2deg);
+            box-shadow: 0 12px 25px rgba(90, 70, 52, 0.2);
+            border-color: var(--color-goldaccent);
+        }
+
 .sidebar-post:hover .serif-title-md {
     color: var(--color-editorial-brown);
+}
+
+/* ==========================================================================
+           7. PHONG CÁCH KHUNG ẢNH NGHỆ THUẬT (ARTISTIC IMAGE FRAMES)
+           ========================================================================== */
+.image-aesthetic-wrapper {
+    position: relative;
+    display: block;
+    background: #FAF8F5; /* Nền giấy/kem ấm sang trọng */
+    padding: 12px;
+    border: 1px solid #E6DFD5;
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(90, 70, 52, 0.08);
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
+                box-shadow 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+                border-color 0.5s ease;
+    text-decoration: none;
+}
+
+/* Nền phụ trang trí phía sau (Offset Backdrop) */
+.image-aesthetic-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: -8px;
+    bottom: -8px;
+    background: #F0EAE1;
+    border-radius: 16px;
+    z-index: -1;
+    opacity: 0.5;
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
+}
+
+.image-zoom-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 10px;
+    background-color: #E2DDD9;
+}
+
+/* Hover effects */
+.image-aesthetic-wrapper:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px rgba(90, 70, 52, 0.15);
+    border-color: var(--color-goldaccent);
+}
+
+.image-aesthetic-wrapper:hover::before {
+    transform: translate(4px, 4px);
+    opacity: 0.8;
+}
+
+.image-aesthetic-wrapper:hover .grid-image {
+    transform: scale(1.06);
 }

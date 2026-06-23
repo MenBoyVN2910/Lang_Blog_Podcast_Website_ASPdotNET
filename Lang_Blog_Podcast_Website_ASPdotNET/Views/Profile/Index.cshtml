@@ -1,0 +1,311 @@
+@model Lang_Blog_Podcast_Website_ASPdotNET.Models.ProfileViewModel
+@{
+    ViewData["Title"] = "Trang Cá Nhân - " + Model.User.FullName;
+    var coverImg = !string.IsNullOrEmpty(Model.User.CoverImagePath) ? Model.User.CoverImagePath : "/images/default-cover.jpg";
+    var avatarImg = Model.User.ProfilePicture != null 
+        ? $"data:image/*;base64,{Convert.ToBase64String(Model.User.ProfilePicture)}" 
+        : "/images/default-avatar.png"; // Có thể thay bằng SVG placeholder
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Profile/Index.css" asp-append-version="true" />
+}
+
+<div class="profile-container">
+    <!-- HERO SECTION (COVER + AVATAR) -->
+    <div class="profile-hero" style="background-image: url('@coverImg');">
+        <!-- Overlay mờ nếu cần -->
+        <div class="hero-overlay"></div>
+    </div>
+
+    <!-- PROFILE INFO -->
+    <div class="profile-header-content">
+        <div class="profile-avatar-wrapper">
+            <img src="@avatarImg" alt="Avatar" class="profile-avatar" />
+        </div>
+
+        <div class="profile-user-info">
+            <h1 class="profile-name">
+                @Model.User.FullName
+                <span class="profile-badge">@Model.RoleBadge</span>
+            </h1>
+            <p class="profile-username">@@@Model.User.UserName</p>
+            
+            @if (!string.IsNullOrEmpty(Model.User.Slogan))
+            {
+                <p class="profile-slogan">"@Model.User.Slogan"</p>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.User.Bio))
+            {
+                <p class="profile-bio">@Model.User.Bio</p>
+            }
+
+            <div class="profile-actions">
+                @if (Model.IsOwner)
+                {
+                    <a href="#" class="btn-action btn-edit-profile" onclick="openModal(event)">
+                        <i class="fa-solid fa-pen"></i> Chỉnh sửa hồ sơ
+                    </a>
+                }
+                else
+                {
+                    <!-- Nút theo dõi (Placeholder) -->
+                    <button class="btn-action btn-follow" onclick="alert('Tính năng đang phát triển!')">
+                        <i class="fa-solid fa-user-plus"></i> Theo dõi
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS RIBBON -->
+    <div class="profile-stats">
+        <div class="stat-item">
+            <div class="stat-value">@Model.TotalStories</div>
+            <div class="stat-label">Bài viết</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">@Model.TotalPodcasts</div>
+            <div class="stat-label">Podcast</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">@Model.TotalViews</div>
+            <div class="stat-label">Lượt xem</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">@Model.TotalFollowers</div>
+            <div class="stat-label">Người theo dõi</div>
+        </div>
+    </div>
+
+    <!-- ACHIEVEMENTS -->
+    <div class="profile-achievements">
+        <h3 class="section-title">Thành Tựu</h3>
+        <div class="achievements-list">
+            @foreach (var ach in Model.Achievements)
+            {
+                <div class="achievement-card @(ach.IsUnlocked ? "unlocked" : "locked")" title="@ach.Description">
+                    <div class="ach-icon" style="color: @(ach.IsUnlocked ? ach.IconColor : "#ccc");">
+                        <i class="@ach.IconClass"></i>
+                    </div>
+                    <div class="ach-info">
+                        <div class="ach-title">@ach.Title</div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- TABS NAVIGATION -->
+    <div class="profile-tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'tab-stories')">Bài Viết Của Tôi</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-podcasts')">Podcast Của Tôi</button>
+        @if (Model.IsOwner)
+        {
+            <button class="tab-btn" onclick="openTab(event, 'tab-favorites')">Nội Dung Yêu Thích <i class="fa-solid fa-lock" style="font-size:0.8em"></i></button>
+        }
+    </div>
+
+    <!-- TABS CONTENT -->
+    <div class="tab-content-area">
+        
+        <!-- Tab Bài Viết -->
+        <div id="tab-stories" class="tab-pane active">
+            @if (!Model.Stories.Any())
+            {
+                <div class="empty-state">Chưa có bài viết nào được xuất bản.</div>
+            }
+            else
+            {
+                <div class="grid-layout">
+                    @foreach (var story in Model.Stories)
+                    {
+                        <div class="content-card">
+                            <img src="@(string.IsNullOrEmpty(story.ImagePath) ? "/images/default-thumbnail.jpg" : story.ImagePath)" alt="@story.Title" onerror="this.src='/images/Logo/logo_website.png'" />
+                            <div class="card-info">
+                                <h4>@story.Title</h4>
+                                <div class="meta">
+                                    <span><i class="fa-regular fa-calendar"></i> @story.CreatedAt.ToString("dd/MM/yyyy")</span>
+                                    <span><i class="fa-regular fa-eye"></i> @story.ViewCount</span>
+                                </div>
+                                <a href="/Story/Details/@story.Id" class="card-link">Xem chi tiết</a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Tab Podcast -->
+        <div id="tab-podcasts" class="tab-pane" style="display:none;">
+            @if (!Model.Podcasts.Any())
+            {
+                <div class="empty-state">Chưa có podcast nào được xuất bản.</div>
+            }
+            else
+            {
+                <div class="list-layout">
+                    @foreach (var pc in Model.Podcasts)
+                    {
+                        <div class="content-list-item">
+                            <img src="@(string.IsNullOrEmpty(pc.ImagePath) ? "/images/default-thumbnail.jpg" : pc.ImagePath)" alt="@pc.Title" onerror="this.src='/images/Logo/logo_website.png'" />
+                            <div class="item-info">
+                                <h4>@pc.Title</h4>
+                                <div class="meta">
+                                    <span><i class="fa-regular fa-calendar"></i> @pc.CreatedAt.ToString("dd/MM/yyyy")</span>
+                                    <span><i class="fa-solid fa-headphones"></i> @pc.ViewCount</span>
+                                </div>
+                            </div>
+                            <div class="item-actions">
+                                <button class="btn-play-mini" onclick="playPodcast('@pc.AudioPath', '@pc.Title', '@(pc.Author ?? Model.User.FullName)', '@(string.IsNullOrEmpty(pc.ImagePath) ? "/images/Logo/logo_website.png" : pc.ImagePath)', @pc.Id)">
+                                    <i class="fa-solid fa-play"></i>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Tab Yêu Thích -->
+        @if (Model.IsOwner)
+        {
+            <div id="tab-favorites" class="tab-pane" style="display:none;">
+                <h4 style="margin-bottom:15px;">Bài Viết Yêu Thích</h4>
+                @if (!Model.FavoriteStories.Any())
+                {
+                    <div class="empty-state">Bạn chưa yêu thích bài viết nào.</div>
+                }
+                else
+                {
+                    <div class="grid-layout">
+                        @foreach (var story in Model.FavoriteStories)
+                        {
+                            <div class="content-card">
+                                <img src="@story.ImagePath" alt="@story.Title" />
+                                <div class="card-info">
+                                    <h4>@story.Title</h4>
+                                    <a href="/Story/Details/@story.Id" class="card-link">Xem chi tiết</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+
+                <h4 style="margin-top:30px; margin-bottom:15px;">Podcast Yêu Thích</h4>
+                @if (!Model.FavoritePodcasts.Any())
+                {
+                    <div class="empty-state">Bạn chưa yêu thích podcast nào.</div>
+                }
+                else
+                {
+                    <div class="list-layout">
+                        @foreach (var pc in Model.FavoritePodcasts)
+                        {
+                            <div class="content-list-item">
+                                <img src="@(string.IsNullOrEmpty(pc.ImagePath) ? "/images/default-thumbnail.jpg" : pc.ImagePath)" alt="@pc.Title" onerror="this.src='/images/Logo/logo_website.png'" />
+                                <div class="item-info">
+                                    <h4>@pc.Title</h4>
+                                </div>
+                                <div class="item-actions">
+                                    <button class="btn-play-mini" onclick="playPodcast('@pc.AudioPath', '@pc.Title', '@(pc.Author ?? Model.User.FullName)', '@(string.IsNullOrEmpty(pc.ImagePath) ? "/images/Logo/logo_website.png" : pc.ImagePath)', @pc.Id)">
+                                        <i class="fa-solid fa-play"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal Edit Profile (Chỉ hiển thị nếu IsOwner) -->
+@if (Model.IsOwner)
+{
+    <div class="custom-modal" id="editProfileModal">
+        <div class="modal-content-custom">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                <div class="modal-header-custom">
+                    <h5 class="modal-title-custom">Chỉnh sửa hồ sơ</h5>
+                    <button type="button" class="btn-close-custom" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body-custom">
+                    
+                    <div class="form-group-custom">
+                        <label class="form-label-custom">Ảnh Bìa (Cover)</label>
+                        <input type="file" name="coverImage" class="form-control-custom" accept="image/*" />
+                        <small style="color:#888; font-size:0.8rem;">Tỉ lệ khuyến nghị 16:9</small>
+                    </div>
+
+                    <div class="form-group-custom">
+                        <label class="form-label-custom">Ảnh Đại Diện (Avatar)</label>
+                        <input type="file" name="avatarImage" class="form-control-custom" accept="image/*" />
+                        <small style="color:#888; font-size:0.8rem;">Ảnh hình vuông</small>
+                    </div>
+
+                    <div class="form-group-custom">
+                        <label class="form-label-custom">Slogan cá nhân</label>
+                        <input type="text" name="slogan" class="form-control-custom" value="@Model.User.Slogan" maxlength="100" placeholder="Một câu nói truyền cảm hứng..." />
+                    </div>
+
+                    <div class="form-group-custom">
+                        <label class="form-label-custom">Câu chuyện của tôi (Bio)</label>
+                        <textarea name="bio" class="form-control-custom" rows="4" maxlength="500" placeholder="Giới thiệu về bạn...">@Model.User.Bio</textarea>
+                    </div>
+                    
+                </div>
+                <div class="modal-footer-custom">
+                    <button type="button" class="btn-custom btn-secondary-custom" onclick="closeModal()">Hủy</button>
+                    <button type="submit" class="btn-custom btn-primary-custom">Lưu Thay Đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-pane");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).style.display = "block";
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        // JS cho Custom Modal
+        function openModal(e) {
+            e.preventDefault();
+            document.getElementById('editProfileModal').classList.add('show');
+        }
+        function closeModal() {
+            document.getElementById('editProfileModal').classList.remove('show');
+        }
+
+        // Tích hợp Global Player
+        function playPodcast(audioPath, title, author, imagePath, podcastId) {
+            if (!audioPath) {
+                alert('Tệp âm thanh không tồn tại!');
+                return;
+            }
+            if (typeof LangPlayer !== 'undefined') {
+                LangPlayer.play(audioPath, title, author, imagePath, podcastId);
+            } else if (typeof window.LangPlayer !== 'undefined') {
+                window.LangPlayer.play(audioPath, title, author, imagePath, podcastId);
+            } else {
+                alert('Trình phát âm thanh chưa sẵn sàng.');
+            }
+        }
+    </script>
+}

@@ -132,7 +132,11 @@
                                 </p>
 
                                 <div class="card-footer">
-                                    <span class="card-date">@((podcast.PublishDate ?? podcast.CreatedAt).ToString("dd/MM/yyyy"))</span>
+                                    <div class="footer-left">
+                                        <span class="card-date">@((podcast.PublishDate ?? podcast.CreatedAt).ToString("dd/MM/yyyy"))</span>
+                                        <span class="meta-dot"></span>
+                                        <span class="card-views" title="Lượt xem"><i class="fa-regular fa-eye"></i> @podcast.ViewCount</span>
+                                    </div>
                                     <span class="card-action-text">CHI TIẾT <i class="fa-solid fa-arrow-right"></i></span>
                                 </div>
                             </div>

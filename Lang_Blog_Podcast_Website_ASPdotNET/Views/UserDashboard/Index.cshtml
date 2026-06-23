@@ -1,0 +1,414 @@
+@model Lang_Blog_Podcast_Website_ASPdotNET.Models.UserDashboardViewModel
+
+@{
+    ViewData["Title"] = "Quản lý bài viết";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var categories = ViewBag.Categories as List<Lang_Blog_Podcast_Website_ASPdotNET.Models.Category>;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/UserDashboard/Index.css" />
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+}
+
+<div class="ud-container">
+    <div class="ud-header">
+        <h1>Quản Lý Bài Viết Của Bạn</h1>
+        <p>Nơi lưu giữ và theo dõi trạng thái các tác phẩm của bạn trên LẶNG.</p>
+    </div>
+
+    @if (TempData["DashboardSuccess"] != null)
+    {
+        <div class="ud-alert success">
+            <i class="fa-solid fa-circle-check"></i> @TempData["DashboardSuccess"]
+        </div>
+    }
+
+    @if (TempData["DashboardError"] != null)
+    {
+        <div class="ud-alert error">
+            <i class="fa-solid fa-circle-exclamation"></i> @TempData["DashboardError"]
+        </div>
+    }
+
+    <div class="ud-stats-grid">
+        <div class="ud-stat-card">
+            <span>Tổng bài viết & Podcast</span>
+            <strong>@(Model.TotalStories + Model.TotalPodcasts)</strong>
+        </div>
+        <div class="ud-stat-card">
+            <span>Đang chờ duyệt</span>
+            <strong>@Model.PendingCount</strong>
+        </div>
+        <div class="ud-stat-card">
+            <span>Đã xuất bản</span>
+            <strong>@Model.ApprovedCount</strong>
+        </div>
+    </div>
+
+    <div class="ud-tabs">
+        <button class="ud-tab-btn active" onclick="openUdTab(event, 'my-stories')">Mảnh ghép ký ức</button>
+        <button class="ud-tab-btn" onclick="openUdTab(event, 'my-podcasts')">Podcast Series</button>
+        <button class="ud-tab-btn" onclick="openUdTab(event, 'submit-new')">Gửi bài mới</button>
+    </div>
+
+    <!-- TAB: Mảnh Ghép Ký Ức (Stories) -->
+    <div id="my-stories" class="ud-tab-content active">
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3>Danh sách câu chuyện của bạn</h3>
+            <button class="ud-btn primary" onclick="openUdTab(event, 'submit-new'); document.getElementById('storyRadio').checked = true; toggleUploadForm();"><i class="fa-solid fa-pen"></i> Viết bài mới</button>
+        </div>
+
+        @if (Model.MyStories.Count == 0)
+        {
+            <div style="text-align: center; padding: 40px; color: var(--text-muted); background: var(--white); border-radius: 12px; border: 1px dashed var(--border-color);">
+                Bạn chưa có bài viết nào. Hãy chia sẻ câu chuyện của bạn với LẶNG nhé.
+            </div>
+        }
+        else
+        {
+            <table class="ud-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">Tiêu đề</th>
+                        <th style="width: 15%;">Ngày gửi</th>
+                        <th style="width: 15%;">Trạng thái</th>
+                        <th style="width: 30%; text-align: right;">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var story in Model.MyStories)
+                    {
+                        <tr>
+                            <td>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <img src="@story.ImagePath" alt="Cover" style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover;" onerror="this.src='/images/Default_Images/Blog.png'" />
+                                    <div>
+                                        <strong style="display: block; color: var(--primary-color);">@story.Title</strong>
+                                        <span style="font-size: 12px; color: var(--text-muted);">@(story.Category?.Name ?? "Không phân loại")</span>
+                                    </div>
+                                </div>
+                                @if (!string.IsNullOrEmpty(story.RejectionReason) && story.Status == Lang_Blog_Podcast_Website_ASPdotNET.Models.StoryStatus.Rejected)
+                                {
+                                    <div class="rejection-reason">
+                                        <strong>Phản hồi từ Admin:</strong> @story.RejectionReason
+                                    </div>
+                                }
+                                @if (story.Status == Lang_Blog_Podcast_Website_ASPdotNET.Models.StoryStatus.EditPending)
+                                {
+                                    <div style="margin-top: 8px; font-size: 12px; color: #1976D2;">
+                                        <i class="fa-solid fa-circle-info"></i> Đang có 1 bản chỉnh sửa chờ duyệt.
+                                    </div>
+                                }
+                            </td>
+                            <td>@story.CreatedAt.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                @if (story.Status == Lang_Blog_Podcast_Website_ASPdotNET.Models.StoryStatus.Pending)
+                                {
+                                    <span class="ud-badge pending">Chờ duyệt</span>
+                                }
+                                else if (story.Status == Lang_Blog_Podcast_Website_ASPdotNET.Models.StoryStatus.Approved)
+                                {
+                                    <span class="ud-badge approved">Đã xuất bản</span>
+                                }
+                                else if (story.Status == Lang_Blog_Podcast_Website_ASPdotNET.Models.StoryStatus.Rejected)
+                                {
+                                    <span class="ud-badge rejected">Cần chỉnh sửa</span>
+                                }
+                                else if (story.Status == Lang_Blog_Podcast_Website_ASPdotNET.Models.StoryStatus.EditPending)
+                                {
+                                    <span class="ud-badge editpending">Sửa chờ duyệt</span>
+                                }
+                            </td>
+                            <td style="text-align: right;">
+                                <div class="ud-action-group" style="justify-content: flex-end;">
+                                    @if (story.Status == Lang_Blog_Podcast_Website_ASPdotNET.Models.StoryStatus.Approved)
+                                    {
+                                        <a href="/Story/Details/@story.Id" class="ud-btn outline" style="padding: 6px 12px; font-size: 12px;"><i class="fa-solid fa-eye"></i> Xem bài</a>
+                                    }
+                                    <a href="/UserDashboard/EditStory/@story.Id" class="ud-btn primary" style="padding: 6px 12px; font-size: 12px;"><i class="fa-solid fa-pen"></i> Sửa</a>
+                                    <form asp-action="DeleteStory" asp-controller="UserDashboard" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài viết này không? Hành động này không thể hoàn tác.');">
+                                        <input type="hidden" name="id" value="@story.Id" />
+                                        <button type="submit" class="ud-btn danger" style="padding: 6px; font-size: 12px;" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <!-- TAB: Podcast Series -->
+    <div id="my-podcasts" class="ud-tab-content">
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3>Danh sách Podcast của bạn</h3>
+            <button class="ud-btn primary" onclick="openUdTab(event, 'submit-new'); document.getElementById('podcastRadio').checked = true; toggleUploadForm();"><i class="fa-solid fa-plus"></i> Tạo Podcast mới</button>
+        </div>
+
+        @if (Model.MyPodcasts.Count == 0)
+        {
+            <div style="text-align: center; padding: 40px; color: var(--text-muted); background: var(--white); border-radius: 12px; border: 1px dashed var(--border-color);">
+                Bạn chưa có Podcast nào. Gửi tập Podcast đầu tiên của bạn ngay!
+            </div>
+        }
+        else
+        {
+            <table class="ud-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">Tiêu đề</th>
+                        <th style="width: 15%;">Ngày gửi</th>
+                        <th style="width: 15%;">Trạng thái</th>
+                        <th style="width: 30%; text-align: right;">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var podcast in Model.MyPodcasts)
+                    {
+                        <tr>
+                            <td>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <div style="position: relative;">
+                                        <img src="@podcast.ImagePath" alt="Cover" style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover;" onerror="this.src='/images/Default_Images/Blog.png'" />
+                                        <div style="position: absolute; bottom: -5px; right: -5px; background: #E8F0FF; color: #4A7ADB; font-size: 9px; padding: 2px 5px; border-radius: 10px; font-weight: 600;">Tập @podcast.EpisodeNumber</div>
+                                    </div>
+                                    <div>
+                                        <strong style="display: block; color: var(--primary-color);">@podcast.Title</strong>
+                                        <span style="font-size: 12px; color: var(--text-muted);">@(podcast.Category?.Name ?? "Không phân loại")</span>
+                                    </div>
+                                </div>
+                                @if (!string.IsNullOrEmpty(podcast.RejectionReason) && podcast.Status == Lang_Blog_Podcast_Website_ASPdotNET.Models.StoryStatus.Rejected)
+                                {
+                                    <div class="rejection-reason">
+                                        <strong>Phản hồi từ Admin:</strong> @podcast.RejectionReason
+                                    </div>
+                                }
+                                @if (podcast.Status == Lang_Blog_Podcast_Website_ASPdotNET.Models.StoryStatus.EditPending)
+                                {
+                                    <div style="margin-top: 8px; font-size: 12px; color: #1976D2;">
+                                        <i class="fa-solid fa-circle-info"></i> Đang có 1 bản chỉnh sửa chờ duyệt.
+                                    </div>
+                                }
+                            </td>
+                            <td>@podcast.CreatedAt.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                @if (podcast.Status == Lang_Blog_Podcast_Website_ASPdotNET.Models.StoryStatus.Pending)
+                                {
+                                    <span class="ud-badge pending">Chờ duyệt</span>
+                                }
+                                else if (podcast.Status == Lang_Blog_Podcast_Website_ASPdotNET.Models.StoryStatus.Approved)
+                                {
+                                    <span class="ud-badge approved">Đã xuất bản</span>
+                                }
+                                else if (podcast.Status == Lang_Blog_Podcast_Website_ASPdotNET.Models.StoryStatus.Rejected)
+                                {
+                                    <span class="ud-badge rejected">Cần chỉnh sửa</span>
+                                }
+                                else if (podcast.Status == Lang_Blog_Podcast_Website_ASPdotNET.Models.StoryStatus.EditPending)
+                                {
+                                    <span class="ud-badge editpending">Sửa chờ duyệt</span>
+                                }
+                            </td>
+                            <td style="text-align: right;">
+                                <div class="ud-action-group" style="justify-content: flex-end;">
+                                    @if (podcast.Status == Lang_Blog_Podcast_Website_ASPdotNET.Models.StoryStatus.Approved)
+                                    {
+                                        <a href="/PodCast/Details/@podcast.Id" class="ud-btn outline" style="padding: 6px 12px; font-size: 12px;"><i class="fa-solid fa-eye"></i> Xem bài</a>
+                                    }
+                                    <a href="/UserDashboard/EditPodcast/@podcast.Id" class="ud-btn primary" style="padding: 6px 12px; font-size: 12px;"><i class="fa-solid fa-pen"></i> Sửa</a>
+                                    <form asp-action="DeletePodcast" asp-controller="UserDashboard" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa Podcast này không?');">
+                                        <input type="hidden" name="id" value="@podcast.Id" />
+                                        <button type="submit" class="ud-btn danger" style="padding: 6px; font-size: 12px;" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <!-- TAB: Gửi bài mới -->
+    <div id="submit-new" class="ud-tab-content">
+        <h3 style="margin-bottom: 20px;">Tạo Tác Phẩm Mới</h3>
+        
+        <div style="background: var(--white); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color);">
+            <div style="margin-bottom: 30px; display: flex; gap: 30px;">
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer;">
+                    <input type="radio" name="postType" id="storyRadio" value="story" checked onchange="toggleUploadForm()" />
+                    Viết Bài Story
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer;">
+                    <input type="radio" name="postType" id="podcastRadio" value="podcast" onchange="toggleUploadForm()" />
+                    Tải Lên Podcast
+                </label>
+            </div>
+
+            <!-- Form Viết Bài (Story) -->
+            <div id="form-story" style="display: block;">
+                <form asp-action="SubmitStory" asp-controller="UserDashboard" method="post" enctype="multipart/form-data" onsubmit="return prepareStorySubmit()">
+                    <div class="ud-form-group">
+                        <label>Tiêu đề bài viết</label>
+                        <input type="text" name="Title" class="ud-input" placeholder="Nhập tiêu đề thật hay..." required />
+                    </div>
+                    
+                    <div style="display: flex; gap: 20px;">
+                        <div class="ud-form-group" style="flex: 1;">
+                            <label>Tác giả / Bút danh</label>
+                            <input type="text" name="Author" class="ud-input" placeholder="Tên hiển thị trên bài viết..." />
+                        </div>
+                        <div class="ud-form-group" style="flex: 1;">
+                            <label>Danh mục</label>
+                            <select name="CategoryId" class="ud-input" required>
+                                <option value="">-- Chọn chủ đề --</option>
+                                @foreach (var c in categories)
+                                {
+                                    <option value="@c.Id">@c.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="ud-form-group">
+                        <label>Ảnh bìa (Bắt buộc)</label>
+                        <input type="file" name="ImageFile" class="ud-input" accept="image/*" required />
+                    </div>
+
+                    <div class="ud-form-group">
+                        <label>Nội dung câu chuyện</label>
+                        <!-- Quill Editor -->
+                        <div id="editor-container" style="height: 300px; background: #fff; border-radius: 0 0 8px 8px;"></div>
+                        <input type="hidden" name="Content" id="storyContentHidden" />
+                    </div>
+
+                    <button type="submit" class="ud-btn primary"><i class="fa-solid fa-paper-plane"></i> Gửi duyệt bài viết</button>
+                </form>
+            </div>
+
+            <!-- Form Tải Lên Podcast -->
+            <div id="form-podcast" style="display: none;">
+                <form asp-action="SubmitPodcast" asp-controller="UserDashboard" method="post" enctype="multipart/form-data">
+                    <div class="ud-form-group">
+                        <label>Tiêu đề Podcast</label>
+                        <input type="text" name="Title" class="ud-input" placeholder="Nhập tiêu đề Podcast..." required />
+                    </div>
+                    
+                    <div style="display: flex; gap: 20px;">
+                        <div class="ud-form-group" style="flex: 1;">
+                            <label>Tác giả / Diễn giả</label>
+                            <input type="text" name="Author" class="ud-input" placeholder="Tên người thể hiện..." />
+                        </div>
+                        <div class="ud-form-group" style="flex: 1;">
+                            <label>Danh mục</label>
+                            <select name="CategoryId" class="ud-input" required>
+                                <option value="">-- Chọn chủ đề --</option>
+                                @foreach (var c in categories)
+                                {
+                                    <option value="@c.Id">@c.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 20px;">
+                        <div class="ud-form-group" style="flex: 1;">
+                            <label>Số tập (Tập thứ mấy)</label>
+                            <input type="number" name="EpisodeNumber" class="ud-input" value="1" min="1" required />
+                        </div>
+                        <div class="ud-form-group" style="flex: 1;">
+                            <label>Thời lượng (VD: 15:30)</label>
+                            <input type="text" name="Duration" class="ud-input" placeholder="Phút:Giây" />
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 20px;">
+                        <div class="ud-form-group" style="flex: 1;">
+                            <label>Ảnh bìa (Vuông 1:1)</label>
+                            <input type="file" name="ImageFile" class="ud-input" accept="image/*" required />
+                        </div>
+                        <div class="ud-form-group" style="flex: 1;">
+                            <label>File âm thanh (MP3/WAV)</label>
+                            <input type="file" name="AudioFile" class="ud-input" accept="audio/*" required />
+                        </div>
+                    </div>
+
+                    <div class="ud-form-group">
+                        <label>Mô tả Podcast</label>
+                        <textarea name="Description" class="ud-textarea" placeholder="Giới thiệu nội dung của tập podcast này..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="ud-btn primary"><i class="fa-solid fa-cloud-arrow-up"></i> Tải lên Podcast</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script>
+        function openUdTab(evt, tabId) {
+            const contents = document.querySelectorAll('.ud-tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            const buttons = document.querySelectorAll('.ud-tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            if(evt) evt.currentTarget.classList.add('active');
+            
+            const hashMap = { 'my-stories': 'write-story', 'my-podcasts': 'upload-podcast', 'submit-new': 'submit' };
+            // Update URL parameters for tab keeping if redirecting
+        }
+
+        // Kiểm tra URL xem đang ở tab nào
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
+            if (tabParam === 'upload-podcast') {
+                openUdTab(null, 'my-podcasts');
+                document.querySelectorAll('.ud-tab-btn')[1].classList.add('active');
+            } else if (tabParam === 'write-story') {
+                openUdTab(null, 'submit-new');
+                document.querySelectorAll('.ud-tab-btn')[2].classList.add('active');
+                document.getElementById('storyRadio').checked = true;
+                toggleUploadForm();
+            }
+        });
+
+        function toggleUploadForm() {
+            var isStory = document.getElementById('storyRadio').checked;
+            document.getElementById('form-story').style.display = isStory ? 'block' : 'none';
+            document.getElementById('form-podcast').style.display = isStory ? 'none' : 'block';
+        }
+
+        // Khởi tạo Quill cho Story
+        var quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Viết câu chuyện của bạn ở đây...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'align': [] }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            }
+        });
+
+        function prepareStorySubmit() {
+            var content = document.querySelector('#editor-container .ql-editor').innerHTML;
+            if (quill.getText().trim().length === 0) {
+                alert("Vui lòng nhập nội dung bài viết.");
+                return false;
+            }
+            document.getElementById('storyContentHidden').value = content;
+            return true;
+        }
+    </script>
+}

@@ -1,0 +1,302 @@
+/* CSS cho User Dashboard */
+:root {
+    --primary-color: #2C2C2C;
+    --secondary-color: #B29B84;
+    --bg-color: #FDFBF7;
+    --white: #FFFFFF;
+    --text-muted: #888888;
+    --border-color: #EEEEEE;
+    --success-bg: #E8F5E9;
+    --success-text: #2E7D32;
+    --warning-bg: #FFF3E0;
+    --warning-text: #E65100;
+    --error-bg: #FFEBEE;
+    --error-text: #C62828;
+    --font-sans: 'Plus Jakarta Sans', sans-serif;
+    --font-serif: 'Playfair Display', serif;
+}
+
+body {
+    background-color: var(--bg-color);
+}
+
+.ud-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: var(--font-sans);
+    color: var(--primary-color);
+}
+
+.ud-header {
+    margin-bottom: 40px;
+}
+
+.ud-header h1 {
+    font-family: var(--font-serif);
+    font-size: 2.5rem;
+    margin: 0 0 10px 0;
+}
+
+.ud-header p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* Thống kê Card */
+.ud-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.ud-stat-card {
+    background: var(--white);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ud-stat-card span {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.ud-stat-card strong {
+    font-size: 2rem;
+    font-family: var(--font-serif);
+    color: var(--primary-color);
+}
+
+/* Tabs */
+.ud-tabs {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0;
+}
+
+.ud-tab-btn {
+    background: none;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    position: relative;
+    font-family: var(--font-sans);
+    transition: color 0.3s ease;
+}
+
+.ud-tab-btn:hover {
+    color: var(--primary-color);
+}
+
+.ud-tab-btn.active {
+    color: var(--secondary-color);
+}
+
+.ud-tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: var(--secondary-color);
+    border-radius: 3px 3px 0 0;
+}
+
+.ud-tab-content {
+    display: none;
+    animation: fadeIn 0.4s ease;
+}
+
+.ud-tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Bảng */
+.ud-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    border: 1px solid var(--border-color);
+}
+
+.ud-table th, .ud-table td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.ud-table th {
+    background: #F8F9FA;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ud-table td {
+    vertical-align: middle;
+}
+
+.ud-table tbody tr:hover {
+    background: #FAFAFA;
+}
+
+.ud-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.ud-badge.pending { background: var(--warning-bg); color: var(--warning-text); }
+.ud-badge.approved { background: var(--success-bg); color: var(--success-text); }
+.ud-badge.rejected { background: var(--error-bg); color: var(--error-text); }
+.ud-badge.editpending { background: #E3F2FD; color: #1976D2; }
+
+/* Nút */
+.ud-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: all 0.3s ease;
+    border: none;
+    font-size: 0.95rem;
+}
+
+.ud-btn.primary {
+    background: var(--secondary-color);
+    color: var(--white);
+}
+
+.ud-btn.primary:hover {
+    background: #9A836D;
+}
+
+.ud-btn.outline {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--primary-color);
+}
+
+.ud-btn.outline:hover {
+    border-color: var(--secondary-color);
+    color: var(--secondary-color);
+}
+
+.ud-btn.danger {
+    background: transparent;
+    color: var(--error-text);
+}
+
+.ud-btn.danger:hover {
+    background: var(--error-bg);
+}
+
+.ud-action-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Alert/Toast */
+.ud-alert {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideIn 0.3s ease-out forwards;
+}
+
+.ud-alert.success { background: var(--success-bg); color: var(--success-text); border: 1px solid #C8E6C9; }
+.ud-alert.error { background: var(--error-bg); color: var(--error-text); border: 1px solid #FFCDD2; }
+.ud-alert.warning { background: var(--warning-bg); color: var(--warning-text); border: 1px solid #FFE0B2; }
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Forms */
+.ud-form-group {
+    margin-bottom: 20px;
+}
+
+.ud-form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.ud-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.ud-input:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+}
+
+.ud-textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    resize: vertical;
+}
+
+.ud-textarea:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+}
+
+.rejection-reason {
+    margin-top: 10px;
+    padding: 10px 15px;
+    background: var(--error-bg);
+    border-left: 3px solid var(--error-text);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: var(--error-text);
+}

@@ -42,6 +42,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 // --------------------------------------------------------
 // 3. CẤU HÌNH MVC & RAZOR PAGES
 // --------------------------------------------------------
+// Đăng ký các dịch vụ Custom
+builder.Services.AddScoped<Lang_Blog_Podcast_Website_ASPdotNET.Services.NotificationService>();
+
 // Đăng ký các dịch vụ cần thiết để sử dụng mô hình MVC (Model-View-Controller)
 builder.Services.AddControllersWithViews();
 // Đăng ký dịch vụ cho Razor Pages (Identity UI mặc định dùng Razor Pages)

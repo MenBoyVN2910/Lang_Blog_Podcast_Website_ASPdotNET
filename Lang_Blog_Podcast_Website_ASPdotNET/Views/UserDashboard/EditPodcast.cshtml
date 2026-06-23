@@ -1,0 +1,82 @@
+@model Lang_Blog_Podcast_Website_ASPdotNET.Models.PodCastUploadViewModel
+
+@{
+    ViewData["Title"] = "Chỉnh sửa Podcast";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var categories = ViewBag.Categories as List<Lang_Blog_Podcast_Website_ASPdotNET.Models.Category>;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/UserDashboard/Index.css" />
+}
+
+<div class="ud-container">
+    <div class="ud-header" style="display:flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+            <h1>Chỉnh Sửa Podcast</h1>
+            <p>Cập nhật thông tin cho tập Podcast của bạn.</p>
+        </div>
+        <a href="/UserDashboard/Index?tab=upload-podcast" class="ud-btn outline"><i class="fa-solid fa-arrow-left"></i> Quay lại</a>
+    </div>
+
+    <div style="background: var(--white); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color);">
+        <form asp-action="EditPodcast" asp-controller="UserDashboard" asp-route-id="@ViewBag.PodcastId" method="post" enctype="multipart/form-data">
+            
+            <div class="ud-form-group">
+                <label>Tiêu đề Podcast</label>
+                <input asp-for="Title" class="ud-input" required />
+            </div>
+            
+            <div style="display: flex; gap: 20px;">
+                <div class="ud-form-group" style="flex: 1;">
+                    <label>Tác giả / Diễn giả</label>
+                    <input asp-for="Author" class="ud-input" />
+                </div>
+                <div class="ud-form-group" style="flex: 1;">
+                    <label>Danh mục</label>
+                    <select asp-for="CategoryId" class="ud-input" required>
+                        @foreach (var c in categories)
+                        {
+                            <option value="@c.Id">@c.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 20px;">
+                <div class="ud-form-group" style="flex: 1;">
+                    <label>Số tập (Tập thứ mấy)</label>
+                    <input asp-for="EpisodeNumber" class="ud-input" min="1" required />
+                </div>
+                <div class="ud-form-group" style="flex: 1;">
+                    <label>Thời lượng (VD: 15:30)</label>
+                    <input asp-for="Duration" class="ud-input" />
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 20px;">
+                <div class="ud-form-group" style="flex: 1;">
+                    <label>Ảnh bìa hiện tại</label>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <img src="@ViewBag.CurrentImagePath" alt="Cover" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" onerror="this.src='/images/Default_Images/Blog.png'" />
+                        <input type="file" name="ImageFile" class="ud-input" accept="image/*" />
+                    </div>
+                </div>
+                <div class="ud-form-group" style="flex: 1;">
+                    <label>Audio hiện tại</label>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <audio controls style="width:100%; height: 35px;"><source src="@ViewBag.CurrentAudioPath" type="audio/mpeg"></audio>
+                        <input type="file" name="AudioFile" class="ud-input" accept="audio/*" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="ud-form-group">
+                <label>Mô tả Podcast</label>
+                <textarea asp-for="Description" class="ud-textarea" required></textarea>
+            </div>
+
+            <button type="submit" class="ud-btn primary"><i class="fa-solid fa-floppy-disk"></i> Lưu thay đổi & Chờ duyệt</button>
+        </form>
+    </div>
+</div>

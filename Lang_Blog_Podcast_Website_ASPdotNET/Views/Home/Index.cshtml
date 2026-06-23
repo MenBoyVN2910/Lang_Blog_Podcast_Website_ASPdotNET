@@ -1,5 +1,8 @@
-﻿@{
-    ViewData["Title"] = "";
+@using Lang_Blog_Podcast_Website_ASPdotNET.Models
+@{
+    ViewData["Title"] = "Trang Chủ";
+    var topPodcasts = ViewBag.TopPodcasts as List<PodCast> ?? new List<PodCast>();
+    var topStories = ViewBag.TopStories as List<Story> ?? new List<Story>();
 }
 @* ======================================================================================================================================================== *@
 <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
@@ -9,26 +12,24 @@
 <link rel="stylesheet" href="~/css/Home/Index.css" />
 @* ======================================================================================================================================================== *@
 
-
-
-@* ======================================================================================================================================================== *@
 <header class="main-header"></header>
 
 <div class="magazine-container">
 
     <main class="main-content-area">
-
         <div class="home-hero-section">
             <div class="hero-meta animate-hero delay-1">
                 <span class="badge featured-badge">FEATURED EDITORIAL</span>
-                <span class="issue-date">MAY 2024 ISSUE</span>
+                <span class="issue-date">@DateTime.Now.ToString("MMM yyyy").ToUpper() ISSUE</span>
             </div>
             <h1 class="serif-title-xl animate-hero delay-2">Im lặng <br>là một ngôn từ.</h1>
         </div>
 
         <div class="grid-item large-post" data-aos="fade-up" data-aos-duration="1200">
-            <a href="#">
-                <img src="~/images/Home/GrayWall.png" alt="Water basin" class="grid-image" />
+            <a href="#" class="image-aesthetic-wrapper">
+                <div class="image-zoom-container">
+                    <img src="~/images/Home/GrayWall.png" alt="Water basin" class="grid-image" />
+                </div>
             </a>
             <div class="post-text-content">
                 <h2 class="serif-title-lg">BẢN GIAO HƯỞNG CỦA NHỮNG NGÀY MƯA.</h2>
@@ -38,9 +39,13 @@
         </div>
 
         <div class="horizontal-post" data-aos="fade-up" data-aos-duration="1200" data-aos-offset="100">
-            <a href="#" class="horiz-image">
-                <img src="~/images/Home/Ghe.png" alt="Chair and branch" class="grid-image" />
-            </a>
+            <div class="horiz-image">
+                <a href="#" class="image-aesthetic-wrapper">
+                    <div class="image-zoom-container">
+                        <img src="~/images/Home/Ghe.png" alt="Chair and branch" class="grid-image" />
+                    </div>
+                </a>
+            </div>
             <div class="horiz-text">
                 <span class="section-title-sans">CẢM HỨNG HÀNG TUẦN</span>
                 <h2 class="serif-title-md">CHẠM VÀO NHỮNG ĐIỀU BÌNH DỊ.</h2>
@@ -48,52 +53,50 @@
                 <a href="#" class="btn-outline">KHÁM PHÁ NGAY</a>
             </div>
         </div>
-
     </main>
 
     <aside class="sidebar-right-area">
 
-        <h3 class="sans-header" data-aos="fade-in">ÂM THANH NGUYÊN BẢN</h3>
-
-        <div class="podcast-card-side" data-aos="fade-left" data-aos-delay="100">
-            <div class="podcast-img-wrapper">
-                <img src="~/images/PodCast/podcast.png" alt="Podcast" class="side-card-img" />
-            </div>
-            <div class="side-card-info">
-                <span class="tag-new">TẬP MỚI NHẤT</span>
-                <h4 class="card-title serif-title">Chuyện về sự bao dung.</h4>
-                <span class="duration">34:20 MIN</span>
-            </div>
+        <!-- THAY ĐỔI: TOP PODCAST -->
+        <h3 class="sans-header" data-aos="fade-in">TOP PODCAST</h3>
+        <div class="top-list-container">
+            @foreach (var podcast in topPodcasts)
+            {
+                <div class="podcast-card-side" data-aos="fade-left" data-aos-delay="100" onclick="playPodcast('@podcast.AudioPath', '@podcast.Title', '@(podcast.Author ?? podcast.User?.FullName)', '@(string.IsNullOrEmpty(podcast.ImagePath) ? "/images/Logo/logo_website.png" : podcast.ImagePath)', @podcast.Id)">
+                    <div class="podcast-img-wrapper">
+                        <img src="@(string.IsNullOrEmpty(podcast.ImagePath) ? "/images/Logo/logo_website.png" : podcast.ImagePath)" alt="@podcast.Title" class="side-card-img" />
+                    </div>
+                    <div class="side-card-info">
+                        <span class="tag-new">@podcast.ViewCount <i class="fa-solid fa-headphones"></i> LƯỢT NGHE</span>
+                        <h4 class="card-title serif-title">@podcast.Title</h4>
+                        <span class="duration"><i class="fa-solid fa-play"></i> Nghe ngay</span>
+                    </div>
+                </div>
+            }
         </div>
+        <a href="@Url.Action("Index", "Podcast")" class="view-all-link" data-aos="fade-in">TẤT CẢ PODCAST &rarr;</a>
 
-        <div class="podcast-card-side" data-aos="fade-left" data-aos-delay="200">
-            <div class="podcast-img-wrapper">
-                <img src="~/images/PodCast/podcast.png" alt="Podcast" class="side-card-img" />
+        <div class="sidebar-divider" style="margin-top: 30px;"></div>
+
+        <!-- THAY ĐỔI: TOP BÀI VIẾT (STORY) -->
+        <h3 class="sans-header" data-aos="fade-in" style="margin-top: 20px;">TOP BÀI VIẾT</h3>
+        
+        @foreach (var story in topStories)
+        {
+            <div class="sidebar-post" data-aos="fade-up" data-aos-duration="1000">
+                <a href="@Url.Action("Details", "Story", new { id = story.Id })" class="image-aesthetic-wrapper">
+                    <div class="image-zoom-container" style="height: 180px;">
+                        <img src="@(string.IsNullOrEmpty(story.ImagePath) ? "/images/default-thumbnail.jpg" : story.ImagePath)" alt="@story.Title" class="grid-image" style="height: 100%; object-fit: cover;" onerror="this.src='/images/Logo/logo_website.png'" />
+                    </div>
+                </a>
+                <div class="post-meta">
+                    <span>@story.CreatedAt.ToString("dd.MM.yyyy")</span> &bull; <span>@story.ViewCount <i class="fa-solid fa-eye"></i></span>
+                </div>
+                <h4 class="serif-title-md" style="margin-top: 5px; font-size: 22px;">@story.Title</h4>
+                <a href="@Url.Action("Details", "Story", new { id = story.Id })" class="read-more-link-small">ĐỌC THÊM &rarr;</a>
             </div>
-            <div class="side-card-info">
-                <span class="tag-new">TẬP MỚI NHẤT</span>
-                <h4 class="card-title serif-title">Chuyện về sự bao dung.</h4>
-                <span class="duration">34:20 MIN</span>
-            </div>
-        </div>
-
-        <a href="#" class="view-all-link" data-aos="fade-in">TẤT CẢ PODCAST &rarr;</a>
-
-        <div class="sidebar-divider"></div>
-
-        <div class="sidebar-post" data-aos="fade-up" data-aos-duration="1000">
-            <a href="#">
-                <img src="~/images/Order/galaxy.jpg" alt="Nebula" class="grid-image" />
-            </a>
-            <div class="post-meta">
-                <span>27.05.2026</span> &bull; <span>771</span>
-            </div>
-            <h4 class="serif-title-md">NGHỆ THUẬT CỦA SỰ CHẬM RÃI</h4>
-            <p class="article-excerpt-small">Trong một thế giới luôn hối hả, sự chậm rãi đôi khi bị coi là yếu đuối. Nhưng thực tế, chậm lại là c...</p>
-            <a href="#" class="read-more-link-small">ĐỌC THÊM &rarr;</a>
-        </div>
-
-        <div class="sidebar-divider"></div>
+            <div class="sidebar-divider"></div>
+        }
 
         <div class="editor-quote-block" data-aos="fade-right">
             <span class="section-title-sans">GHI CHÉP TỪ BIÊN TẬP</span>
@@ -107,65 +110,35 @@
             <span class="banner-version">v3.0</span>
         </div>
 
-        <div class="sidebar-post" data-aos="fade-up" data-aos-duration="1000">
-            <div class="badge chữa-lành-badge">TÂM SỰ</div>
-            <a href="#">
-                <img src="~/images/Home/Ghe.png" alt="Mountain" class="grid-image" />
-            </a>
-            <div class="post-meta">
-                <span>07.06.2026</span> &bull; <span>80</span>
-            </div>
-            <h4 class="serif-title-md">TIẾNG VANG TRONG TĨNH LẶNG</h4>
-            <p class="article-excerpt-small">Có những điều chỉ có thể nghe thấy khi ta hoàn toàn im lặng. Im lặng không phải là sự vắng mặt của â...</p>
-            <a href="#" class="read-more-link-small">ĐỌC THÊM &rarr;</a>
-        </div>
-
-        <div class="sidebar-divider"></div>
-        <a href="#" class="view-all-link" data-aos="fade-in">XEM THÊM CÂU CHUYỆN TỪ BẠN ĐỌC</a>
+        <a href="@Url.Action("Index", "Story")" class="view-all-link" data-aos="fade-in" style="display: block; text-align: center; margin-top: 20px; font-size: 14px; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px;">XEM TẤT CẢ CÂU CHUYỆN &rarr;</a>
 
     </aside>
 
 </div>
-@* ======================================================================================================================================================== *@
 
-
-
-
-@* ======================================================================================================================================================== *@
 @section Scripts {
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 <script>
     AOS.init({
-    once: true,       // Hiệu ứng chỉ chạy 1 lần khi cuộn qua
-    offset: 80,       // Kích hoạt hiệu ứng cách mép dưới màn hình 80px
-    duration: 800,    // Tốc độ mượt mà mặc định
-    easing: 'ease-out-cubic' // Gia tốc mềm mại
+    once: true,
+    offset: 80,
+    duration: 800,
+    easing: 'ease-out-cubic'
     });
+
+    // Hàm gọi Player khi click vào podcast ở trang chủ
+    function playPodcast(audioPath, title, author, imagePath, podcastId) {
+        if (!audioPath) {
+            alert('Tệp âm thanh không tồn tại!');
+            return;
+        }
+        if (typeof LangPlayer !== 'undefined') {
+            LangPlayer.play(audioPath, title, author, imagePath, podcastId);
+        } else if (typeof window.LangPlayer !== 'undefined') {
+            window.LangPlayer.play(audioPath, title, author, imagePath, podcastId);
+        } else {
+            alert('Trình phát âm thanh chưa sẵn sàng. Đang cố gắng tải lại...');
+        }
+    }
 </script>
 }
-@* ======================================================================================================================================================== *@
-
-
-
-@* ======================================================================================================================================================== *@
-<!-- BẮT ĐẦU: Xử lý thông báo thành công -->
-@* @if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert" style="position: fixed; top: 30px; right: 30px; z-index: 9999; background-color: #f0ebe6; border-left: 5px solid #8C847D; color: #1a1a1a; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-        <i class="fa-solid fa-heart" style="color: #8C847D;"></i> <strong>Cảm ơn bạn!</strong> @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-
-    <!-- Tự động ẩn thông báo sau 5 giây -->
-    <script>
-        setTimeout(function() {
-        var alertElement = document.querySelector('.alert');
-        if (alertElement) {
-        var bsAlert = new bootstrap.Alert(alertElement);
-        bsAlert.close();
-        }
-        }, 5000);
-    </script>
-} *@
-<!-- KẾT THÚC: Xử lý thông báo thành công -->
-@* ======================================================================================================================================================== *@

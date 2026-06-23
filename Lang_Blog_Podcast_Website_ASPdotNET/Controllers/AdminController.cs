@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Lang_Blog_Podcast_Website_ASPdotNET.Models;
 using Lang_Blog_Podcast_Website_ASPdotNET.Data;
+using Lang_Blog_Podcast_Website_ASPdotNET.Services;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using System.Linq;
@@ -22,15 +23,18 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _db;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly NotificationService _notificationService;
 
         public AdminController(
             UserManager<ApplicationUser> userManager,
             ApplicationDbContext db,
-            IWebHostEnvironment webHostEnvironment)
+            IWebHostEnvironment webHostEnvironment,
+            NotificationService notificationService)
         {
             _userManager = userManager;
             _db = db;
             _webHostEnvironment = webHostEnvironment;
+            _notificationService = notificationService;
         }
 
         /// <summary>
@@ -78,6 +82,13 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 .OrderByDescending(m => m.Id)
                 .ToListAsync();
 
+            var pendingRevisions = await _db.PostRevisions
+                .Include(r => r.Category)
+                .Include(r => r.User)
+                .Where(r => r.Status == StoryStatus.Pending)
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
+
             // Tải danh sách toàn bộ danh mục bài viết
             var categories = await _db.Categories.ToListAsync();
 
@@ -107,6 +118,8 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 MagazineIssuesCount = magazineIssues.Count,
                 TotalCategoriesCount = categories.Count,
                 TotalPublishedCount = approvedStories.Count + approvedPodcasts.Count,
+                PendingRevisions = pendingRevisions,
+                PendingRevisionsCount = pendingRevisions.Count,
                 Users = userRolesViewModel
             };
 
@@ -262,6 +275,9 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 {
                     await _userManager.AddToRoleAsync(newUser, "Admin");
                 }
+                
+                await _notificationService.CreateAsync(newUser.Id, "Chào mừng đến với LẶNG.", "Tài khoản của bạn đã được admin khởi tạo thành công.", "Welcome");
+                
                 TempData["AdminMessage"] = $"Đã tạo tài khoản {newUser.UserName} thành công!";
             }
             else
@@ -340,6 +356,11 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             }
 
             await _db.SaveChangesAsync();
+            
+            if (story.UserId != null) {
+                await _notificationService.CreateAsync(story.UserId, "Bài viết đã được duyệt", $"Câu chuyện '{story.Title}' đã được duyệt và xuất bản.", "Approved", $"/Story/Details/{story.Id}");
+            }
+            
             TempData["AdminMessage"] = $"Đã duyệt và xuất bản bài viết '{story.Title}' thành công!";
 
             return RedirectToAction(nameof(Index));
@@ -347,26 +368,27 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
 
         /// <summary>
         /// POST: /Admin/Reject
-        /// Từ chối câu chuyện: Xóa bài khỏi cơ sở dữ liệu và dọn dẹp tệp tin ảnh bìa vật lý trên Server.
+        /// Từ chối câu chuyện: Chuyển trạng thái sang Rejected và lưu lý do từ chối
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reject(int id)
+        public async Task<IActionResult> Reject(int id, string rejectionReason)
         {
             if (await _db.Stories.FindAsync(id) is not { } story)
             {
                 return NotFound();
             }
 
-            string imagePath = story.ImagePath;
+            story.Status = StoryStatus.Rejected;
+            story.RejectionReason = rejectionReason;
 
-            _db.Stories.Remove(story);
             await _db.SaveChangesAsync();
 
-            // Xóa tệp vật lý sau khi DB cập nhật thành công
-            DeletePhysicalFile(imagePath);
+            if (story.UserId != null) {
+                await _notificationService.CreateAsync(story.UserId, "Bài viết chưa được duyệt", $"Câu chuyện '{story.Title}' đã bị từ chối duyệt. Lý do: {rejectionReason}", "Rejected");
+            }
 
-            TempData["AdminMessage"] = $"Đã xóa bài viết '{story.Title}' và dọn dẹp các tệp liên quan.";
+            TempData["AdminMessage"] = $"Đã từ chối bài viết '{story.Title}'.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -388,6 +410,11 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             podcast.PublishDate = DateTime.Now;
 
             await _db.SaveChangesAsync();
+            
+            if (podcast.UserId != null) {
+                await _notificationService.CreateAsync(podcast.UserId, "Podcast đã được duyệt", $"Podcast '{podcast.Title}' đã được duyệt và xuất bản.", "Approved", $"/Podcast/Details/{podcast.Id}");
+            }
+            
             TempData["AdminMessage"] = $"Đã duyệt và xuất bản Podcast '{podcast.Title}' thành công!";
 
             return Redirect("/Admin#podcast");
@@ -395,30 +422,112 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
 
         /// <summary>
         /// POST: /Admin/RejectPodcast
-        /// Từ chối Podcast: Xóa khỏi cơ sở dữ liệu và dọn dẹp tệp tin ảnh bìa và âm thanh vật lý.
+        /// Từ chối Podcast: Chuyển trạng thái sang Rejected và lưu lý do từ chối
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RejectPodcast(int id)
+        public async Task<IActionResult> RejectPodcast(int id, string rejectionReason)
         {
             if (await _db.PodCasts.FindAsync(id) is not { } podcast)
             {
                 return NotFound();
             }
 
-            string imagePath = podcast.ImagePath;
-            string audioPath = podcast.AudioPath;
+            podcast.Status = StoryStatus.Rejected;
+            podcast.RejectionReason = rejectionReason;
 
-            _db.PodCasts.Remove(podcast);
             await _db.SaveChangesAsync();
 
-            // Xóa tệp vật lý sau khi DB cập nhật thành công
-            DeletePhysicalFile(imagePath);
-            DeletePhysicalFile(audioPath);
+            if (podcast.UserId != null) {
+                await _notificationService.CreateAsync(podcast.UserId, "Podcast chưa được duyệt", $"Podcast '{podcast.Title}' đã bị từ chối duyệt. Lý do: {rejectionReason}", "Rejected");
+            }
 
-            TempData["AdminMessage"] = $"Đã xóa Podcast '{podcast.Title}' và dọn dẹp các tệp liên quan.";
+            TempData["AdminMessage"] = $"Đã từ chối Podcast '{podcast.Title}'.";
 
             return Redirect("/Admin#podcast");
+        }
+
+        // =========================================================================================
+        // QUẢN LÝ BẢN CHỈNH SỬA (REVISIONS)
+        // =========================================================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveRevision(int id)
+        {
+            var revision = await _db.PostRevisions.FindAsync(id);
+            if (revision == null) return NotFound();
+
+            if (revision.ContentType == "Story")
+            {
+                var story = await _db.Stories.FindAsync(revision.OriginalPostId);
+                if (story != null)
+                {
+                    if (revision.ImagePath != story.ImagePath) DeletePhysicalFile(story.ImagePath);
+                    story.Title = revision.Title;
+                    story.Content = revision.Content;
+                    story.CategoryId = revision.CategoryId;
+                    story.ImagePath = revision.ImagePath;
+                    story.Status = StoryStatus.Approved;
+                }
+            }
+            else if (revision.ContentType == "Podcast")
+            {
+                var podcast = await _db.PodCasts.FindAsync(revision.OriginalPostId);
+                if (podcast != null)
+                {
+                    if (revision.ImagePath != podcast.ImagePath) DeletePhysicalFile(podcast.ImagePath);
+                    if (revision.AudioPath != podcast.AudioPath) DeletePhysicalFile(podcast.AudioPath);
+                    podcast.Title = revision.Title;
+                    podcast.Description = revision.Description;
+                    podcast.CategoryId = revision.CategoryId;
+                    podcast.ImagePath = revision.ImagePath;
+                    podcast.AudioPath = revision.AudioPath;
+                    podcast.Status = StoryStatus.Approved;
+                }
+            }
+
+            _db.PostRevisions.Remove(revision);
+            await _db.SaveChangesAsync();
+
+            if (revision.UserId != null) {
+                await _notificationService.CreateAsync(revision.UserId, "Bản chỉnh sửa đã được duyệt", $"Bản chỉnh sửa cho bài viết '{revision.Title}' đã được duyệt và áp dụng.", "Approved");
+            }
+
+            TempData["AdminMessage"] = "Đã duyệt và áp dụng bản chỉnh sửa!";
+            return Redirect("/Admin#revisions");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectRevision(int id)
+        {
+            var revision = await _db.PostRevisions.FindAsync(id);
+            if (revision == null) return NotFound();
+
+            if (revision.ContentType == "Story")
+            {
+                var story = await _db.Stories.FindAsync(revision.OriginalPostId);
+                if (story != null) story.Status = StoryStatus.Approved;
+                DeletePhysicalFile(revision.ImagePath);
+            }
+            else if (revision.ContentType == "Podcast")
+            {
+                var podcast = await _db.PodCasts.FindAsync(revision.OriginalPostId);
+                if (podcast != null) podcast.Status = StoryStatus.Approved;
+                DeletePhysicalFile(revision.ImagePath);
+                DeletePhysicalFile(revision.AudioPath);
+            }
+
+            _db.PostRevisions.Remove(revision);
+            await _db.SaveChangesAsync();
+
+            if (revision.UserId != null) {
+                await _notificationService.CreateAsync(revision.UserId, "Bản chỉnh sửa bị từ chối", $"Bản chỉnh sửa cho bài viết '{revision.Title}' đã bị từ chối duyệt.", "Rejected");
+            }
+
+            TempData["AdminMessage"] = "Đã từ chối và xóa bản chỉnh sửa!";
+            return Redirect("/Admin#revisions");
         }
 
         // =========================================================================================

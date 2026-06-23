@@ -34,5 +34,8 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
         public int ViewCount { get; set; } = 0; 
         [Display(Name = "Thời lượng")]
         public string? Duration { get; set; }
+
+        [Display(Name = "Lý do từ chối")]
+        public string? RejectionReason { get; set; }
     }
 }

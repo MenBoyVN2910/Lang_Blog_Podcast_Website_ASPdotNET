@@ -43,5 +43,8 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
         public DateTime? PublishDate { get; set; } // Sẽ được cập nhật khi admin duyệt
 
         public int ViewCount { get; set; } = 0; // Số lượt xem (như trong ảnh có 837 lượt xem)
+
+        [Display(Name = "Lý do từ chối")]
+        public string? RejectionReason { get; set; }
     }
 }

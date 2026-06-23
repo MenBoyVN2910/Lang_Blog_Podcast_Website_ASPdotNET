@@ -33,6 +33,7 @@
         @* =====================Navigation Menu========================================== *@
         <nav class="admin-tabs">
             <button class="tab-btn active" onclick="openTab(event, 'stories')"><i class="fa-solid fa-book-open"></i> Mảnh ghép ký ức</button>
+            <button class="tab-btn" onclick="openTab(event, 'revisions')"><i class="fa-solid fa-pen-to-square"></i> Bản chỉnh sửa @(Model.PendingRevisionsCount > 0 ? $"({Model.PendingRevisionsCount})" : "")</button>
             <button class="tab-btn" onclick="openTab(event, 'magazine')"><i class="fa-regular fa-newspaper"></i> Quản lý Tạp chí</button>
             <button class="tab-btn" onclick="openTab(event, 'podcast')"><i class="fa-solid fa-headphones"></i> PodCast Series</button>
             <button class="tab-btn" onclick="openTab(event, 'published')"><i class="fa-solid fa-layer-group"></i> Kho bài viết</button>
@@ -164,7 +165,7 @@
                                         @Html.AntiForgeryToken()
                                         <button type="submit" class="btn-action approve"><i class="fa-solid fa-check me-1"></i> Duyệt</button>
                                     </form>
-                                    <form asp-controller="Admin" asp-action="Reject" asp-route-id="@story.Id" method="post" style="margin:0;" onsubmit="return confirm('Bạn có chắc muốn xóa bài viết này vĩnh viễn?');">
+                                    <form asp-controller="Admin" asp-action="Reject" asp-route-id="@story.Id" method="post" style="margin:0;" onsubmit="return submitRejectWithReason(this, 'Bạn có chắc muốn từ chối bài viết này?');">
                                         @Html.AntiForgeryToken()
                                         <button type="submit" class="btn-action reject"><i class="fa-solid fa-trash-can me-1"></i> Bỏ</button>
                                     </form>
@@ -178,7 +179,78 @@
         </table>
     </div>
 
-
+    @* =====================Bản Chỉnh Sửa========================================== *@
+    <div id="tab-revisions" class="tab-content">
+        <h2 class="section-title">Phê duyệt bản chỉnh sửa (Shadow Copy)</h2>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">Người gửi</th>
+                    <th style="width: 10%;">Loại</th>
+                    <th style="width: 55%;">Thông tin chỉnh sửa</th>
+                    <th style="width: 20%; text-align: right;">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.PendingRevisionsCount == 0)
+                {
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--text-muted); font-style: italic;">
+                            Không có bản chỉnh sửa nào đang chờ duyệt.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var rev in Model.PendingRevisions)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@(string.IsNullOrEmpty(rev.User?.FullName) ? "Ẩn danh" : rev.User.FullName)</strong><br />
+                                <span style="font-size:11px;color:#888;">@rev.CreatedAt.ToString("dd.MM.yyyy")</span>
+                            </td>
+                            <td><span class="badge" style="background:#5bc0de;color:#fff;">@rev.ContentType</span></td>
+                            <td>
+                                <strong>@rev.Title</strong>
+                                <p style="font-size:12px;color:#666;margin:4px 0;">ID bài gốc: @rev.OriginalPostId</p>
+                                <button class="btn-view-more btn-open-modal"
+                                        data-title="@rev.Title"
+                                        data-author="@(string.IsNullOrEmpty(rev.User?.FullName) ? "Ẩn danh" : rev.User.FullName)"
+                                        data-issuenumber="N/A"
+                                        data-time="@rev.CreatedAt.ToString("dd/MM/yyyy HH:mm")"
+                                        data-image="@(string.IsNullOrEmpty(rev.ImagePath) ? "/images/Default_Images/Blog.png" : rev.ImagePath)"
+                                        data-target="rev-content-@rev.Id">
+                                    <i class="fa-solid fa-magnifying-glass"></i> Xem chi tiết
+                                </button>
+                                <div id="rev-content-@rev.Id" style="display:none;">
+                                    @if(rev.ContentType == "Story") {
+                                        @Html.Raw(rev.Content)
+                                    } else {
+                                        <p>@rev.Description</p>
+                                        @if(!string.IsNullOrEmpty(rev.AudioPath)) {
+                                            <audio controls><source src="@rev.AudioPath" type="audio/mpeg"></audio>
+                                        }
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <div class="action-group">
+                                    <form asp-controller="Admin" asp-action="ApproveRevision" asp-route-id="@rev.Id" method="post" style="margin:0;">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn-action approve"><i class="fa-solid fa-check"></i> Duyệt</button>
+                                    </form>
+                                    <form asp-controller="Admin" asp-action="RejectRevision" asp-route-id="@rev.Id" method="post" style="margin:0;" onsubmit="return confirm('Từ chối bản sửa này? Bản Live sẽ được giữ nguyên.');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn-action reject"><i class="fa-solid fa-times"></i> Bỏ</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
 
     @* =====================Magazine========================================== *@
     <div id="tab-magazine" class="tab-content">
@@ -358,7 +430,7 @@
                                         @Html.AntiForgeryToken()
                                         <button type="submit" class="btn-action approve"><i class="fa-solid fa-check me-1"></i> Duyệt</button>
                                     </form>
-                                    <form asp-controller="Admin" asp-action="RejectPodcast" asp-route-id="@podcast.Id" method="post" style="margin:0;" onsubmit="return confirm('Bạn có chắc muốn xóa Podcast này vĩnh viễn?');">
+                                    <form asp-controller="Admin" asp-action="RejectPodcast" asp-route-id="@podcast.Id" method="post" style="margin:0;" onsubmit="return submitRejectWithReason(this, 'Bạn có chắc muốn từ chối Podcast này?');">
                                         @Html.AntiForgeryToken()
                                         <button type="submit" class="btn-action reject"><i class="fa-solid fa-trash-can me-1"></i> Bỏ</button>
                                     </form>
@@ -772,6 +844,17 @@
                     }
                 });
             }
+        }
+
+        function submitRejectWithReason(form, msg) {
+            const reason = prompt(msg + "\n\nVui lòng nhập lý do từ chối (Để lại góp ý cho người gửi):");
+            if (reason === null) return false;
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "rejectionReason";
+            input.value = reason;
+            form.appendChild(input);
+            return true;
         }
     </script>
 }
