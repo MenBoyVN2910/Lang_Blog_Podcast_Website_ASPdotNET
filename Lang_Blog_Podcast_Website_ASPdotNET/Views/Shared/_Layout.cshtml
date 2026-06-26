@@ -87,10 +87,10 @@
                 <h2 class="logo-text-footer">LẶNG.</h2>
                 <p class="footer-slogan">"Nơi những tâm hồn tìm thấy nhau trong sự tĩnh lặng của ngôn từ."</p>
                 <div class="social-links">
-                    <a href="#">FB</a>
-                    <a href="#">IG</a>
-                    <a href="#">TW</a>
-                    <a href="#">BE</a>
+                    <a href="https://www.facebook.com/minh.nhat.65912/">FB</a>
+                    <a href="https://www.threads.com/chao_em_hehe">TH</a>
+                    <a href="https://x.com/MinhNhat291025">X</a>
+                    @* <a href="#">BE</a> *@
                 </div>
             </div>
 
@@ -98,19 +98,22 @@
             <div class="footer-links">
                 <h4 class="footer-heading">KHÁM PHÁ</h4>
                 <ul>
-                    <li><a href="#">Câu chuyện</a></li>
-                    <li><a href="#">Tạp chí</a></li>
-                    <li><a href="#">Podcast</a></li>
+                    <li><a asp-controller="Story" asp-action="Index">CÂU CHUYỆN</a></li>
+                    <li><a asp-controller="Magazine" asp-action="Index">TẠP CHÍ</a></li>
+                    <li> <a asp-controller="Podcast" asp-action="Index">PODCAST</a></li>
                 </ul>
             </div>
 
+
+           
             @* Cột 3: Các liên kết liên hệ và tương tác hành động *@
             <div class="footer-links">
                 <h4 class="footer-heading">KẾT NỐI</h4>
                 <ul>
-                    <li><a href="#">Về chúng tôi</a></li>
-                    <li><a href="#">Tham gia</a></li>
-                    <li class="email-link"><a href="#">HELLO@LANGMAGAZINE.VN</a></li>
+                    <li><a asp-controller="Home" asp-action="About">Về Chúng Tôi</a></li>
+                   
+                    <li class="email"> <p>BUIMINHNHAT2910@GMAIL.COM</p> </li>
+
                 </ul>
             </div>
 
@@ -118,8 +121,11 @@
 
         @* Bản quyền và nút cuộn lên đầu trang *@
         <div class="footer-bottom">
-            <span class="copyright">&copy; 2024 LẶNG. MEDIA - BẢO LƯU MỌI QUYỀN</span>
+            <span class="copyright">&copy; 2026 LẶNG. MEDIA </span>
             <a href="#" class="back-to-top">VỀ ĐẦU TRANG &uarr;</a>
+            <span class="creator-credit" style="display: block; font-size: 8px; margin-top: 8px; color: #888;">
+                Cre By: Bùi Minh Nhật
+            </span>
         </div>
     </footer>
 

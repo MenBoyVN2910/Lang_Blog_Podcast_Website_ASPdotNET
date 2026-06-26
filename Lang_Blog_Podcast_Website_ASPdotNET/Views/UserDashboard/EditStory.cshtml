@@ -8,7 +8,7 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/UserDashboard/Index.css" />
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/Story/Submit.css" />
 }
 
 <div class="ud-container">
@@ -17,80 +17,183 @@
             <h1>Chỉnh Sửa Câu Chuyện</h1>
             <p>Cập nhật lại nội dung mảnh ghép của bạn.</p>
         </div>
-        <a href="/UserDashboard/Index?tab=write-story" class="ud-btn outline"><i class="fa-solid fa-arrow-left"></i> Quay lại</a>
+        <a href="/UserDashboard/" class="ud-btn outline"><i class="fa-solid fa-arrow-left"></i> Quay lại</a>
     </div>
 
     <div style="background: var(--white); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color);">
-        <form asp-action="EditStory" asp-controller="UserDashboard" asp-route-id="@ViewBag.StoryId" method="post" enctype="multipart/form-data" onsubmit="return prepareStorySubmit()">
+        <form asp-action="EditStory" asp-controller="UserDashboard" asp-route-id="@ViewBag.StoryId" method="post" enctype="multipart/form-data">
             
             <div class="ud-form-group">
-                <label>Tiêu đề bài viết</label>
-                <input asp-for="Title" class="ud-input" required />
+                <label class="lang-label"><i class="fa-solid fa-heading"></i> Tiêu đề câu chuyện <span style="font-size: 11px; font-weight: 400; color: #9E9590;">&mdash; Tối đa 50 ký tự </span></label>
+                <input asp-for="Title" class="form-control-lang" placeholder="Viết một tiêu đề thật thơ..." maxlength="50" required />
+            </div>
+
+            <div class="ud-form-group">
+                <label class="lang-label"><i class="fa-solid fa-hashtag"></i> Số phát hành (Nếu có) <span style="font-size: 11px; font-weight: 400; color: #9E9590;">&mdash; Bỏ trống sẽ hiển thị là <em>None</em></span></label>
+                <input asp-for="IssueNumber" class="form-control-lang" type="number" min="1" placeholder="Nhập số phát hành của bạn..." maxlength="10" oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" />
+            </div>
+
+            <div class="ud-form-group">
+                <label class="lang-label"><i class="fa-solid fa-layer-group"></i> Danh mục</label>
+                <select asp-for="CategoryId" class="form-control-lang" required>
+                    <option value="">-- Chọn danh mục câu chuyện --</option>
+                    @foreach (var c in categories)
+                    {
+                        <option value="@c.Id">@c.Name</option>
+                    }
+                </select>
             </div>
             
-            <div style="display: flex; gap: 20px;">
-                <div class="ud-form-group" style="flex: 1;">
-                    <label>Tác giả / Bút danh</label>
-                    <input asp-for="Author" class="ud-input" />
+            <div class="ud-form-group">
+                <label class="lang-label"><i class="fa-regular fa-image"></i> Ảnh bìa hiện tại (Tải lên ảnh mới sẽ thay thế ảnh cũ)</label>
+                <div style="margin-bottom: 15px;">
+                    <img src="@ViewBag.CurrentImagePath" alt="Current Cover" style="width: 150px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color);" />
                 </div>
-                <div class="ud-form-group" style="flex: 1;">
-                    <label>Danh mục</label>
-                    <select asp-for="CategoryId" class="ud-input" required>
-                        @foreach (var c in categories)
-                        {
-                            <option value="@c.Id">@c.Name</option>
-                        }
-                    </select>
-                </div>
+                <label for="ud-story-image-upload" class="custom-file-upload">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> <span>Nhấn để chọn ảnh mới (Không bắt buộc)...</span>
+                </label>
+                <input id="ud-story-image-upload" name="ImageFile" type="file" style="display:none;" accept="image/*" onchange="updateFileName(this, 'ud-story-file-name-img')" />
+                <div id="ud-story-file-name-img" class="small text-muted mt-2"></div>
+                <div id="ud-story-image-preview-container" class="text-center" style="display: none; margin-top: 15px;"></div>
             </div>
 
             <div class="ud-form-group">
-                <label>Ảnh bìa (Tải lên ảnh mới sẽ thay thế ảnh cũ)</label>
-                <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px;">
-                    <img src="@ViewBag.CurrentImagePath" alt="Current Cover" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color);" />
-                    <input type="file" name="ImageFile" class="ud-input" accept="image/*" />
-                </div>
+                <label class="lang-label"><i class="fa-solid fa-book-open"></i> Nội dung câu chuyện<span style="font-size: 11px; font-weight: 400; color: #9E9590;">&mdash; Chỉ thêm ảnh sau 30 ký tự đầu </span></label>
+                <textarea id="storyContent" name="Content" class="form-control-lang" rows="15" placeholder="Hãy để những con chữ dẫn lối...">@Model.Content</textarea>
             </div>
 
-            <div class="ud-form-group">
-                <label>Nội dung câu chuyện</label>
-                <div id="editor-container" style="height: 400px; background: #fff; border-radius: 0 0 8px 8px;">
-                    @Html.Raw(Model.Content)
-                </div>
-                <input type="hidden" name="Content" id="storyContentHidden" />
+            <div class="text-center mt-4">
+                <button type="submit" class="btn-submit-lang" style="width: 100%;">LƯU THAY ĐỔI & CHỜ DUYỆT <i class="fa-solid fa-floppy-disk ms-2"></i></button>
             </div>
-
-            <button type="submit" class="ud-btn primary"><i class="fa-solid fa-floppy-disk"></i> Lưu thay đổi & Chờ duyệt</button>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        var quill = new Quill('#editor-container', {
-            theme: 'snow',
-            modules: {
-                toolbar: [
-                    [{ 'header': [2, 3, false] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    ['blockquote'],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    [{ 'align': [] }],
-                    ['link', 'image'],
-                    ['clean']
-                ]
+        function updateFileName(input, targetId) {
+            if (input.files && input.files.length > 0) {
+                var file = input.files[0];
+                var fileName = file.name;
+
+                document.getElementById(targetId).innerHTML = "<i class='fa-solid fa-check text-success'></i> Đã chọn: <strong>" + fileName + "</strong>";
+
+                if (input.accept === 'image/*') {
+                    var imgContainerId = 'ud-story-image-preview-container';
+                    var imgContainer = document.getElementById(imgContainerId);
+                    if (imgContainer && file.type.match('image.*')) {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            imgContainer.innerHTML = '<img src="' + e.target.result + '" style="max-width: 100%; max-height: 200px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 2px solid #ddd;" />';
+                            imgContainer.style.display = 'block';
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                }
+            } else {
+                document.getElementById(targetId).innerHTML = "";
+                document.getElementById('ud-story-image-preview-container').style.display = 'none';
+            }
+        }
+
+        tinymce.init({
+            selector: '#storyContent',
+            height: 600,
+            menubar: true,
+            plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons'
+            ],
+            toolbar: 'undo redo | blocks | fontfamily fontsize forecolor backcolor | ' +
+                     'bold italic underline strikethrough | alignleft aligncenter ' +
+                     'alignright alignjustify | bullist numlist outdent indent | ' +
+                     'emoticons link image | removeformat | help',
+            font_family_formats: 'Playfair Display=Playfair Display, serif; Montserrat=Montserrat, sans-serif; Arial=arial,helvetica,sans-serif; Times New Roman=times new roman,times;',
+            font_size_formats: '10pt 12pt 14pt 16pt 18pt 24pt 36pt',
+            content_style: `
+                @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap');
+                body {
+                    font-family: 'Playfair Display', serif;
+                    color: #8C847D;
+                    font-size: 16px;
+                    line-height: 1.8;
+                    padding: 10px;
+                }
+                body::placeholder { color: #ccc; }
+            `,
+            setup: function (editor) {
+                editor.on('change keyup nodeChange', function () {
+                    editor.save();
+                });
+
+                editor.on('BeforeExecCommand', function (e) {
+                    if (e.command === 'mceImage') {
+                        var charCount = editor.getContent({ format: 'text' }).trim().length;
+                        if (charCount < 30) {
+                            e.preventDefault();
+                            alert('Vui lòng viết ít nhất 30 ký tự trước khi chèn ảnh! (Hiện tại: ' + charCount + ' ký tự)');
+                        }
+                    }
+                });
+
+                editor.on('drop', function (e) {
+                    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                        var isImage = false;
+                        for (var i = 0; i < e.dataTransfer.files.length; i++) {
+                            if (e.dataTransfer.files[i].type.match('image.*')) {
+                                isImage = true;
+                                break;
+                            }
+                        }
+                        if (isImage) {
+                            var charCount = editor.getContent({ format: 'text' }).trim().length;
+                            if (charCount < 30) {
+                                e.preventDefault();
+                                alert('Vui lòng viết ít nhất 30 ký tự trước khi chèn ảnh! (Hiện tại: ' + charCount + ' ký tự)');
+                            }
+                        }
+                    }
+                });
+
+                editor.on('SetContent', function (e) {
+                    var images = editor.dom.select('img');
+                    for (var i = 0; i < images.length; i++) {
+                        if (!editor.dom.getAttrib(images[i], 'data-resized')) {
+                            editor.dom.setAttrib(images[i], 'width', '720');
+                            editor.dom.setAttrib(images[i], 'height', '480');
+                            editor.dom.setStyle(images[i], 'object-fit', 'cover');
+                            editor.dom.setStyle(images[i], 'border-radius', '8px');
+                            editor.dom.setAttrib(images[i], 'data-resized', 'true');
+                        }
+                    }
+                });
             }
         });
 
-        function prepareStorySubmit() {
-            var content = document.querySelector('#editor-container .ql-editor').innerHTML;
-            if (quill.getText().trim().length === 0) {
+        document.querySelector("form").addEventListener("submit", function(e) {
+            var content = tinymce.get("storyContent").getContent({ format: 'text' }).trim();
+            if (content.length === 0) {
+                e.preventDefault();
                 alert("Vui lòng nhập nội dung bài viết.");
-                return false;
             }
-            document.getElementById('storyContentHidden').value = content;
-            return true;
+        });
+
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <text>
+            document.addEventListener("DOMContentLoaded", function () {
+                Swal.fire({
+                    title: 'Chưa thể cập nhật!',
+                    html: '@Html.Raw(ViewBag.ErrorMessage)',
+                    icon: 'error',
+                    confirmButtonColor: '#111',
+                    confirmButtonText: 'Tôi sẽ kiểm tra lại'
+                });
+            });
+            </text>
         }
     </script>
 }

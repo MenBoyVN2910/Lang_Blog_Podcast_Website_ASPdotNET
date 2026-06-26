@@ -22,27 +22,25 @@
 
         <div class="form-row">
             <div class="form-col" style="flex: 100%;">
-                <label class="lang-label"><i class="fa-solid fa-heading"></i> Tiêu đề câu chuyện</label>
+                <label class="lang-label"><i class="fa-solid fa-heading"></i> Tiêu đề câu chuyện <span style="font-size: 11px; font-weight: 400; color: #9E9590;">&mdash; Tối đa 50 ký tự </span></label>
                 <input asp-for="Title" class="form-control-lang" placeholder="Viết một tiêu đề thật thơ..." maxlength="50" />
                 <span asp-validation-for="Title" class="text-danger small mt-1"></span>
             </div>
         </div>
 
-        <div class="form-row">
-            <div class="form-col">
-                <label class="lang-label"><i class="fa-solid fa-pen-nib"></i> Tác giả <span class="text-danger">*</span></label>
 
-                <input asp-for="Author" class="form-control-lang" placeholder="Nhập tên của bạn..." maxlength="30" />
-
-                <span asp-validation-for="Author" class="text-danger small mt-1"></span>
-            </div>
-        </div>
 
         <div class="form-row">
             <div class="form-col">
-                <label class="lang-label"><i class="fa-solid fa-hashtag"></i> Số phát hành (Nếu có)</label>
+                <label class="lang-label"><i class="fa-solid fa-hashtag"></i> Số phát hành (Nếu có) <span style="font-size: 11px; font-weight: 400; color: #9E9590;">&mdash; Bỏ trống sẽ hiển thị là <em>None</em></label>
 
-                <input asp-for="IssueNumber" class="form-control-lang" placeholder="Nhập số phát hành của bạn..." maxlength="30" />
+                <input asp-for="IssueNumber"
+                       class="form-control-lang"
+                       type="number"
+                       min="1"
+                       placeholder="Nhập số phát hành của bạn..."
+                       maxlength="10"
+                       oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" />
 
                 <span asp-validation-for="IssueNumber" class="text-danger small mt-1"></span>
             </div>
@@ -61,11 +59,11 @@
         
         <div class="form-row">
             <div class="form-col">
-                <label class="lang-label"><i class="fa-regular fa-image"></i> Ảnh bìa câu chuyện</label>
+                <label class="lang-label"><i class="fa-regular fa-image"></i> Ảnh bìa câu chuyện<span style="font-size: 11px; font-weight: 400; color: #9E9590;">&mdash; Nên chọn ảnh ngang </span></label>
                 <label for="image-upload" class="custom-file-upload">
                     <i class="fa-solid fa-cloud-arrow-up"></i> <span>Nhấn để chọn ảnh...</span>
                 </label>
-                <input id="image-upload" asp-for="ImageFile" type="file" style="display:none;" accept="~/images/Default_Images/Blog.png" onchange="updateFileName(this, 'file-name-img')" />
+                <input id="image-upload" asp-for="ImageFile" type="file" style="display:none;" accept="image/*" onchange="updateFileName(this, 'file-name-img')" />
                 <div id="file-name-img" class="small text-muted mt-2"></div>
                 <div id="image-preview-container" class="text-center" style="display: none; margin-top: 15px;"></div>
 
@@ -76,7 +74,7 @@
 
         <div class="form-row">
             <div class="form-col" style="flex: 100%;">
-                <label class="lang-label"><i class="fa-solid fa-book-open"></i> Lời tự sự</label>
+                <label class="lang-label"><i class="fa-solid fa-book-open"></i> Lời tự sự<span style="font-size: 11px; font-weight: 400; color: #9E9590;">&mdash; Chỉ thêm ảnh sau 30 ký tự đầu </span></label>
                 <textarea id="storyContent" asp-for="Content" class="form-control-lang" rows="15" placeholder="Hãy để những con chữ dẫn lối..."></textarea>
                 <span asp-validation-for="Content" class="text-danger small mt-1"></span>
             </div>
@@ -161,35 +159,35 @@
         editor.save();
         });
 
-        // 2.2 Chặn nút bấm "Chèn ảnh" nếu chưa đủ 30 chữ
+        // 2.2 Chặn nút bấm "Chèn ảnh" nếu chưa đủ 30 ký tự
         editor.on('BeforeExecCommand', function (e) {
-        if (e.command === 'mceImage') {
-        var wordCount = editor.plugins.wordcount.getCount();
-        if (wordCount < 30) {
-        e.preventDefault();
-        alert('Vui lòng viết ít nhất 30 chữ trước khi chèn ảnh! (Hiện tại: ' + wordCount + ' chữ)');
-        }
-        }
+            if (e.command === 'mceImage') {
+                var charCount = editor.getContent({ format: 'text' }).trim().length;
+                if (charCount < 30) {
+                    e.preventDefault();
+                    alert('Vui lòng viết ít nhất 30 ký tự trước khi chèn ảnh! (Hiện tại: ' + charCount + ' ký tự)');
+                }
+            }
         });
 
-        // 2.3 Chặn thao tác kéo - thả ảnh trực tiếp nếu chưa đủ 30 chữ
+        // 2.3 Chặn thao tác kéo - thả ảnh trực tiếp nếu chưa đủ 30 ký tự
         editor.on('drop', function (e) {
-        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        var isImage = false;
-        for (var i = 0; i < e.dataTransfer.files.length; i++) {
-        if (e.dataTransfer.files[i].type.match('image.*')) {
-        isImage = true;
-        break;
-        }
-        }
-        if (isImage) {
-        var wordCount = editor.plugins.wordcount.getCount();
-        if (wordCount < 30) {
-        e.preventDefault();
-        alert('Vui lòng viết ít nhất 30 chữ trước khi chèn ảnh! (Hiện tại: ' + wordCount + ' chữ)');
-        }
-        }
-        }
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                var isImage = false;
+                for (var i = 0; i < e.dataTransfer.files.length; i++) {
+                    if (e.dataTransfer.files[i].type.match('image.*')) {
+                        isImage = true;
+                        break;
+                    }
+                }
+                if (isImage) {
+                    var charCount = editor.getContent({ format: 'text' }).trim().length;
+                    if (charCount < 30) {
+                        e.preventDefault();
+                        alert('Vui lòng viết ít nhất 30 ký tự trước khi chèn ảnh! (Hiện tại: ' + charCount + ' ký tự)');
+                    }
+                }
+            }
         });
 
         // 2.4 Ép kích thước ảnh thành 720x480 khi chèn thành công

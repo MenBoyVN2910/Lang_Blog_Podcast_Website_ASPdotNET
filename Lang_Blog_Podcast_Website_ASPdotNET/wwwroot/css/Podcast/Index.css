@@ -462,6 +462,9 @@ body, html {
     line-height: 1.4;
     margin: 0 0 12px 0;
     transition: color 0.3s ease;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .premium-podcast-card:hover .card-title {
@@ -478,6 +481,9 @@ body, html {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .card-footer {
@@ -551,4 +557,54 @@ body, html {
 .dark-swal-popup {
     border: 1px solid var(--pd-border) !important;
     border-radius: 12px !important;
+}
+
+/* ==========================================================================
+   PAGINATION
+   ========================================================================== */
+.pagination-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 50px;
+    padding: 20px 0;
+}
+
+.pagination-nav .page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--pd-border);
+    border-radius: 8px;
+    background: var(--pd-bg-card);
+    color: var(--pd-text-body);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pagination-nav .page-link:hover:not(.disabled):not(.active) {
+    background-color: var(--pd-accent);
+    color: #fff;
+    border-color: var(--pd-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(178, 155, 132, 0.3);
+}
+
+.pagination-nav .page-link.active {
+    background-color: var(--pd-accent);
+    color: #fff;
+    border-color: var(--pd-accent);
+    box-shadow: 0 4px 12px rgba(178, 155, 132, 0.3);
+}
+
+.pagination-nav .page-link.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+    cursor: not-allowed;
 }

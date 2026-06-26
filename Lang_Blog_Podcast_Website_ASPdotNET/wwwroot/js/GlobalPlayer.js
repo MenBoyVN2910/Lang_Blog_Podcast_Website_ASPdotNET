@@ -44,6 +44,7 @@ const LangPlayer = (function () {
         const state = {
             src: audioEl.src,
             currentTime: audioEl.currentTime,
+            duration: audioEl.duration || 0,
             volume: audioEl.volume,
             speed: currentSpeed,
             title: trackTitle ? trackTitle.textContent : '',
@@ -383,6 +384,21 @@ const LangPlayer = (function () {
         // Khôi phục volume
         audioEl.volume = state.volume != null ? state.volume : 1;
         updateVolumeUI();
+        
+        // Khôi phục tiến trình ban đầu nếu có duration lưu lại
+        if (state.duration) {
+            var pct = (state.currentTime / state.duration) * 100;
+            seekbarFill.style.width = pct + '%';
+            timeCurrent.textContent = formatTime(state.currentTime);
+            timeTotal.textContent = formatTime(state.duration);
+        }
+
+        // Cập nhật icon lúc mới restore
+        if (state.paused) {
+             btnPlay.innerHTML = '<i class="fa-solid fa-play" style="transform: translateX(1px);"></i>';
+        } else {
+             btnPlay.innerHTML = '<i class="fa-solid fa-pause"></i>';
+        }
 
         // Khôi phục audio
         audioEl.src = state.src;
@@ -397,12 +413,17 @@ const LangPlayer = (function () {
                     // Autoplay bị chặn, chỉ cần cập nhật UI
                     updatePlayIcon();
                 });
+            } else {
+                updatePlayIcon();
             }
-            updatePlayIcon();
         });
 
-        // Hiển thị player mà không có slide animation
+        // Hiển thị player ngay lập tức (tắt transition để không bị giật khi chuyển trang)
+        playerEl.style.transition = 'none';
         showPlayer(false);
+        // Buộc trình duyệt tính toán lại layout ngay lập tức (Force reflow)
+        void playerEl.offsetHeight;
+        playerEl.style.transition = '';
     }
 
     // ====== Public API ======

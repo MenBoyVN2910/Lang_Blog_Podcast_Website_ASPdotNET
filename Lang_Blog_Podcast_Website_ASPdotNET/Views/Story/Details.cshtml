@@ -4,7 +4,9 @@
     ViewData["Title"] = Model.Title;
 }
 
-<link rel="stylesheet" href="~/css/Story/detail.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/Story/detail.css" asp-append-version="true" />\
+<!-- Thêm version (hash) vào URL của file CSS để tránh trình duyệt dùng cache cũ.
+     Khi file thay đổi, URL cũng thay đổi và trình duyệt sẽ tải phiên bản mới. -->
 
 <div class="lang-story-light-container">
     <div class="article-container">
@@ -27,18 +29,30 @@
                         <span class="meta-value">@Model.CreatedAt.ToString("dd.MM.yyyy")</span>
                     </div>
 
-                    <div class="meta-group">
-                        <span class="meta-label">TÁC GIẢ</span>
-                        @{
-                            var rawAuthor = string.IsNullOrEmpty(Model.User?.FullName) ? (string.IsNullOrEmpty(Model.Author) ? "Ẩn danh" : Model.Author) : Model.User.FullName;
-                            var displayAuthor = rawAuthor.Length > 20 ? rawAuthor.Substring(0, 20) + "..." : rawAuthor;
-                        }
-                        <span class="meta-value font-italic" title="@rawAuthor">@displayAuthor</span>
-                    </div>
+                    
 
                     <div class="meta-group">
                         <span class="meta-label">SỐ PHÁT HÀNH</span>
                         <span class="meta-value font-italic">@(string.IsNullOrEmpty(Model.IssueNumber) ? "None" : Model.IssueNumber)</span>
+                    </div>
+
+                    <div class="meta-group">
+                        <span class="meta-label">TÁC GIẢ</span>
+                        @{
+                            var rawAuthor = Model.User?.FullName ?? "Ẩn danh";
+                            var displayAuthor = rawAuthor.Length > 20 ? rawAuthor.Substring(0, 20) + "..." : rawAuthor;
+                            var authorUsername = Model.User?.UserName;
+                        }
+                        @if (authorUsername != null)
+                        {
+                            <a href="@Url.Action("Index", "Profile", new { username = authorUsername })"
+                               class="meta-value font-italic author-link"
+                               title="Xem trang cá nhân của @rawAuthor">@displayAuthor</a>
+                        }
+                        else
+                        {
+                            <span class="meta-value font-italic" title="@rawAuthor">@displayAuthor</span>
+                        }
                     </div>
                 </div>
             </div>
@@ -61,11 +75,11 @@
                 <div class="article-footer">
                     <div class="author-note">
                         <span class="note-label">LỜI NGỎ</span>
-                        <p>Cảm ơn bạn đã dành thời gian lắng nghe tâm hồn của mình.<br>Hy vọng bài viết này mang lại cho bạn chút ánh sáng nhỏ bé<br>trong thế giới đầy hối hả này.</p>
+                        <p>Cảm ơn bạn đã dành thời gian lắng nghe tâm hồn của Lặnger.<br>Hy vọng bài viết này mang lại cho bạn chút ánh sáng nhỏ bé<br>trong thế giới đầy hối hả này.</p>
                     </div>
                     <div class="magazine-signature">
-                        <span class="note-label">THỰC HIỆN BỞI</span>
-                        <h4>Lặng. Magazine</h4>
+                        <span class="note-label">NGƯỜI HỖ TRỢ</span>
+                        <h4>Lặng.Story</h4>
                     </div>
                 </div>
             </div>

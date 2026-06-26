@@ -92,6 +92,9 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             if (model.ImageFile == null || model.ImageFile.Length == 0)
             {
                 TempData["DashboardError"] = "Vui lòng chọn ảnh bìa cho câu chuyện của bạn!";
+                TempData["StoryFormData"] = System.Text.Json.JsonSerializer.Serialize(new {
+                    model.Title, model.IssueNumber, model.CategoryId, model.Content
+                });
                 return RedirectToAction(nameof(Index), new { tab = "write-story" });
             }
 
@@ -101,6 +104,9 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 if (isTitleExist)
                 {
                     TempData["DashboardError"] = "Tiêu đề này đã tồn tại, vui lòng chọn tiêu đề khác!";
+                    TempData["StoryFormData"] = System.Text.Json.JsonSerializer.Serialize(new {
+                        model.Title, model.IssueNumber, model.CategoryId, model.Content
+                    });
                     return RedirectToAction(nameof(Index), new { tab = "write-story" });
                 }
             }
@@ -115,9 +121,9 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                     {
                         Title = model.Title,
                         Content = model.Content,
-                        Author = model.Author?.Trim() ?? "Ẩn danh",
                         UserId = _userManager.GetUserId(User),
-                        IssueNumber = "None",
+                        // Note: Author column removed from Story; User.FullName will be used as display name where applicable. This assignment keeps author relation via UserId only.
+                        IssueNumber = string.IsNullOrWhiteSpace(model.IssueNumber) ? "None" : model.IssueNumber,
                         CategoryId = model.CategoryId,
                         ImagePath = uploadedFileName,
                         Status = StoryStatus.Pending,
@@ -139,10 +145,17 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             }
             else
             {
-                TempData["DashboardError"] = "Vui lòng kiểm tra lại. Thông tin bị thiếu hoặc không hợp lệ.";
+                var errorMessages = ModelState.Values
+                                    .SelectMany(v => v.Errors)
+                                    .Select(e => e.ErrorMessage)
+                                    .ToList();
+                TempData["DashboardError"] = string.Join("<br/>", errorMessages);
+                TempData["StoryFormData"] = System.Text.Json.JsonSerializer.Serialize(new {
+                    model.Title, model.IssueNumber, model.CategoryId, model.Content
+                });
             }
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { tab = "write-story" });
         }
 
         // ===================================== SUBMIT PODCAST =====================================
@@ -188,7 +201,14 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             }
             else
             {
-                TempData["DashboardError"] = "Vui lòng kiểm tra lại. Thông tin bị thiếu hoặc không hợp lệ.";
+                var errorMessages = ModelState.Values
+                                    .SelectMany(v => v.Errors)
+                                    .Select(e => e.ErrorMessage)
+                                    .ToList();
+                TempData["DashboardError"] = string.Join("<br/>", errorMessages);
+                TempData["PodcastFormData"] = System.Text.Json.JsonSerializer.Serialize(new {
+                    model.Title, model.Author, model.EpisodeNumber, model.CategoryId, model.Description
+                });
             }
 
             return RedirectToAction(nameof(Index), new { tab = "upload-podcast" });
@@ -207,9 +227,9 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             var model = new StoryUploadViewModel
             {
                 Title = story.Title,
-                Author = story.Author,
                 Content = story.Content,
-                CategoryId = story.CategoryId
+                CategoryId = story.CategoryId,
+                IssueNumber = story.IssueNumber
             };
 
             ViewBag.StoryId = story.Id;
@@ -232,6 +252,11 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
 
             if (!ModelState.IsValid)
             {
+                var errorMessages = ModelState.Values
+                                    .SelectMany(v => v.Errors)
+                                    .Select(e => e.ErrorMessage)
+                                    .ToList();
+                ViewBag.ErrorMessage = string.Join("<br/>", errorMessages);
                 ViewBag.StoryId = story.Id;
                 ViewBag.CurrentImagePath = story.ImagePath;
                 ViewBag.Categories = await _db.Categories.ToListAsync();
@@ -261,6 +286,7 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 };
                 
                 story.Status = StoryStatus.EditPending;
+                story.IssueNumber = string.IsNullOrWhiteSpace(model.IssueNumber) ? "None" : model.IssueNumber;
 
                 _db.PostRevisions.Add(revision);
                 
@@ -274,6 +300,7 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 story.Title = model.Title;
                 story.Content = model.Content;
                 story.CategoryId = model.CategoryId;
+                story.IssueNumber = string.IsNullOrWhiteSpace(model.IssueNumber) ? "None" : model.IssueNumber;
                 story.ImagePath = newImagePath;
                 story.Status = StoryStatus.Pending; // Nếu đang Reject thì sửa xong chuyển lại thành Pending
                 story.RejectionReason = null; // Xóa lý do từ chối cũ
@@ -325,6 +352,11 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
 
             if (!ModelState.IsValid)
             {
+                var errorMessages = ModelState.Values
+                                    .SelectMany(v => v.Errors)
+                                    .Select(e => e.ErrorMessage)
+                                    .ToList();
+                ViewBag.ErrorMessage = string.Join("<br/>", errorMessages);
                 ViewBag.PodcastId = podcast.Id;
                 ViewBag.CurrentImagePath = podcast.ImagePath;
                 ViewBag.CurrentAudioPath = podcast.AudioPath;

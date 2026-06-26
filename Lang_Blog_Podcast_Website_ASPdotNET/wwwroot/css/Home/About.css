@@ -389,3 +389,9 @@
         background-color: var(--about-accent-gold); /* Chuyển màu vàng nâu thay vì đen thui */
         letter-spacing: 0.4em; /* Chữ giãn ra một chút */
     }
+
+.qr_code {
+    width: 50%;
+    height: 55%;
+}
+

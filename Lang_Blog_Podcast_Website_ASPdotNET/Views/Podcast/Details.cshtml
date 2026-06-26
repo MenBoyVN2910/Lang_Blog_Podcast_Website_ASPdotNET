@@ -65,7 +65,7 @@
             <button class="pd-btn-play" id="btn-play-details"
                     data-audio-url="@Model.AudioPath"
                     data-audio-title="@Model.Title"
-                    data-audio-author="@(Model.User?.FullName ?? Model.Author)"
+                    data-audio-author="@(Model.User?.FullName ?? Model.Author ?? "Lặng")"
                     data-audio-image="@Model.ImagePath"
                     data-podcast-id="@Model.Id"
                     onclick="playFromDetails(this);"
@@ -80,7 +80,14 @@
                 </div>
                 <div class="pd-stat">
                     <i class="fa-solid fa-microphone-lines"></i>
-                    <span>@(Model.User?.FullName ?? Model.Author)</span>
+                    @if (Model.User?.UserName != null)
+                    {
+                        <a href="@Url.Action("Index", "Profile", new { username = Model.User.UserName })" title="Xem trang cá nhân của @(Model.User.FullName)">@(Model.User.FullName)</a>
+                    }
+                    else
+                    {
+                        <span>@(Model.User?.FullName ?? Model.Author ?? "Lặng")</span>
+                    }
                 </div>
             </div>
         </div>
@@ -112,7 +119,16 @@
                 <ul class="pd-detail-list">
                     <li>
                         <span class="pd-detail-label">Người dẫn</span>
-                        <span class="pd-detail-value">@(Model.User?.FullName ?? Model.Author)</span>
+                        <span class="pd-detail-value">
+                            @if (Model.User?.UserName != null)
+                            {
+                               @Model.Author
+                            }
+                            else
+                            {
+                                @(Model.User?.FullName ?? Model.Author ?? "Lặng")
+                            }
+                        </span>
                     </li>
                     <li>
                         <span class="pd-detail-label">Danh mục</span>

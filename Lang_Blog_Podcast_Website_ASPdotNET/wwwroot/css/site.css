@@ -346,6 +346,11 @@ button.btn-join {
 .footer-theme-avant .footer-heading { color: #FFFFFF; }
 .footer-theme-avant .footer-links a { color: #FFFFFF; }
 .footer-theme-avant .footer-links .email-link a { color: #FFFFFF; font-family: 'Plus Jakarta Sans', sans-serif !important; letter-spacing: 2px; }
+    .footer-theme-avant .footer-links .email p{
+        color: #FFFFFF;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        letter-spacing: 2px;
+    }
 .footer-theme-avant .footer-bottom { border-top: 1px solid #333333; color: #999999; }
 .footer-theme-avant .back-to-top { color: #FFFFFF; }
 

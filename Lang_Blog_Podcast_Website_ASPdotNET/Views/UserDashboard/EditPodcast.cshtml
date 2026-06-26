@@ -8,6 +8,7 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/UserDashboard/Index.css" />
+    <link rel="stylesheet" href="~/css/Story/Submit.css" />
 }
 
 <div class="ud-container">
@@ -21,62 +22,145 @@
 
     <div style="background: var(--white); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color);">
         <form asp-action="EditPodcast" asp-controller="UserDashboard" asp-route-id="@ViewBag.PodcastId" method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Duration" id="audio-duration-input" />
             
             <div class="ud-form-group">
-                <label>Tiêu đề Podcast</label>
-                <input asp-for="Title" class="ud-input" required />
+                <label class="lang-label"><i class="fa-solid fa-heading"></i> Tiêu đề Podcast<span style="font-size: 11px; font-weight: 400; color: #9E9590;">&mdash; Tối đa 40 ký tự</span></label>
+                <input asp-for="Title" class="form-control-lang" placeholder="Nhập tiêu đề Podcast..." maxlength="40" required />
             </div>
             
-            <div style="display: flex; gap: 20px;">
-                <div class="ud-form-group" style="flex: 1;">
-                    <label>Tác giả / Diễn giả</label>
-                    <input asp-for="Author" class="ud-input" />
-                </div>
-                <div class="ud-form-group" style="flex: 1;">
-                    <label>Danh mục</label>
-                    <select asp-for="CategoryId" class="ud-input" required>
-                        @foreach (var c in categories)
-                        {
-                            <option value="@c.Id">@c.Name</option>
-                        }
-                    </select>
-                </div>
-            </div>
-
-            <div style="display: flex; gap: 20px;">
-                <div class="ud-form-group" style="flex: 1;">
-                    <label>Số tập (Tập thứ mấy)</label>
-                    <input asp-for="EpisodeNumber" class="ud-input" min="1" required />
-                </div>
-                <div class="ud-form-group" style="flex: 1;">
-                    <label>Thời lượng (VD: 15:30)</label>
-                    <input asp-for="Duration" class="ud-input" />
-                </div>
-            </div>
-
-            <div style="display: flex; gap: 20px;">
-                <div class="ud-form-group" style="flex: 1;">
-                    <label>Ảnh bìa hiện tại</label>
-                    <div style="display: flex; gap: 15px; align-items: center;">
-                        <img src="@ViewBag.CurrentImagePath" alt="Cover" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" onerror="this.src='/images/Default_Images/Blog.png'" />
-                        <input type="file" name="ImageFile" class="ud-input" accept="image/*" />
-                    </div>
-                </div>
-                <div class="ud-form-group" style="flex: 1;">
-                    <label>Audio hiện tại</label>
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <audio controls style="width:100%; height: 35px;"><source src="@ViewBag.CurrentAudioPath" type="audio/mpeg"></audio>
-                        <input type="file" name="AudioFile" class="ud-input" accept="audio/*" />
-                    </div>
-                </div>
+            <div class="ud-form-group">
+                <label class="lang-label"><i class="fa-solid fa-pen-nib"></i> Người dẫn (Host) <span style="font-size: 11px; font-weight: 400; color: #9E9590;">&mdash; Tối đa 30 ký tự</span></label>
+                <input asp-for="Author" class="form-control-lang" placeholder="Nhập tên người dẫn..." maxlength="30" />
             </div>
 
             <div class="ud-form-group">
-                <label>Mô tả Podcast</label>
-                <textarea asp-for="Description" class="ud-textarea" required></textarea>
+                <label class="lang-label"><i class="fa-solid fa-hashtag"></i> Số tập (Episode) <span style="font-size: 11px; font-weight: 400; color: #9E9590;">&mdash; Bỏ trống sẽ hiển thị là <em>None</em></span></label>
+                <input asp-for="EpisodeNumber" class="form-control-lang" type="number" min="1" placeholder="Nhập số tập (tùy chọn)..." maxlength="8" oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" />
             </div>
 
-            <button type="submit" class="ud-btn primary"><i class="fa-solid fa-floppy-disk"></i> Lưu thay đổi & Chờ duyệt</button>
+            <div class="ud-form-group">
+                <label class="lang-label"><i class="fa-solid fa-layer-group"></i> Danh mục</label>
+                <select asp-for="CategoryId" class="form-control-lang" required>
+                    <option value="">-- Chọn danh mục Podcast --</option>
+                    @foreach (var c in categories)
+                    {
+                        <option value="@c.Id">@c.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="ud-form-group">
+                <label class="lang-label"><i class="fa-regular fa-image"></i> Ảnh bìa hiện tại (Tải lên ảnh mới sẽ thay thế ảnh cũ)</label>
+                <div style="margin-bottom: 15px;">
+                    <img src="@ViewBag.CurrentImagePath" alt="Current Cover" style="width: 150px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color);" />
+                </div>
+                <label for="ud-podcast-image-upload" class="custom-file-upload">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> <span>Nhấn để chọn ảnh bìa mới (Không bắt buộc)...</span>
+                </label>
+                <input id="ud-podcast-image-upload" name="ImageFile" type="file" style="display:none;" accept="image/*" onchange="updateFileName(this, 'ud-podcast-file-name-img')" />
+                <div id="ud-podcast-file-name-img" class="small text-muted mt-2"></div>
+                <div id="ud-podcast-image-preview-container" class="text-center" style="display: none; margin-top: 15px;"></div>
+            </div>
+
+            <div class="ud-form-group">
+                <label class="lang-label"><i class="fa-solid fa-microphone-lines"></i> Audio hiện tại (Tải lên audio mới sẽ thay thế audio cũ)</label>
+                <div style="margin-bottom: 15px;">
+                    <audio controls style="width:100%; max-width:400px; height: 40px; border-radius: 8px;"><source src="@ViewBag.CurrentAudioPath" type="audio/mpeg"></audio>
+                </div>
+                <label for="ud-podcast-audio-upload" class="custom-file-upload" style="border-color: #4A7ADB;">
+                    <i class="fa-solid fa-file-audio" style="color: #4A7ADB;"></i> <span>Nhấn để chọn tệp Audio mới (Không bắt buộc)...</span>
+                </label>
+                <input id="ud-podcast-audio-upload" name="AudioFile" type="file" style="display:none;" accept="audio/*" onchange="updateFileName(this, 'ud-podcast-file-name-audio')" />
+                <div id="ud-podcast-file-name-audio" class="small text-muted mt-2"></div>
+                <div id="ud-podcast-audio-preview-container" style="display: none; margin-top: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #eef2f6;">
+                    <span style="font-size: 12px; font-weight: 600; color: #4A7ADB; display: block; margin-bottom: 8px;"><i class="fa-solid fa-headphones"></i> Audio Preview mới</span>
+                    <audio id="ud-podcast-audio-preview" controls style="width: 100%; height: 40px; border-radius: 8px;"></audio>
+                </div>
+            </div>
+
+            <div class="ud-form-group">
+                <label class="lang-label"><i class="fa-solid fa-align-left"></i> Mô tả Podcast</label>
+                <textarea asp-for="Description" class="form-control-lang" rows="6" placeholder="Mô tả ngắn gọn nội dung Podcast..." required></textarea>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn-submit-lang" style="width: 100%;">LƯU THAY ĐỔI & CHỜ DUYỆT <i class="fa-solid fa-floppy-disk ms-2"></i></button>
+            </div>
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function updateFileName(input, targetId) {
+            if (input.files && input.files.length > 0) {
+                var file = input.files[0];
+                var fileName = file.name;
+
+                document.getElementById(targetId).innerHTML = "<i class='fa-solid fa-check text-success'></i> Đã chọn: <strong>" + fileName + "</strong>";
+
+                if (input.accept === 'image/*') {
+                    var imgContainerId = 'ud-podcast-image-preview-container';
+                    var imgContainer = document.getElementById(imgContainerId);
+                    if (imgContainer && file.type.match('image.*')) {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            imgContainer.innerHTML = '<img src="' + e.target.result + '" style="max-width: 100%; max-height: 200px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 2px solid #ddd;" />';
+                            imgContainer.style.display = 'block';
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                } else if (input.accept === 'audio/*') {
+                    var audioContainer = document.getElementById('ud-podcast-audio-preview-container');
+                    var audioPreview = document.getElementById('ud-podcast-audio-preview');
+                    if (audioContainer && file.type.match('audio.*')) {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            audioPreview.src = e.target.result;
+                            audioContainer.style.display = 'block';
+                        }
+                        reader.readAsDataURL(file);
+
+                        audioPreview.onloadedmetadata = function () {
+                            var seconds = Math.floor(audioPreview.duration);
+                            var h = Math.floor(seconds / 3600);
+                            var m = Math.floor((seconds % 3600) / 60);
+                            var s = seconds % 60;
+                            var durationStr = "";
+                            if (h > 0) {
+                                durationStr += h + ":" + (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+                            } else {
+                                durationStr += m + ":" + (s < 10 ? "0" : "") + s;
+                            }
+                            document.getElementById('audio-duration-input').value = durationStr;
+                        };
+                    }
+                }
+            } else {
+                document.getElementById(targetId).innerHTML = "";
+                if (input.accept === 'image/*') {
+                    document.getElementById('ud-podcast-image-preview-container').style.display = 'none';
+                } else if (input.accept === 'audio/*') {
+                    document.getElementById('ud-podcast-audio-preview-container').style.display = 'none';
+                }
+            }
+        }
+
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <text>
+            document.addEventListener("DOMContentLoaded", function () {
+                Swal.fire({
+                    title: 'Chưa thể cập nhật!',
+                    html: '@Html.Raw(ViewBag.ErrorMessage)',
+                    icon: 'error',
+                    confirmButtonColor: '#111',
+                    confirmButtonText: 'Tôi sẽ kiểm tra lại'
+                });
+            });
+            </text>
+        }
+    </script>
+}

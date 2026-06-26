@@ -175,7 +175,7 @@
                 <h4 style="margin-bottom:15px;">Bài Viết Yêu Thích</h4>
                 @if (!Model.FavoriteStories.Any())
                 {
-                    <div class="empty-state">Bạn chưa yêu thích bài viết nào.</div>
+                    <div class="empty-state">Đang Phát Triển...</div>
                 }
                 else
                 {
@@ -196,7 +196,7 @@
                 <h4 style="margin-top:30px; margin-bottom:15px;">Podcast Yêu Thích</h4>
                 @if (!Model.FavoritePodcasts.Any())
                 {
-                    <div class="empty-state">Bạn chưa yêu thích podcast nào.</div>
+                    <div class="empty-state">Đang Phát Triển...</div>
                 }
                 else
                 {
@@ -247,13 +247,13 @@
                     </div>
 
                     <div class="form-group-custom">
-                        <label class="form-label-custom">Slogan cá nhân</label>
-                        <input type="text" name="slogan" class="form-control-custom" value="@Model.User.Slogan" maxlength="100" placeholder="Một câu nói truyền cảm hứng..." />
+                        <label class="form-label-custom">Slogan cá nhân <span style="font-size: 11px; font-weight: 400; color: black;">&mdash; Tối đa 50 ký tự</span></label>
+                        <input type="text" name="slogan" class="form-control-custom" value="@Model.User.Slogan" maxlength="50" placeholder="Một câu nói truyền cảm hứng..." />
                     </div>
 
                     <div class="form-group-custom">
-                        <label class="form-label-custom">Câu chuyện của tôi (Bio)</label>
-                        <textarea name="bio" class="form-control-custom" rows="4" maxlength="500" placeholder="Giới thiệu về bạn...">@Model.User.Bio</textarea>
+                        <label class="form-label-custom">Câu chuyện của tôi (Bio) <span style="font-size: 11px; font-weight: 400; color: black;">&mdash; Tối đa 200 ký tự</span></label>
+                        <textarea name="bio" class="form-control-custom" rows="4" maxlength="200" placeholder="Giới thiệu về bạn...">@Model.User.Bio</textarea>
                     </div>
                     
                 </div>

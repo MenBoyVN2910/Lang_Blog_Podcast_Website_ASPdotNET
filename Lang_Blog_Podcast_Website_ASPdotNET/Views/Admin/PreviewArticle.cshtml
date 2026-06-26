@@ -27,7 +27,8 @@
         background-image: url('@Model.ImagePath');
         background-size: cover;
         background-position: center;
-        filter: grayscale(100%) brightness(40%);
+        filter: none;
+        /* filter: grayscale(100%) brightness(40%); */
         z-index: 1;
     }
     
@@ -53,6 +54,12 @@
         font-size: 4vw;
         line-height: 1.2;
         margin-bottom: 30px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-all;
+        max-width: 20ch; /* Giới hạn khoảng 20 ký tự một dòng */
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .article-meta {
@@ -76,6 +83,11 @@
         font-size: 18px;
         line-height: 2;
         color: #222;
+        /* Giữ nội dung luôn nằm trong khung */
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        box-sizing: border-box;
     }
 
     .article-body p {
@@ -83,7 +95,7 @@
     }
 
     /* Định dạng Dropcap cho chữ cái đầu tiên của bài viết */
-    .article-body > p:first-of-type::first-letter {
+    .article-body > .article-content-wrapper > p:first-of-type::first-letter {
         font-size: 80px;
         float: left;
         line-height: 0.8;
@@ -115,7 +127,8 @@
         max-width: 100%;
         height: auto;
         margin: 30px 0;
-        filter: grayscale(100%);
+        filter: none;
+        /* filter: grayscale(100%); */
     }
 
     .preview-badge {
@@ -132,6 +145,54 @@
         border-radius: 4px;
         z-index: 9999;
         box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    /* Xem Thêm Styles */
+    .article-content-wrapper {
+        position: relative;
+        overflow: hidden;
+        transition: max-height 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    
+    .read-more-trigger-wrapper {
+        position: relative;
+        text-align: center;
+        margin-top: -120px;
+        padding-top: 140px;
+        z-index: 12;
+    }
+    
+    .read-more-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 50px;
+        background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.95) 80%, rgba(255,255,255,1) 100%);
+        pointer-events: none;
+    }
+    
+    .read-more-btn {
+        position: relative;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        padding: 14px 35px;
+        background-color: #111;
+        color: #fff;
+        border: 1px solid #111;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    
+    .read-more-btn:hover {
+        background-color: #fff;
+        color: #111;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(0,0,0,0.25);
     }
 </style>
 
@@ -155,7 +216,14 @@
     </div>
 
     <main class="article-body" data-aos="fade-up" data-aos-delay="800">
-        @Html.Raw(Model.Content)
+        <div class="article-content-wrapper" id="articleContent">
+            @Html.Raw(Model.Content)
+        </div>
+
+        <div class="read-more-trigger-wrapper" id="readMoreWrapper" style="display: none;">
+            <div class="read-more-overlay"></div>
+            <button class="read-more-btn" id="readMoreBtn">Xem Thêm ở Cuối Bài <i class="fa-solid fa-chevron-down"></i></button>
+        </div>
 
         <div style="margin-top: 80px; border-top: 1px solid #ddd; padding-top: 40px; text-align: center;">
             <a href="/Admin/PreviewIssue/@Model.IssueId" class="btn outline" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; padding: 12px 30px; text-decoration: none; color: #111;">
@@ -173,6 +241,47 @@
             offset: 50,
             easing: 'ease-out-cubic',
             duration: 1200
+        });
+
+        // Script Xem Thêm - Thu Gọn bài viết trên 100 dòng
+        document.addEventListener("DOMContentLoaded", function() {
+            const contentEl = document.getElementById('articleContent');
+            const readMoreWrapper = document.getElementById('readMoreWrapper');
+            const readMoreBtn = document.getElementById('readMoreBtn');
+            const overlay = document.querySelector('.read-more-overlay');
+            
+            if (contentEl) {
+                const style = window.getComputedStyle(contentEl);
+                const lineHeight = parseFloat(style.lineHeight) || 36; // 36px mặc định nếu line-height: 2 cho font 18px
+                const maxAllowedHeight = lineHeight * 100; // Chiều cao tối đa cho 100 dòng
+                
+                if (contentEl.scrollHeight > maxAllowedHeight) {
+                    contentEl.classList.add('collapsed');
+                    contentEl.style.maxHeight = maxAllowedHeight + 'px';
+                    readMoreWrapper.style.display = 'block';
+                    
+                    readMoreBtn.addEventListener('click', function() {
+                        if (contentEl.classList.contains('collapsed')) {
+                            contentEl.classList.remove('collapsed');
+                            contentEl.style.maxHeight = contentEl.scrollHeight + 'px';
+                            readMoreBtn.innerHTML = 'Thu Gọn Bài Viết <i class="fa-solid fa-chevron-up"></i>';
+                            overlay.style.display = 'none';
+                            readMoreWrapper.style.marginTop = '20px';
+                            readMoreWrapper.style.paddingTop = '0';
+                        } else {
+                            contentEl.classList.add('collapsed');
+                            contentEl.style.maxHeight = maxAllowedHeight + 'px';
+                            readMoreBtn.innerHTML = 'Xem Thêm ở Cuối Bài <i class="fa-solid fa-chevron-down"></i>';
+                            overlay.style.display = 'block';
+                            readMoreWrapper.style.marginTop = '-120px';
+                            readMoreWrapper.style.paddingTop = '140px';
+                            
+                            // Cuộn mượt về khu vực nút bấm để giữ tiêu điểm
+                            contentEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                        }
+                    });
+                }
+            }
         });
     </script>
 }

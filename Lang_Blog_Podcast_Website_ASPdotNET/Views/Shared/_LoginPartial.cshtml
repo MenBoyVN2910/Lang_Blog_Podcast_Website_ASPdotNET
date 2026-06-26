@@ -71,9 +71,12 @@
                 {
                     @* Trang cá nhân *@
                     <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">Trang Cá Nhân <i class="fa-solid fa-star" style="color: red; font-size: 0.8rem; margin-left: 5px;" title="Admin"></i></a></li>
-                    
+
                     @* Bảng điều khiển admin *@
                     <li><a class="dropdown-item" asp-controller="Admin" asp-action="Index" style="color: var(--secondary-color);">Bảng Điều Khiển</a></li>
+
+                    @* Quản lý bài viết *@
+                    <li><a class="dropdown-item" asp-controller="UserDashboard" asp-action="Index" style="color: var(--secondary-color);">Quản Lý Bài Viết</a></li>
                 }
                 else
                 {

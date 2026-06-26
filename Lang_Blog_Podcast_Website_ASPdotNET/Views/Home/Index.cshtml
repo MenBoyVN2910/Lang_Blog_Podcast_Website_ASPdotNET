@@ -25,32 +25,92 @@
             <h1 class="serif-title-xl animate-hero delay-2">Im lặng <br>là một ngôn từ.</h1>
         </div>
 
-        <div class="grid-item large-post" data-aos="fade-up" data-aos-duration="1200">
-            <a href="#" class="image-aesthetic-wrapper">
-                <div class="image-zoom-container">
-                    <img src="~/images/Home/GrayWall.png" alt="Water basin" class="grid-image" />
+
+        <!-- Bắt Đầu Hero Carousel -->
+        <div class="hero-carousel" data-aos="fade-up" data-aos-duration="1200">
+            <div class="carousel-inner">
+                @if (ViewBag.CarouselItems != null)
+                {
+                    int index = 0;
+                    foreach (var item in ViewBag.CarouselItems)
+                    {
+                        string defaultImg = item.Type == "podcast" ? "/images/Logo/logo_website.png" : "/images/default-thumbnail.jpg";
+                        string imgPath = string.IsNullOrEmpty(item.ImagePath) ? defaultImg : item.ImagePath;
+                        string url = item.Type == "podcast" ? Url.Action("Details", "Podcast", new { id = item.Id }) : Url.Action("Details", "Story", new { id = item.Id });
+                        
+                        <div class="carousel-slide @(index == 0 ? "active" : "")" data-index="@index">
+                            <a href="@url" class="image-aesthetic-wrapper">
+                                @if (item.Type == "podcast")
+                                {
+                                    <span class="carousel-badge carousel-badge-podcast"><i class="fa-solid fa-headphones"></i> PODCAST</span>
+                                }
+                                else
+                                {
+                                    <span class="carousel-badge carousel-badge-story"><i class="fa-solid fa-book-open"></i> BÀI VIẾT</span>
+                                }
+                                <div class="image-zoom-container carousel-image-container">
+                                    <img src="@imgPath" alt="@item.Title" class="grid-image" onerror="this.src='@defaultImg'" />
+                                </div>
+                            </a>
+                            <div class="post-text-content carousel-text">
+                                <h2 class="serif-title-lg">@item.Title</h2>
+                                <p class="article-excerpt">@Html.Raw(item.Description)</p>
+                                <div class="carousel-meta">
+                                    <span>Bởi <strong>@item.Author</strong></span> &bull; 
+                                    <span>@item.CreatedAt.ToString("dd.MM.yyyy")</span> &bull; 
+                                    <span><i class="fa-solid fa-eye"></i> @item.ViewCount</span>
+                                </div>
+                                @if (item.Type == "podcast" && !string.IsNullOrEmpty(item.AudioPath))
+                                {
+                                    <a href="javascript:void(0)" onclick="playPodcast('@item.AudioPath', '@item.Title', '@item.Author', '@imgPath', @item.Id)" class="read-more-link"><i class="fa-solid fa-play"></i> NGHE NGAY &rarr;</a>
+                                }
+                                else
+                                {
+                                    <a href="@url" class="read-more-link">KHÁM PHÁ NGAY &rarr;</a>
+                                }
+                            </div>
+                        </div>
+                        index++;
+                    }
+                }
+            </div>
+
+            <div class="carousel-controls">
+                <button class="carousel-nav-btn prev-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                <div class="carousel-dots">
+                    @if (ViewBag.CarouselItems != null)
+                    {
+                        int index = 0;
+                        foreach (var item in ViewBag.CarouselItems)
+                        {
+                            <span class="dot @(index == 0 ? "active" : "")" data-index="@index"></span>
+                            index++;
+                        }
+                    }
                 </div>
-            </a>
-            <div class="post-text-content">
-                <h2 class="serif-title-lg">BẢN GIAO HƯỞNG CỦA NHỮNG NGÀY MƯA.</h2>
-                <p class="article-excerpt">Khi tiếng mưa rơi hòa quyện cùng sự tĩnh lặng của căn phòng, ta bắt gặp chính mình trong những suy tư sâu thẳm nhất.</p>
-                <a href="#" class="read-more-link">KHÁM PHÁ CHƯƠNG NÀY &rarr;</a>
+                <button class="carousel-nav-btn next-btn"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            <div class="carousel-progress-container">
+                <div class="carousel-progress-bar"></div>
             </div>
         </div>
+        <!-- Kết Thúc Hero Carousel -->
 
+
+        <!-- CHƯƠNG TRÌNH THEO MÙA -->
         <div class="horizontal-post" data-aos="fade-up" data-aos-duration="1200" data-aos-offset="100">
             <div class="horiz-image">
-                <a href="#" class="image-aesthetic-wrapper">
+                <a href="https://www.threads.com/chao_em_hehe/post/DZ-c2mFE2Sw?xmt=AQG0lX5PUUzAdoXsRjgOdhWtoei2V5_1pP5DADxDjfOJYg" class="image-aesthetic-wrapper">
                     <div class="image-zoom-container">
-                        <img src="~/images/Home/Ghe.png" alt="Chair and branch" class="grid-image" />
+                        <img src="~/images/Bia.png" alt="Chair and branch" class="grid-image" />
                     </div>
                 </a>
             </div>
             <div class="horiz-text">
-                <span class="section-title-sans">CẢM HỨNG HÀNG TUẦN</span>
-                <h2 class="serif-title-md">CHẠM VÀO NHỮNG ĐIỀU BÌNH DỊ.</h2>
-                <p class="article-excerpt">Hãy để tâm hồn mình được nghỉ ngơi sau những giờ làm việc căng thẳng. Đôi khi, chỉ cần một tách trà và một cuốn sách hay là quá đủ.</p>
-                <a href="#" class="btn-outline">KHÁM PHÁ NGAY</a>
+                <span class="section-title-sans">CHƯƠNG TRÌNH THEO MÙA</span>
+                <h2 class="serif-title-md">BẢN GIAO HƯỞNG CỦA NHỮNG NGÀY MƯA.</h2>
+                <p class="article-excerpt">Khi tiếng mưa rơi hòa quyện cùng sự tĩnh lặng của căn phòng, ta bắt gặp chính mình trong những suy tư sâu thẳm nhất.</p>
+                <a href="https://www.threads.com/chao_em_hehe/post/DZ-c2mFE2Sw?xmt=AQG0lX5PUUzAdoXsRjgOdhWtoei2V5_1pP5DADxDjfOJYg" class="btn-outline">KHÁM PHÁ NGAY</a>
             </div>
         </div>
     </main>
@@ -92,7 +152,12 @@
                 <div class="post-meta">
                     <span>@story.CreatedAt.ToString("dd.MM.yyyy")</span> &bull; <span>@story.ViewCount <i class="fa-solid fa-eye"></i></span>
                 </div>
-                <h4 class="serif-title-md" style="margin-top: 5px; font-size: 22px;">@story.Title</h4>
+
+                <!-- Fix: Rút gọn tiêu đề tối đa 20 ký tự -->
+                <h4 class="serif-title-md" style="margin-top: 5px; font-size: 22px;">
+                    @(story.Title?.Length > 20 ? story.Title.Substring(0, 20) + "..." : story.Title)
+                </h4>
+
                 <a href="@Url.Action("Details", "Story", new { id = story.Id })" class="read-more-link-small">ĐỌC THÊM &rarr;</a>
             </div>
             <div class="sidebar-divider"></div>
@@ -140,5 +205,91 @@
             alert('Trình phát âm thanh chưa sẵn sàng. Đang cố gắng tải lại...');
         }
     }
+
+    // Hero Carousel Logic
+    document.addEventListener("DOMContentLoaded", function() {
+        const slides = document.querySelectorAll('.carousel-slide');
+        const dots = document.querySelectorAll('.dot');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+        const progressBar = document.querySelector('.carousel-progress-bar');
+        const carousel = document.querySelector('.hero-carousel');
+        
+        let currentSlide = 0;
+        let slideInterval;
+        const intervalTime = 5000; // 5 seconds
+        
+        if(slides.length === 0) return;
+
+        function goToSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            dots[currentSlide].classList.remove('active');
+            
+            currentSlide = (n + slides.length) % slides.length;
+            
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+            
+            resetProgress();
+        }
+
+        function nextSlide() {
+            goToSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            goToSlide(currentSlide - 1);
+        }
+
+        function startSlide() {
+            if(slideInterval) clearInterval(slideInterval);
+            slideInterval = setInterval(nextSlide, intervalTime);
+            startProgress();
+        }
+
+        function stopSlide() {
+            clearInterval(slideInterval);
+            progressBar.style.animationPlayState = 'paused';
+        }
+
+        function startProgress() {
+            progressBar.style.animation = 'none';
+            progressBar.offsetHeight; /* trigger reflow */
+            progressBar.style.animation = `progress ${intervalTime}ms linear infinite`;
+            progressBar.style.animationPlayState = 'running';
+        }
+
+        function resetProgress() {
+            startProgress();
+            if(slideInterval) {
+                clearInterval(slideInterval);
+                slideInterval = setInterval(nextSlide, intervalTime);
+            }
+        }
+
+        nextBtn.addEventListener('click', () => {
+            nextSlide();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            prevSlide();
+        });
+
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                goToSlide(index);
+            });
+        });
+
+        carousel.addEventListener('mouseenter', stopSlide);
+        carousel.addEventListener('mouseleave', () => {
+            if(slideInterval) {
+                startSlide();
+            }
+        });
+
+        // Initialize
+        startSlide();
+    });
 </script>
 }

@@ -31,7 +31,8 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
         /// GET: /Podcast/
         /// Hiển thị giao diện danh sách các số phát sóng Podcast.
         /// </summary>
-        public async Task<IActionResult> Index(string? search, int? categoryId)
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> Index(string? search, int? categoryId, string? sortBy, int page = 1)
         {
             var query = _db.PodCasts
                 .Include(p => p.Category)
@@ -48,13 +49,49 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 query = query.Where(p => p.CategoryId == categoryId.Value);
             }
 
+            switch (sortBy)
+            {
+                case "date_asc":
+                    query = query.OrderBy(p => p.CreatedAt);
+                    break;
+                case "views_desc":
+                    query = query.OrderByDescending(p => p.ViewCount);
+                    break;
+                case "views_asc":
+                    query = query.OrderBy(p => p.ViewCount);
+                    break;
+                case "name_asc":
+                    query = query.OrderBy(p => p.Title);
+                    break;
+                case "name_desc":
+                    query = query.OrderByDescending(p => p.Title);
+                    break;
+                case "date_desc":
+                default:
+                    query = query.OrderByDescending(p => p.CreatedAt);
+                    break;
+            }
+
+            // Phân trang: Mỗi trang 4 thẻ
+            int pageSize = 4;
+            int totalItems = await query.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            if (page < 1) page = 1;
+            if (page > totalPages && totalPages > 0) page = totalPages;
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+
             var podcasts = await query
-                .OrderByDescending(p => p.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
             ViewBag.Categories = await _db.Categories.ToListAsync();
             ViewBag.Search = search;
             ViewBag.CategoryId = categoryId;
+            ViewBag.CurrentSort = sortBy;
 
             return View(podcasts);
         }

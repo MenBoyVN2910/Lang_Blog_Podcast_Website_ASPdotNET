@@ -74,8 +74,22 @@
                 </select>
             </div>
 
+            <div class="category-box">
+                <select name="sortBy" class="glass-select" onchange="this.form.submit()">
+                    @{
+                        var currentSort = ViewBag.CurrentSort as string;
+                    }
+                    <option value="date_desc" selected="@(string.IsNullOrEmpty(currentSort) || currentSort == "date_desc" ? "selected" : null)">Sắp xếp: Mới nhất</option>
+                    <option value="date_asc" selected="@(currentSort == "date_asc" ? "selected" : null)">Sắp xếp: Cũ nhất</option>
+                    <option value="views_desc" selected="@(currentSort == "views_desc" ? "selected" : null)">Lượt xem: Cao đến thấp</option>
+                    <option value="views_asc" selected="@(currentSort == "views_asc" ? "selected" : null)">Lượt xem: Thấp đến cao</option>
+                    <option value="name_asc" selected="@(currentSort == "name_asc" ? "selected" : null)">Tên: A-Z</option>
+                    <option value="name_desc" selected="@(currentSort == "name_desc" ? "selected" : null)">Tên: Z-A</option>
+                </select>
+            </div>
+
             <button type="submit" class="btn-glass-search">TÌM KIẾM</button>
-            @if (!string.IsNullOrEmpty(ViewBag.CurrentSearch) || ViewBag.CurrentCategoryId != null)
+            @if (!string.IsNullOrEmpty(ViewBag.CurrentSearch) || ViewBag.CurrentCategoryId != null || !string.IsNullOrEmpty(ViewBag.CurrentSort))
             {
                 <a asp-controller="Story" asp-action="Index" class="btn-glass-clear" title="Xóa bộ lọc"><i class="fa-solid fa-xmark"></i></a>
             }
@@ -85,12 +99,7 @@
     @* --- STORY GRID CAO CẤP --- *@
     <section class="story-grid-section">
         <div class="story-grid">
-            @{
-                // Lọc ra danh sách các bài viết đã được duyệt
-                var approvedStories = Model.Where(s => s.Status == StoryStatus.Approved).ToList();
-            }
-
-            @if (!approvedStories.Any())
+            @if (!Model.Any())
             {
                 <div class="empty-state" data-aos="fade-up">
                     <i class="fa-solid fa-book-open empty-icon"></i>
@@ -100,18 +109,18 @@
             else
             {
                 int delay = 0;
-                foreach (var story in approvedStories)
+                @foreach (var story in Model)
                 {
-                    // Lọc HTML tags để hiển thị trích dẫn
+                    // Lọc HTML tags để hiển thị trích dẫn, giới hạn tối đa 20 ký tự
                     var plainText = string.IsNullOrEmpty(story.Content) ? "" : System.Text.RegularExpressions.Regex.Replace(story.Content, "<.*?>", string.Empty);
-                    var excerpt = plainText.Length > 120 ? plainText.Substring(0, 120) + "..." : plainText;
+                    var excerpt = plainText.Length > 20 ? plainText.Substring(0, 20) + "..." : plainText;
 
                     // Fallback ảnh mặc định
                     var defaultImg = string.IsNullOrWhiteSpace(story.ImagePath) ? Url.Content("~/images/Default_Images/Blog.png") : story.ImagePath;
 
                     <div class="premium-story-card" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="@delay">
                         <a href="@Url.Action("Details", "Story", new { id = story.Id })" class="card-link-wrapper">
-                            
+
                             @* Nửa trên: Ảnh bìa cinematic 16:10 *@
                             <div class="card-image-section">
                                 <img src="@defaultImg" class="card-image" alt="@story.Title" />
@@ -123,7 +132,7 @@
                             <div class="card-info-section">
                                 <div class="card-meta">
                                     @{
-                                        var rawAuthor = string.IsNullOrEmpty(story.User?.FullName) ? (string.IsNullOrEmpty(story.Author) ? "Ẩn danh" : story.Author) : story.User.FullName;
+                                        var rawAuthor = story.User?.FullName ?? "Ẩn danh";
                                         var displayAuthor = rawAuthor.Length > 15 ? rawAuthor.Substring(0, 15) + "..." : rawAuthor;
                                     }
                                     <span class="meta-item">@story.CreatedAt.ToString("dd.MM.yyyy")</span>
@@ -134,7 +143,8 @@
                                 </div>
 
                                 <h3 class="card-title">
-                                    @(story.Title?.Length > 40 ? story.Title.Substring(0, 40) + "..." : story.Title)
+                                    @* Giới hạn Tiêu đề tối đa 20 ký tự *@
+                                    @(story.Title?.Length > 20 ? story.Title.Substring(0, 20) + "..." : story.Title)
                                 </h3>
 
                                 <p class="card-excerpt">
@@ -152,12 +162,41 @@
                         </a>
                     </div>
                     delay += 100;
-                    if (delay > 400) delay = 0; // Tránh delay quá lâu
+                    if (delay > 400) delay = 0;
                 }
             }
         </div>
+
+        @* --- PHÂN TRANG --- *@
+        @{
+            int currentPage = ViewBag.CurrentPage ?? 1;
+            int totalPages = ViewBag.TotalPages ?? 1;
+        }
+        @if (totalPages > 1)
+        {
+            <nav class="pagination-nav" data-aos="fade-up">
+                <a class="page-link @(currentPage <= 1 ? "disabled" : "")"
+                   href="@Url.Action("Index", "Story", new { categoryId = ViewBag.CurrentCategoryId, searchString = ViewBag.CurrentSearch, sortBy = ViewBag.CurrentSort, page = currentPage - 1 })">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <a class="page-link @(i == currentPage ? "active" : "")"
+                       href="@Url.Action("Index", "Story", new { categoryId = ViewBag.CurrentCategoryId, searchString = ViewBag.CurrentSearch, sortBy = ViewBag.CurrentSort, page = i })">
+                        @i
+                    </a>
+                }
+
+                <a class="page-link @(currentPage >= totalPages ? "disabled" : "")"
+                   href="@Url.Action("Index", "Story", new { categoryId = ViewBag.CurrentCategoryId, searchString = ViewBag.CurrentSearch, sortBy = ViewBag.CurrentSort, page = currentPage + 1 })">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </nav>
+        }
     </section>
 </div>
+
 
 @section Scripts {
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
@@ -165,31 +204,31 @@
 
     <script>
         AOS.init({
-            once: true,
-            offset: 50,
-            easing: 'ease-out-cubic'
+        once: true,
+        offset: 50,
+        easing: 'ease-out-cubic'
         });
 
         function showLoginAlert() {
-            Swal.fire({
-                title: 'Một chút nhịp ngưng...',
-                text: 'Bạn cần đăng nhập để có thể gửi gắm câu chuyện của mình. Hãy đăng nhập và trở lại đây nhé!',
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#2A2825',
-                cancelButtonColor: '#E2DDD5',
-                confirmButtonText: 'Đăng nhập',
-                cancelButtonText: 'Lúc khác',
-                background: '#FAF9F6',
-                color: '#2A2825',
-                customClass: {
-                    popup: 'light-swal-popup'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '/Identity/Account/Login';
-                }
-            });
+        Swal.fire({
+        title: 'Một chút nhịp ngưng...',
+        text: 'Bạn cần đăng nhập để có thể gửi gắm câu chuyện của mình. Hãy đăng nhập và trở lại đây nhé!',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#2A2825',
+        cancelButtonColor: '#E2DDD5',
+        confirmButtonText: 'Đăng nhập',
+        cancelButtonText: 'Lúc khác',
+        background: '#FAF9F6',
+        color: '#2A2825',
+        customClass: {
+        popup: 'light-swal-popup'
+        }
+        }).then((result) => {
+        if (result.isConfirmed) {
+        window.location.href = '/Identity/Account/Login';
+        }
+        });
         }
     </script>
 }

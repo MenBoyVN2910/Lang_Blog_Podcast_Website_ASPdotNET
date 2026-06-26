@@ -33,12 +33,15 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
         /// </summary>
         /// <param name="categoryId">ID danh mục để lọc bài viết (tùy chọn)</param>
         /// <param name="searchString">Từ khóa tìm kiếm tiêu đề bài viết (tùy chọn)</param>
-        public async Task<IActionResult> Index(int? categoryId, string searchString)
+        /// <param name="sortBy">Tiêu chí sắp xếp bài viết (tùy chọn)</param>
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> Index(int? categoryId, string searchString, string sortBy, int page = 1)
         {
             // 1. Tải danh sách danh mục đổ vào Dropdown chọn lọc trên giao diện
             ViewBag.Categories = await _db.Categories.ToListAsync();
             ViewBag.CurrentCategoryId = categoryId;
             ViewBag.CurrentSearch = searchString;
+            ViewBag.CurrentSort = sortBy;
 
             // 2. Khởi tạo Query chỉ truy vấn những câu chuyện đã được duyệt (Approved) để tối ưu hiệu năng
             var storiesQuery = _db.Stories
@@ -58,10 +61,47 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 storiesQuery = storiesQuery.Where(s => s.Title.Contains(searchString));
             }
 
-            // Sắp xếp bài viết mới nhất lên đầu tiên
-            storiesQuery = storiesQuery.OrderByDescending(s => s.CreatedAt);
+            // Sắp xếp bài viết
+            switch (sortBy)
+            {
+                case "date_asc":
+                    storiesQuery = storiesQuery.OrderBy(s => s.CreatedAt);
+                    break;
+                case "views_desc":
+                    storiesQuery = storiesQuery.OrderByDescending(s => s.ViewCount);
+                    break;
+                case "views_asc":
+                    storiesQuery = storiesQuery.OrderBy(s => s.ViewCount);
+                    break;
+                case "name_asc":
+                    storiesQuery = storiesQuery.OrderBy(s => s.Title);
+                    break;
+                case "name_desc":
+                    storiesQuery = storiesQuery.OrderByDescending(s => s.Title);
+                    break;
+                case "date_desc":
+                default:
+                    storiesQuery = storiesQuery.OrderByDescending(s => s.CreatedAt);
+                    break;
+            }
 
-            return View(await storiesQuery.ToListAsync());
+            // 5. Phân trang: Mỗi trang 6 thẻ
+            int pageSize = 6;
+            int totalItems = await storiesQuery.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            
+            if (page < 1) page = 1;
+            if (page > totalPages && totalPages > 0) page = totalPages;
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+
+            var stories = await storiesQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return View(stories);
         }
 
         /// <summary>
@@ -117,7 +157,6 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                     {
                         Title = model.Title,
                         Content = model.Content,
-                        Author = model.Author?.Trim() ?? "Ẩn danh",
                         UserId = _userManager.GetUserId(User), // Gán UserId của người đang đăng nhập
                         IssueNumber = string.IsNullOrWhiteSpace(model.IssueNumber) ? "None" : model.IssueNumber.Trim(),
                         CategoryId = model.CategoryId,

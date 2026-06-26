@@ -22,6 +22,7 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
         /// GET: /
         /// Hiển thị Trang chủ của website.
         /// </summary>
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Index()
         {
             // Top 2 Podcast có lượt xem cao nhất
@@ -41,6 +42,52 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 .OrderByDescending(s => s.ViewCount)
                 .Take(2)
                 .ToListAsync();
+
+            // 5 Bài viết/Podcast mới nhất cho Carousel
+            var latestPodcasts = await _db.PodCasts
+                .Include(p => p.Category)
+                .Include(p => p.User)
+                .Where(p => p.Status == StoryStatus.Approved)
+                .OrderByDescending(p => p.CreatedAt)
+                .Take(5)
+                .Select(p => new {
+                    Type = "podcast",
+                    p.Id,
+                    p.Title,
+                    p.Description,
+                    p.ImagePath,
+                    p.CreatedAt,
+                    p.ViewCount,
+                    Author = p.Author ?? p.User.FullName,
+                    CategoryName = p.Category.Name,
+                    AudioPath = p.AudioPath
+                })
+                .ToListAsync();
+
+            var latestStories = await _db.Stories
+                .Include(s => s.Category)
+                .Include(s => s.User)
+                .Where(s => s.Status == StoryStatus.Approved)
+                .OrderByDescending(s => s.CreatedAt)
+                .Take(5)
+                .Select(s => new {
+                    Type = "story",
+                    s.Id,
+                    s.Title,
+                    Description = s.Content.Length > 120 ? s.Content.Substring(0, 120) + "..." : s.Content,
+                    s.ImagePath,
+                    s.CreatedAt,
+                    s.ViewCount,
+                    Author = s.User.FullName,
+                    CategoryName = s.Category.Name,
+                    AudioPath = (string)null
+                })
+                .ToListAsync();
+
+            ViewBag.CarouselItems = latestPodcasts.Concat(latestStories)
+                .OrderByDescending(x => x.CreatedAt)
+                .Take(5)
+                .ToList();
 
             return View();
         }

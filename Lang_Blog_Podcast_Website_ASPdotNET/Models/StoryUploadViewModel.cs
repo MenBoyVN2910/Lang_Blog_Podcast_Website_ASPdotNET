@@ -10,11 +10,7 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
         public string Title { get; set; }
 
  
-        [Required(ErrorMessage = "Vui lòng nhập tên tác giả.")]
-        [StringLength(30, ErrorMessage = "Tên tác giả không được vượt quá 20 ký tự.")]
-        public string Author { get; set; }
-
-        [StringLength(30, ErrorMessage = "Số phát hành không được vượt quá 20 ký tự.")]
+        [StringLength(10, ErrorMessage = "Số phát hành không được vượt quá 10 ký tự.")]
         public string? IssueNumber { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn danh mục.")]

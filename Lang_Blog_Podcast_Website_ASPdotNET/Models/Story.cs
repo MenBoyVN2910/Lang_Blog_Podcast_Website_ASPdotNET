@@ -17,9 +17,6 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
         [Display(Name = "Nội dung")]
         public string Content { get; set; }
 
-        [Display(Name = "Tác giả")]
-        public string Author { get; set; } // Có thể để ẩn danh hoặc tên tự điền
-
         // Liên kết với ApplicationUser (Người gửi bài)
         public string? UserId { get; set; }
         public ApplicationUser? User { get; set; }

@@ -66,8 +66,22 @@
                 </select>
             </div>
             
+            <div class="category-box">
+                <select name="sortBy" class="glass-select" onchange="this.form.submit()">
+                    @{
+                        var currentSort = ViewBag.CurrentSort as string;
+                    }
+                    <option value="date_desc" selected="@(string.IsNullOrEmpty(currentSort) || currentSort == "date_desc" ? "selected" : null)">Sắp xếp: Mới nhất</option>
+                    <option value="date_asc" selected="@(currentSort == "date_asc" ? "selected" : null)">Sắp xếp: Cũ nhất</option>
+                    <option value="views_desc" selected="@(currentSort == "views_desc" ? "selected" : null)">Lượt xem: Cao đến thấp</option>
+                    <option value="views_asc" selected="@(currentSort == "views_asc" ? "selected" : null)">Lượt xem: Thấp đến cao</option>
+                    <option value="name_asc" selected="@(currentSort == "name_asc" ? "selected" : null)">Tên: A-Z</option>
+                    <option value="name_desc" selected="@(currentSort == "name_desc" ? "selected" : null)">Tên: Z-A</option>
+                </select>
+            </div>
+
             <button type="submit" class="btn-glass-search">TÌM KIẾM</button>
-            @if (!string.IsNullOrEmpty(ViewBag.Search) || ViewBag.CategoryId != null)
+            @if (!string.IsNullOrEmpty(ViewBag.Search) || ViewBag.CategoryId != null || !string.IsNullOrEmpty(ViewBag.CurrentSort as string))
             {
                 <a asp-controller="Podcast" asp-action="Index" class="btn-glass-clear" title="Xóa bộ lọc"><i class="fa-solid fa-xmark"></i></a>
             }
@@ -85,7 +99,7 @@
                     <div class="premium-podcast-card" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="@delay"
                          data-audio-url="@podcast.AudioPath"
                          data-audio-title="@podcast.Title"
-                         data-audio-author="@(podcast.User?.FullName ?? podcast.Author)"
+                         data-audio-author="@(podcast.User?.FullName ?? podcast.Author ?? "Lặng")"
                          data-audio-image="@podcast.ImagePath"
                          data-podcast-id="@podcast.Id">
                         
@@ -154,6 +168,34 @@
                 </div>
             }
         </div>
+
+        @* --- PHÂN TRANG --- *@
+        @{
+            int currentPage = ViewBag.CurrentPage ?? 1;
+            int totalPages = ViewBag.TotalPages ?? 1;
+        }
+        @if (totalPages > 1)
+        {
+            <nav class="pagination-nav" data-aos="fade-up">
+                <a class="page-link @(currentPage <= 1 ? "disabled" : "")"
+                   href="@Url.Action("Index", "Podcast", new { search = ViewBag.Search, categoryId = ViewBag.CategoryId, sortBy = ViewBag.CurrentSort, page = currentPage - 1 })">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <a class="page-link @(i == currentPage ? "active" : "")"
+                       href="@Url.Action("Index", "Podcast", new { search = ViewBag.Search, categoryId = ViewBag.CategoryId, sortBy = ViewBag.CurrentSort, page = i })">
+                        @i
+                    </a>
+                }
+
+                <a class="page-link @(currentPage >= totalPages ? "disabled" : "")"
+                   href="@Url.Action("Index", "Podcast", new { search = ViewBag.Search, categoryId = ViewBag.CategoryId, sortBy = ViewBag.CurrentSort, page = currentPage + 1 })">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </nav>
+        }
     </section>
 </div>
 

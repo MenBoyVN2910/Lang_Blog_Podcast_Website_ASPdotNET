@@ -16,6 +16,7 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             _db = db;
         }
 
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Index()
         {
             var issues = await _db.MagazineIssues
@@ -25,6 +26,7 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             return View(issues);
         }
 
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> IssueDetails(int id)
         {
             var issue = await _db.MagazineIssues

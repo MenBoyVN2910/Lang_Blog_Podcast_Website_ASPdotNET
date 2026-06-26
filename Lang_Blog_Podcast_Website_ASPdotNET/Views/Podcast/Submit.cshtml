@@ -20,7 +20,7 @@
         <input type="hidden" asp-for="Duration" id="audio-duration-input" />
         <div class="form-row">
             <div class="form-col" style="flex: 100%;">
-                <label class="lang-label"><i class="fa-solid fa-heading"></i> Tiêu đề Podcast</label>
+                <label class="lang-label"><i class="fa-solid fa-heading"></i> Tiêu đề Podcast<span style="font-size: 11px; font-weight: 400; color: #9E9590;">&mdash; Tối đa 40 ký tự</span></label>
                 <input asp-for="Title" class="form-control-lang" placeholder="Nhập tiêu đề Podcast..." maxlength="40" />
                 <span asp-validation-for="Title" class="text-danger small mt-1"></span>
             </div>
@@ -28,7 +28,7 @@
         @* ================================================Mô Tả============================================================ *@
         <div class="form-row">
             <div class="form-col">
-                <label class="lang-label"><i class="fa-solid fa-pen-nib"></i> Người dẫn (Host) <span class="text-danger">*</span></label>
+                <label class="lang-label"><i class="fa-solid fa-pen-nib"></i> Người dẫn (Host) <span style="font-size: 11px; font-weight: 400; color: #9E9590;">&mdash; Tối đa 30 ký tự</span></label>
                 <input asp-for="Author" class="form-control-lang" placeholder="Nhập tên người dẫn..." maxlength="30" />
                 <span asp-validation-for="Author" class="text-danger small mt-1"></span>
             </div>
@@ -38,7 +38,7 @@
         <div class="form-row">
             <div class="form-col">
                 <label class="lang-label"><i class="fa-solid fa-hashtag"></i> Số tập (Episode) <span style="font-size: 11px; font-weight: 400; color: #9E9590;">&mdash; Bỏ trống sẽ hiển thị là <em>None</em></span></label>
-                <input asp-for="EpisodeNumber" class="form-control-lang" type="number" min="1" placeholder="Nhập số tập (tùy chọn)..." />
+                <input asp-for="EpisodeNumber" class="form-control-lang" type="number" min="1" placeholder="Nhập số tập (tùy chọn)..." maxlength="8" oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" />
                 <span asp-validation-for="EpisodeNumber" class="text-danger small mt-1"></span>
             </div>
         </div>

@@ -239,6 +239,19 @@
     font-family: 'Montserrat', sans-serif;
     font-size: 0.8rem;
     color: #9A9187;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.pd-stat a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.pd-stat a:hover {
+    color: #B29B84;
 }
 
 .pd-stat i {
@@ -413,6 +426,20 @@
     color: #1A1817;
     font-weight: 600;
     text-align: right;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    max-width: 65%;
+}
+
+.pd-detail-value a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.pd-detail-value a:hover {
+    color: #B29B84;
 }
 
 .pd-detail-badge {
