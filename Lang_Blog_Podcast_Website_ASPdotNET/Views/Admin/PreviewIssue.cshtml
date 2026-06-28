@@ -60,7 +60,7 @@
                     string plainText = string.IsNullOrEmpty(article.Content) ? "" : Regex.Replace(article.Content, "<.*?>", string.Empty);
                     string excerpt = plainText.Length > 600 ? plainText.Substring(0, 600) + "..." : plainText;
 
-                    <div class="page article-page">
+                    <div class="page article-page layout-@(article.LayoutType?.ToLower() ?? "tall")">
                         <div class="page-content">
                             <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; color: #999; letter-spacing: 2px; margin-bottom: 15px; text-transform: uppercase;">
                                 @(article.Category?.Name ?? "Editorial")
@@ -107,8 +107,11 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const pageFlip = new St.PageFlip(document.getElementById('flipbook'), {
+        (function() {
+            const container = document.getElementById('flipbook');
+            if (!container) return;
+
+            const pageFlip = new St.PageFlip(container, {
                 width: 450,
                 height: 600,
                 size: "stretch",
@@ -137,7 +140,7 @@
             });
 
             document.getElementById('page-counter').innerText = `1 / ${document.querySelectorAll('.page').length}`;
-        });
+        })();
     </script>
 }
 @* ======================================================================================================================================================== *@

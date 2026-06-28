@@ -114,6 +114,31 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Submit(PodCastUploadViewModel model)
         {
+            // Kiểm tra trùng lặp tiêu đề Podcast (có phân biệt theo người dùng)
+            if (!string.IsNullOrWhiteSpace(model.Title))
+            {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                string cleanTitle = model.Title.Trim().ToLower();
+
+                // Khác user mà trùng tiêu đề → từ chối
+                bool otherUserSameTitle = await _db.PodCasts
+                    .AnyAsync(p => p.Title.Trim().ToLower() == cleanTitle && p.UserId != currentUserId);
+                if (otherUserSameTitle)
+                {
+                    ModelState.AddModelError("Title", "Tiêu đề này đã được sử dụng bởi người dẫn khác!");
+                }
+
+                // Cùng user, trùng tiêu đề, trùng cả số tập → từ chối
+                bool sameUserSameTitleSameEpisode = await _db.PodCasts
+                    .AnyAsync(p => p.Title.Trim().ToLower() == cleanTitle
+                                && p.UserId == currentUserId
+                                && p.EpisodeNumber == model.EpisodeNumber);
+                if (sameUserSameTitleSameEpisode)
+                {
+                    ModelState.AddModelError("Title", "Bạn đã có podcast cùng tiêu đề và số tập này!");
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 try

@@ -45,10 +45,6 @@
 
     @* =====================Menu admin========================================== *@
     <main class="admin-main">
-        @if (TempData["AdminMessage"] != null)
-        {
-            <div class="alert-box">@TempData["AdminMessage"]</div>
-        }
 
         <section class="stats-wrapper">
             <div class="stat-card">
@@ -85,7 +81,7 @@
     @* =====================Blog========================================== *@
     <div id="tab-stories" class="tab-content active">
         <h2 class="section-title">Phê duyệt tâm sự từ độc giả</h2>
-        <table class="data-table">
+        <table class="data-table" id="pendingStoriesTable">
             <thead>
                 <tr>
                     <th style="width: 18%;">Người gửi</th>
@@ -116,7 +112,7 @@
                         string excerpt = words.Length > 25 ? string.Join(" ", words.Take(25)) + "..." : plainText;
                         if (excerpt.Length > 150) excerpt = excerpt.Substring(0, 150) + "...";
 
-                        <tr>
+                        <tr class="story-row">
                             <td>
                                 <div class="user-info">
                                     @if (story.User?.ProfilePicture != null)
@@ -177,6 +173,7 @@
                 }
             </tbody>
         </table>
+        <div class="pagination-wrapper" id="storiesPagination" style="display:none;"></div>
     </div>
 
     @* =====================Bản Chỉnh Sửa========================================== *@
@@ -358,7 +355,7 @@
     @* =====================PodCast========================================== *@
     <div id="tab-podcast" class="tab-content">
         <h2 class="section-title">Những Thanh Âm Chạm Đến Trái Tim</h2>
-        <table class="data-table">
+        <table class="data-table" id="pendingPodcastsTable">
             <thead>
                 <tr>
                     <th style="width: 18%;">Người gửi</th>
@@ -382,7 +379,7 @@
                     int index_pod = 0;
                     @foreach (var podcast in Model.PendingPodCasts)
                     {
-                        <tr>
+                        <tr class="podcast-row">
                             <td>
                                 <div class="user-info">
                                     @if (podcast.User?.ProfilePicture != null)
@@ -446,6 +443,7 @@
                 }
             </tbody>
         </table>
+        <div class="pagination-wrapper" id="podcastsPagination" style="display:none;"></div>
     </div>
 
     @* =====================Kho Bài Viết (Published Posts)========================================== *@
@@ -515,6 +513,7 @@
                         </div>
                     }
                 </div>
+                <div class="pagination-wrapper" id="pubStoriesPagination" style="display:none;"></div>
             }
         </div>
 
@@ -570,6 +569,7 @@
                         </div>
                     }
                 </div>
+                <div class="pagination-wrapper" id="pubPodcastsPagination" style="display:none;"></div>
             }
         </div>
     </div>
@@ -584,8 +584,12 @@
             <button type="submit" class="btn primary">Thêm danh mục</button>
         </form>
 
+        <div style="margin-bottom: 20px; max-width: 600px; display: flex; justify-content: flex-start;">
+            <input type="text" id="categorySearchInput" class="input-field" placeholder="Tìm kiếm danh mục..." style="width: 100%; max-width: 300px; height: 40px; font-size: 13px;" onkeyup="filterCategories()" />
+        </div>
+
         <div style="max-width: 600px;">
-            <table class="data-table">
+            <table class="data-table" id="categoriesTable">
                 <thead>
                     <tr>
                         <th style="width: 25%;">Mã ID</th>
@@ -596,7 +600,7 @@
                 <tbody>
                     @foreach (var cat in Model.Categories)
                     {
-                        <tr>
+                        <tr class="category-row">
                             <td style="color: var(--text-muted);">#@cat.Id.ToString("D2")</td>
                             <td><strong>@cat.Name.ToUpper()</strong></td>
                             <td>
@@ -609,6 +613,7 @@
                     }
                 </tbody>
             </table>
+            <div class="pagination-wrapper" id="categoriesPagination" style="display:none;"></div>
         </div>
         </div>
 
@@ -644,8 +649,12 @@
                 </form>
             </div>
 
+            <div style="margin-bottom: 20px; display: flex; justify-content: flex-start;">
+                <input type="text" id="userSearchInput" class="input-field" placeholder="Tìm kiếm người dùng (Tài khoản hoặc Email)..." style="width: 100%; max-width: 350px; height: 40px; font-size: 13px;" onkeyup="filterUsers()" />
+            </div>
+
             <div class="lang-table-wrapper">
-                <table class="lang-table">
+                <table class="lang-table" id="usersTable">
                     <thead>
                         <tr>
                             <th>Tài khoản</th>
@@ -657,9 +666,9 @@
                     <tbody>
                         @foreach (var user in Model.Users)
                         {
-                            <tr>
+                            <tr class="user-row">
                                 <td class="user-name-cell">@user.UserName</td>
-                                <td style="color: #555;">@user.Email</td>
+                                <td class="user-email-cell" style="color: #555;">@user.Email</td>
                                 <td>
                                     @if (user.IsAdmin)
                                     {
@@ -700,6 +709,7 @@
                         }
                     </tbody>
                 </table>
+                <div class="pagination-wrapper" id="usersPagination" style="display:none;"></div>
             </div>
         </div>
     </main>
@@ -748,6 +758,30 @@
 @* ======================================================================================================================================================== *@
 @section Scripts {
     <script>
+        @if (TempData["AdminError"] != null)
+        {
+            <text>
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi Thao Tác',
+                text: @Html.Raw(Json.Serialize(TempData["AdminError"])),
+                confirmButtonColor: '#B29B84'
+            });
+            </text>
+        }
+        @if (TempData["AdminMessage"] != null)
+        {
+            <text>
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công',
+                text: @Html.Raw(Json.Serialize(TempData["AdminMessage"])),
+                showConfirmButton: false,
+                timer: 2500
+            });
+            </text>
+        }
+
         function openTab(evt, tabId) {
             const contents = document.querySelectorAll('.tab-content');
             contents.forEach(content => content.classList.remove('active'));
@@ -761,7 +795,7 @@
         }
 
         // Tự động khôi phục tab đang chọn từ URL hash khi tải trang
-        window.addEventListener("DOMContentLoaded", function () {
+        (function () {
             const hash = window.location.hash;
             if (hash) {
                 const tabId = hash.substring(1); // Bỏ dấu '#'
@@ -770,10 +804,10 @@
                     openTab({ currentTarget: targetBtn }, tabId);
                 }
             }
-        });
+        })();
 
         // Tự động bắt sự kiện khi click vào nút "Đọc toàn bộ nội dung"
-        document.addEventListener("DOMContentLoaded", function () {
+        (function () {
             const viewButtons = document.querySelectorAll(".btn-open-modal");
 
             viewButtons.forEach(button => {
@@ -821,7 +855,7 @@
                     document.getElementById('storyModal').style.display = 'flex';
                 });
             });
-        });
+        })();
 
         function closeStoryModal(e) {
             if (e.target.id === 'storyModal') {
@@ -845,18 +879,70 @@
 
         function filterPublishedPosts() {
             const input = document.getElementById('publishedSearchInput').value.toLowerCase();
-            const activeTab = document.querySelector('.pub-sub-content.active');
             
-            if (activeTab) {
-                const cards = activeTab.querySelectorAll('.published-card');
-                cards.forEach(card => {
+            // Lọc Câu chuyện
+            const storyGrid = document.getElementById('publishedStoriesGrid');
+            if (storyGrid) {
+                const storyCards = storyGrid.querySelectorAll('.published-card');
+                storyCards.forEach(card => {
                     const title = card.getAttribute('data-title') || '';
                     if (title.includes(input)) {
-                        card.style.display = '';
+                        card.classList.remove('filtered-out');
                     } else {
-                        card.style.display = 'none';
+                        card.classList.add('filtered-out');
                     }
                 });
+                paginateElements('publishedStoriesGrid', '.published-card', 'pubStoriesPagination', 20, 'câu chuyện', true);
+            }
+
+            // Lọc Podcast
+            const podcastGrid = document.getElementById('publishedPodcastsGrid');
+            if (podcastGrid) {
+                const podcastCards = podcastGrid.querySelectorAll('.published-card');
+                podcastCards.forEach(card => {
+                    const title = card.getAttribute('data-title') || '';
+                    if (title.includes(input)) {
+                        card.classList.remove('filtered-out');
+                    } else {
+                        card.classList.add('filtered-out');
+                    }
+                });
+                paginateElements('publishedPodcastsGrid', '.published-card', 'pubPodcastsPagination', 20, 'podcast', true);
+            }
+        }
+
+        function filterCategories() {
+            const input = document.getElementById('categorySearchInput').value.toLowerCase();
+            const table = document.getElementById('categoriesTable');
+            if (table) {
+                const rows = table.querySelectorAll('tbody tr.category-row');
+                rows.forEach(row => {
+                    const name = row.querySelector('td strong').innerText.toLowerCase();
+                    if (name.includes(input)) {
+                        row.classList.remove('filtered-out');
+                    } else {
+                        row.classList.add('filtered-out');
+                    }
+                });
+                paginateElements('categoriesTable', 'tbody tr.category-row', 'categoriesPagination', 10, 'danh mục', true);
+            }
+        }
+
+        function filterUsers() {
+            const input = document.getElementById('userSearchInput').value.toLowerCase();
+            const table = document.getElementById('usersTable');
+            if (table) {
+                const rows = table.querySelectorAll('tbody tr.user-row');
+                rows.forEach(row => {
+                    const userName = row.querySelector('.user-name-cell').innerText.toLowerCase();
+                    const email = row.querySelector('.user-email-cell').innerText.toLowerCase();
+                    if (userName.includes(input) || email.includes(input)) {
+                        row.classList.remove('filtered-out');
+                    } else {
+                        row.classList.add('filtered-out');
+                    }
+                });
+                paginateElements('usersTable', 'tbody tr.user-row', 'usersPagination', 10, 'người dùng', true);
             }
         }
 
@@ -870,6 +956,144 @@
             form.appendChild(input);
             return true;
         }
+
+        // Hàm phân trang client-side dùng chung (Generic Client-side Pagination)
+        const paginationStates = {};
+
+        function paginateElements(containerId, itemSelector, paginationContainerId, itemsPerPage = 10, unitName = "mục", resetPage = false) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const paginationContainer = document.getElementById(paginationContainerId);
+            if (!paginationContainer) return;
+
+            const allItems = Array.from(container.querySelectorAll(itemSelector));
+            const visibleItems = allItems.filter(item => !item.classList.contains('filtered-out'));
+            const totalItems = visibleItems.length;
+
+            if (totalItems === 0) {
+                paginationContainer.style.display = 'none';
+                allItems.forEach(item => item.style.display = 'none');
+                return;
+            }
+
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const stateKey = `${containerId}_${paginationContainerId}`;
+
+            if (resetPage || !paginationStates[stateKey]) {
+                paginationStates[stateKey] = 1;
+            }
+            if (paginationStates[stateKey] > totalPages) {
+                paginationStates[stateKey] = totalPages;
+            }
+            if (paginationStates[stateKey] < 1) {
+                paginationStates[stateKey] = 1;
+            }
+
+            let currentPage = paginationStates[stateKey];
+
+            function showPage(page) {
+                currentPage = page;
+                paginationStates[stateKey] = page;
+                const start = (page - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+
+                allItems.forEach(item => item.style.display = 'none');
+
+                visibleItems.forEach((item, idx) => {
+                    if (idx >= start && idx < end) {
+                        item.style.display = '';
+                    }
+                });
+
+                updatePaginationUI();
+            }
+
+            function updatePaginationUI() {
+                const startItem = (currentPage - 1) * itemsPerPage + 1;
+                const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+
+                if (totalPages <= 1) {
+                    paginationContainer.style.display = 'none';
+                    return;
+                }
+                paginationContainer.style.display = 'flex';
+
+                paginationContainer.innerHTML = `
+                    <div class="pagination-info">
+                        Hiển thị <span>${startItem}-${endItem}</span> của <span>${totalItems}</span> ${unitName}
+                    </div>
+                    <div class="pagination-buttons">
+                        <button type="button" class="page-nav-btn prev-btn" ${currentPage === 1 ? 'disabled' : ''}>
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        ${generatePageNumbers()}
+                        <button type="button" class="page-nav-btn next-btn" ${currentPage === totalPages ? 'disabled' : ''}>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                `;
+
+                paginationContainer.querySelector('.prev-btn').addEventListener('click', () => {
+                    if (currentPage > 1) showPage(currentPage - 1);
+                });
+
+                paginationContainer.querySelector('.next-btn').addEventListener('click', () => {
+                    if (currentPage < totalPages) showPage(currentPage + 1);
+                });
+
+                paginationContainer.querySelectorAll('.page-num-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const targetPage = parseInt(e.currentTarget.getAttribute('data-page'));
+                        showPage(targetPage);
+                    });
+                });
+            }
+
+            function generatePageNumbers() {
+                let html = '';
+                const maxVisiblePages = 5;
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+                if (endPage - startPage + 1 < maxVisiblePages) {
+                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                }
+
+                if (startPage > 1) {
+                    html += `<button type="button" class="page-num-btn" data-page="1">1</button>`;
+                    if (startPage > 2) html += `<span style="padding: 0 4px; color: #888;">...</span>`;
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    html += `<button type="button" class="page-num-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+                }
+
+                if (endPage < totalPages) {
+                    if (endPage < totalPages - 1) html += `<span style="padding: 0 4px; color: #888;">...</span>`;
+                    html += `<button type="button" class="page-num-btn" data-page="${totalPages}">${totalPages}</button>`;
+                }
+
+                return html;
+            }
+
+            showPage(currentPage);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            paginateElements('pendingStoriesTable', 'tbody tr.story-row', 'storiesPagination', 10, 'câu chuyện chờ duyệt');
+            paginateElements('pendingPodcastsTable', 'tbody tr.podcast-row', 'podcastsPagination', 10, 'podcast chờ duyệt');
+
+            // Khởi tạo phân trang cho kho bài viết đã xuất bản (20 bài/trang)
+            paginateElements('publishedStoriesGrid', '.published-card', 'pubStoriesPagination', 20, 'câu chuyện');
+            paginateElements('publishedPodcastsGrid', '.published-card', 'pubPodcastsPagination', 20, 'podcast');
+
+            // Khởi tạo phân trang cho quản lý danh mục (10 danh mục/trang)
+            paginateElements('categoriesTable', 'tbody tr.category-row', 'categoriesPagination', 10, 'danh mục');
+
+            // Khởi tạo phân trang cho quản lý người dùng (10 người dùng/trang)
+            paginateElements('usersTable', 'tbody tr.user-row', 'usersPagination', 10, 'người dùng');
+        });
     </script>
 }
 @* ======================================================================================================================================================== *@

@@ -202,13 +202,13 @@
         // =========================================================================
         document.addEventListener("DOMContentLoaded", function () {
 
-            @if (TempData["AdminMessage"] != null)
+             @if (TempData["AdminMessage"] != null)
             {
                 <text>
                 Swal.fire({
                     icon: 'success',
                     title: 'Thành công!',
-                    html: '@Html.Raw(TempData["AdminMessage"])',
+                    html: @Html.Raw(Json.Serialize(TempData["AdminMessage"])),
                     confirmButtonColor: '#111',
                     confirmButtonText: 'Quay về Trang quản lý',
                     allowOutsideClick: false,
@@ -226,7 +226,7 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Có lỗi xảy ra!',
-                    html: '@Html.Raw(TempData["AdminError"])',
+                    html: @Html.Raw(Json.Serialize(TempData["AdminError"])),
                     confirmButtonColor: '#dc3545',
                     confirmButtonText: 'Tôi sẽ kiểm tra lại'
                 });

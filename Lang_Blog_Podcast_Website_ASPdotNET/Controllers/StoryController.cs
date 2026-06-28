@@ -132,13 +132,29 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 ModelState.AddModelError("ImageFile", "Vui lòng chọn ảnh bìa cho câu chuyện của bạn!");
             }
 
-            // 2. Kiểm tra trùng lặp tiêu đề bài viết trong cơ sở dữ liệu
+            // 2. Kiểm tra trùng lặp tiêu đề bài viết (có phân biệt theo người dùng)
             if (!string.IsNullOrWhiteSpace(model.Title))
             {
-                bool isTitleExist = await _db.Stories.AnyAsync(s => s.Title.Trim().ToLower() == model.Title.Trim().ToLower());
-                if (isTitleExist)
+                var currentUserId = _userManager.GetUserId(User);
+                string cleanTitle = model.Title.Trim().ToLower();
+                string cleanIssueNumber = string.IsNullOrWhiteSpace(model.IssueNumber) ? "none" : model.IssueNumber.Trim().ToLower();
+
+                // Khác user mà trùng tiêu đề → từ chối
+                bool otherUserSameTitle = await _db.Stories
+                    .AnyAsync(s => s.Title.Trim().ToLower() == cleanTitle && s.UserId != currentUserId);
+                if (otherUserSameTitle)
                 {
-                    ModelState.AddModelError("Title", "Tiêu đề này đã tồn tại, vui lòng chọn tiêu đề khác!");
+                    ModelState.AddModelError("Title", "Tiêu đề này đã được sử dụng bởi tác giả khác!");
+                }
+
+                // Cùng user, trùng tiêu đề, trùng cả số phát hành → từ chối
+                bool sameUserSameTitleSameIssue = await _db.Stories
+                    .AnyAsync(s => s.Title.Trim().ToLower() == cleanTitle
+                                && s.UserId == currentUserId
+                                && (s.IssueNumber ?? "None").Trim().ToLower() == cleanIssueNumber);
+                if (sameUserSameTitleSameIssue)
+                {
+                    ModelState.AddModelError("Title", "Bạn đã có bài viết cùng tiêu đề và số phát hành này!");
                 }
             }
 

@@ -1,0 +1,162 @@
+﻿:root {
+    --lang-bg-cream: #faf9f7;
+    --lang-dark: #1a1a1a;
+    --lang-muted: #8c867a;
+    --lang-border: #eae6e1;
+    --lang-success-bg: #f0f7f4;
+    --lang-success-text: #3a7d44;
+    --lang-danger-bg: #fdf2f2;
+    --lang-danger-text: #ba2525;
+}
+
+.admin-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 40px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(26, 26, 26, 0.03);
+    border: 1px solid var(--lang-border);
+}
+
+/* Hiệu ứng tiêu đề nhẹ nhàng */
+.lang-title-section h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    font-size: 1.85rem;
+    color: var(--lang-dark);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+}
+
+.btn-back {
+    color: var(--lang-muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+}
+
+    .btn-back:hover {
+        color: var(--lang-dark);
+        transform: translateX(-4px);
+    }
+
+/* Phong cách Table hiện đại */
+.lang-table-wrapper {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.lang-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    text-align: left;
+}
+
+    .lang-table th {
+        padding: 16px 20px;
+        color: var(--lang-muted);
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        border-bottom: 2px solid var(--lang-dark);
+    }
+
+    .lang-table td {
+        padding: 18px 20px;
+        color: #333;
+        font-size: 14px;
+        border-bottom: 1px solid var(--lang-border);
+        vertical-align: middle;
+        transition: background-color 0.25s ease;
+    }
+
+    /* Hiệu ứng hover dòng nhẹ nhàng */
+    .lang-table tbody tr {
+        transition: all 0.25s ease;
+    }
+
+        .lang-table tbody tr:hover td {
+            background-color: #fdfdfc;
+        }
+
+/* Định dạng cột Tài khoản nổi bật */
+.user-name-cell {
+    font-weight: 600;
+    color: var(--lang-dark);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Badges Vai trò tinh tế */
+.badge-role {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.badge-admin {
+    background-color: var(--lang-success-bg);
+    color: var(--lang-success-text);
+    border: 1px solid rgba(58, 125, 68, 0.15);
+}
+
+.badge-reader {
+    background-color: var(--lang-bg-cream);
+    color: var(--lang-muted);
+    border: 1px solid var(--lang-border);
+}
+
+/* Thiết kế nút Hành động đi kèm hiệu ứng click/hover mạnh mẽ */
+.btn-action {
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-grant {
+    background-color: var(--lang-dark);
+    color: #ffffff;
+}
+
+    .btn-grant:hover {
+        background-color: #333333;
+        box-shadow: 0 4px 12px rgba(26, 26, 26, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .btn-grant:active {
+        transform: translateY(0);
+    }
+
+.btn-revoke {
+    background-color: #ffffff;
+    color: var(--lang-danger-text);
+    border-color: var(--lang-danger-text);
+}
+
+    .btn-revoke:hover {
+        background-color: var(--lang-danger-bg);
+        box-shadow: 0 4px 12px rgba(186, 37, 37, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .btn-revoke:active {
+        transform: translateY(0);
+    }

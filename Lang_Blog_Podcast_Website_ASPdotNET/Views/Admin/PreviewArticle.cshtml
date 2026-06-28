@@ -16,7 +16,7 @@
     <div class="preview-badge"><i class="fa-solid fa-eye"></i> CHẾ ĐỘ XEM TRƯỚC (PREVIEW)</div>
 
     <div class="article-header" data-aos="fade-in">
-        <div class="article-header-bg"></div>
+        <div class="article-header-bg" style="background-image: url('@(string.IsNullOrEmpty(Model.ImagePath) ? "/images/default-cover.jpg" : Model.ImagePath)');"></div>
         <div class="article-header-content">
             <div class="article-category" data-aos="fade-up" data-aos-delay="200">
                 LẶNG. MAGAZINE / @(Model.Category?.Name ?? "Tạp Chí")

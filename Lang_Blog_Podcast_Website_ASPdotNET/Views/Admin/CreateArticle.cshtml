@@ -129,6 +129,7 @@
             plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table wordcount',
             toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | removeformat | help',
             height: 500,
+            statusbar: false,
             skin: 'oxide',
             content_css: 'default',
             setup: function (editor) {
@@ -241,13 +242,13 @@
         // 5. THÔNG BÁO SWEETALERT2 TỪ SERVER (TempData)
         // =========================================================================
         document.addEventListener("DOMContentLoaded", function () {
-            @if (TempData["AdminMessage"] != null)
+             @if (TempData["AdminMessage"] != null)
             {
                 <text>
                 Swal.fire({
                     icon: 'success',
                     title: 'Thành công!',
-                    html: '@Html.Raw(TempData["AdminMessage"])',
+                    html: @Html.Raw(Json.Serialize(TempData["AdminMessage"])),
                     confirmButtonColor: '#111',
                     confirmButtonText: 'Quay về Trang quản lý',
                     allowOutsideClick: false,
@@ -265,7 +266,7 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Có lỗi xảy ra!',
-                    html: '@Html.Raw(TempData["AdminError"])',
+                    html: @Html.Raw(Json.Serialize(TempData["AdminError"])),
                     confirmButtonColor: '#dc3545',
                     confirmButtonText: 'Tôi sẽ kiểm tra lại'
                 });

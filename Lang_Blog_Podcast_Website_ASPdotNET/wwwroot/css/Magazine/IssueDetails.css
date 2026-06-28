@@ -1,4 +1,4 @@
-﻿body {
+body {
     background-color: #f4f4f4; /* Nền xám nhạt để làm nổi bật cuốn tạp chí */
 }
 
@@ -64,20 +64,23 @@
         margin-bottom: 10px;
     }
 
-/* Ruột tạp chí */
+/* Ruột tạp chí - Layout chung */
+.article-page .page-content {
+    display: flex;
+    flex-direction: column;
+}
+
 .article-page h2 {
     font-family: var(--font-serif-header);
     font-size: 32px;
     color: #000;
     margin-bottom: 15px;
+    line-height: 1.2;
 }
 
 .article-page img {
-    width: 100%;
-    height: 250px;
     object-fit: cover;
     margin-bottom: 20px;
-    filter: grayscale(100%);
 }
 
 .article-page .excerpt {
@@ -86,6 +89,106 @@
     line-height: 1.8;
     color: #333;
     flex-grow: 1;
+}
+
+/* Các Layout Cụ Thể */
+
+/* 1. Layout Tall (Dọc Lớn - 3:4) */
+.layout-tall img {
+    width: auto;
+    max-width: 100%;
+    height: 280px;
+    aspect-ratio: 3/4;
+    display: block;
+    margin: 0 auto 20px auto;
+    box-shadow: 8px 8px 0px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+}
+
+/* 2. Layout Wide (Ngang Rộng - 21:9) */
+.layout-wide img {
+    width: 100%;
+    aspect-ratio: 21/9;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+.layout-wide h2 {
+    font-size: 26px;
+}
+
+/* 3. Layout Short (Ngang Nhỏ - 16:9) */
+.layout-short img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* 4. Layout Minimal (Vuông - 1:1) */
+.layout-minimal img {
+    aspect-ratio: 1/1;
+    width: 170px;
+    height: 170px;
+    margin: 0 auto 25px auto;
+    display: block;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+.layout-minimal h2 {
+    text-align: center;
+}
+.layout-minimal .excerpt {
+    text-align: center;
+    font-style: italic;
+    color: #555;
+    padding: 0 20px;
+}
+
+/* 5. Layout Tall Offset (Dọc Lệch) */
+.layout-tall-offset .page-content {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    grid-template-rows: auto auto 1fr auto;
+    gap: 15px;
+    height: 100%;
+    padding: 40px;
+}
+.layout-tall-offset .page-content > div:nth-child(1) {
+    grid-column: 1 / span 2;
+    grid-row: 1;
+    margin-bottom: 0 !important;
+}
+.layout-tall-offset .page-content h2 {
+    grid-column: 1;
+    grid-row: 2;
+    font-size: 24px;
+    margin: 0;
+    align-self: center;
+    line-height: 1.3;
+    padding-right: 15px;
+}
+.layout-tall-offset .page-content img {
+    grid-column: 2;
+    grid-row: 2;
+    width: 100%;
+    aspect-ratio: 3/4;
+    margin: 0;
+    box-shadow: 8px 8px 0px rgba(0,0,0,0.1);
+    border: 1px solid #eee;
+}
+.layout-tall-offset .page-content .excerpt {
+    grid-column: 1 / span 2;
+    grid-row: 3;
+    margin-top: 15px;
+    margin-bottom: 0;
+}
+.layout-tall-offset .page-content > div:nth-child(5) {
+    grid-column: 1 / span 2;
+    grid-row: 4;
+    margin-top: auto;
 }
 
 .read-more-btn {

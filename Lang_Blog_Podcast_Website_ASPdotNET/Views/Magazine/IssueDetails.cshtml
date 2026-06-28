@@ -59,7 +59,7 @@
                     string plainText = string.IsNullOrEmpty(article.Content) ? "" : Regex.Replace(article.Content, "<.*?>", string.Empty);
                     string excerpt = plainText.Length > 400 ? plainText.Substring(0, 400) + "..." : plainText;
 
-                    <div class="page article-page">
+                    <div class="page article-page layout-@(article.LayoutType?.ToLower() ?? "tall")">
                         <div class="page-content">
                             <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; color: #999; letter-spacing: 2px; margin-bottom: 15px; text-transform: uppercase;">
                                 @(article.Category?.Name ?? "Editorial")
@@ -106,10 +106,13 @@
     <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
     
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        (function() {
+            const container = document.getElementById('flipbook');
+            if (!container) return;
+
             // Khởi tạo PageFlip
-            const pageFlip = new St.PageFlip(document.getElementById('flipbook'), {
-                width: 450, // width base cho 1 trang (không phải cả cuốn sách)
+            const pageFlip = new St.PageFlip(container, {
+                width: 450,
                 height: 600,
                 size: "stretch",
                 minWidth: 315,
@@ -118,7 +121,7 @@
                 maxHeight: 1350,
                 drawShadow: true,
                 showCover: true,
-                mobileScrollSupport: false // Vô hiệu hóa vuốt cuộn trên đt để tránh xung đột
+                mobileScrollSupport: false
             });
 
             // Tải trang từ DOM
@@ -135,14 +138,13 @@
 
             // Cập nhật trạng thái số trang
             pageFlip.on('flip', (e) => {
-                // e.data là trang đang được lật tới (trang đầu của mảng hiển thị)
                 const totalPages = pageFlip.getPageCount();
                 document.getElementById('page-counter').innerText = `${e.data + 1} / ${totalPages}`;
             });
 
             // Gán số trang khởi tạo
             document.getElementById('page-counter').innerText = `1 / ${document.querySelectorAll('.page').length}`;
-        });
+        })();
     </script>
 }
 @* ======================================================================================================================================================== *@

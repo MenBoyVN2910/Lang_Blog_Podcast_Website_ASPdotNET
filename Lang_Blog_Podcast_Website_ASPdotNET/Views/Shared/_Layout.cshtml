@@ -11,17 +11,20 @@
     @* Tối ưu hóa tốc độ tải font từ Google Fonts bằng cách kết nối sớm (Preconnect) *@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Playfair+Display+SC&family=Montserrat:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Playfair+Display+SC&family=Montserrat:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" data-layout-style="true">
 
     @* Nhúng file CSS chính của trang web, tự động tạo chuỗi định danh phiên bản (v=...) để tránh lỗi bộ nhớ đệm (Cache) *@
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/GlobalPlayer.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" data-layout-style="true" />
+    <link rel="stylesheet" href="~/css/GlobalPlayer.css" asp-append-version="true" data-layout-style="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" data-layout-style="true" />
     @* Cấu hình ảnh biểu tượng thu nhỏ (Favicon) hiển thị trên tab trình duyệt *@
     <link rel="icon"
           type="image/png"
           href="~/images/Logo/logo_website.png" />
     @await RenderSectionAsync("Styles", required: false)
+
+    <!-- THÊM DÒNG NÀY VÀO ĐÂY -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" data-layout-style="true" />
 </head>
 @* ======================================================================================================================================================== *@
 
@@ -186,7 +189,7 @@
     </div>
 
     @* =================================JAVASCRIPT=========================================== *@
-    <script>
+    <script data-layout-script="true">
             (function () {
                 // Lắng nghe sự kiện click chuột trên toàn bộ tài liệu (Document)
                 document.addEventListener('click', function (e) {
@@ -240,7 +243,7 @@
                 });
             })();
     </script>
-    <script>
+    <script data-layout-script="true">
 document.addEventListener('DOMContentLoaded', function() {
     const bellBtn = document.getElementById('bell-btn-toggle');
     const notifDropdown = document.getElementById('notif-dropdown');
@@ -343,9 +346,15 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(loadUnreadCount, 60000);
 });
 </script>
-    <script src="~/js/GlobalPlayer.js" asp-append-version="true"></script>
+    <!-- Gọi thư viện AOS và SweetAlert dùng chung cho toàn web -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js" data-layout-script="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" data-layout-script="true"></script>
+
+    <script src="~/js/GlobalPlayer.js" asp-append-version="true" data-layout-script="true"></script>
+    <script src="~/js/spa-router.js" asp-append-version="true" data-layout-script="true"></script>
     @* Vùng cho phép các View con nhúng bổ sung các đoạn mã Script riêng lẻ vào cuối trang Layout *@
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 @* ======================================================================================================================================================== *@
 </html>

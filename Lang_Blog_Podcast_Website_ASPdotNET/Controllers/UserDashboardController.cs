@@ -100,10 +100,30 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
 
             if (!string.IsNullOrWhiteSpace(model.Title))
             {
-                bool isTitleExist = await _db.Stories.AnyAsync(s => s.Title.Trim().ToLower() == model.Title.Trim().ToLower());
-                if (isTitleExist)
+                var currentUserId = _userManager.GetUserId(User);
+                string cleanTitle = model.Title.Trim().ToLower();
+                string cleanIssueNumber = string.IsNullOrWhiteSpace(model.IssueNumber) ? "none" : model.IssueNumber.Trim().ToLower();
+
+                // Khác user mà trùng tiêu đề → từ chối
+                bool otherUserSameTitle = await _db.Stories
+                    .AnyAsync(s => s.Title.Trim().ToLower() == cleanTitle && s.UserId != currentUserId);
+                if (otherUserSameTitle)
                 {
-                    TempData["DashboardError"] = "Tiêu đề này đã tồn tại, vui lòng chọn tiêu đề khác!";
+                    TempData["DashboardError"] = "Tiêu đề này đã được sử dụng bởi tác giả khác!";
+                    TempData["StoryFormData"] = System.Text.Json.JsonSerializer.Serialize(new {
+                        model.Title, model.IssueNumber, model.CategoryId, model.Content
+                    });
+                    return RedirectToAction(nameof(Index), new { tab = "write-story" });
+                }
+
+                // Cùng user, trùng tiêu đề, trùng cả số phát hành → từ chối
+                bool sameUserSameTitleSameIssue = await _db.Stories
+                    .AnyAsync(s => s.Title.Trim().ToLower() == cleanTitle
+                                && s.UserId == currentUserId
+                                && (s.IssueNumber ?? "None").Trim().ToLower() == cleanIssueNumber);
+                if (sameUserSameTitleSameIssue)
+                {
+                    TempData["DashboardError"] = "Bạn đã có bài viết cùng tiêu đề và số phát hành này!";
                     TempData["StoryFormData"] = System.Text.Json.JsonSerializer.Serialize(new {
                         model.Title, model.IssueNumber, model.CategoryId, model.Content
                     });
@@ -164,6 +184,39 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitPodcast(PodCastUploadViewModel model)
         {
+            // Kiểm tra trùng lặp tiêu đề Podcast (có phân biệt theo người dùng)
+            if (!string.IsNullOrWhiteSpace(model.Title))
+            {
+                var currentUserId = _userManager.GetUserId(User);
+                string cleanTitle = model.Title.Trim().ToLower();
+
+                // Khác user mà trùng tiêu đề → từ chối
+                bool otherUserSameTitle = await _db.PodCasts
+                    .AnyAsync(p => p.Title.Trim().ToLower() == cleanTitle && p.UserId != currentUserId);
+                if (otherUserSameTitle)
+                {
+                    TempData["DashboardError"] = "Tiêu đề Podcast này đã được sử dụng bởi người dẫn khác!";
+                    TempData["PodcastFormData"] = System.Text.Json.JsonSerializer.Serialize(new {
+                        model.Title, model.Author, model.EpisodeNumber, model.CategoryId, model.Description
+                    });
+                    return RedirectToAction(nameof(Index), new { tab = "upload-podcast" });
+                }
+
+                // Cùng user, trùng tiêu đề, trùng cả số tập → từ chối
+                bool sameUserSameTitleSameEpisode = await _db.PodCasts
+                    .AnyAsync(p => p.Title.Trim().ToLower() == cleanTitle
+                                && p.UserId == currentUserId
+                                && p.EpisodeNumber == model.EpisodeNumber);
+                if (sameUserSameTitleSameEpisode)
+                {
+                    TempData["DashboardError"] = "Bạn đã có podcast cùng tiêu đề và số tập này!";
+                    TempData["PodcastFormData"] = System.Text.Json.JsonSerializer.Serialize(new {
+                        model.Title, model.Author, model.EpisodeNumber, model.CategoryId, model.Description
+                    });
+                    return RedirectToAction(nameof(Index), new { tab = "upload-podcast" });
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 try
@@ -249,6 +302,29 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
 
             ModelState.Remove("ImageFile");
             ModelState.Remove("IssueNumber");
+
+            // Kiểm tra trùng lặp tiêu đề (loại trừ chính bài đang sửa)
+            if (!string.IsNullOrWhiteSpace(model.Title))
+            {
+                string cleanTitle = model.Title.Trim().ToLower();
+                string cleanIssueNumber = string.IsNullOrWhiteSpace(model.IssueNumber) ? "none" : model.IssueNumber.Trim().ToLower();
+
+                bool otherUserSameTitle = await _db.Stories
+                    .AnyAsync(s => s.Id != id && s.Title.Trim().ToLower() == cleanTitle && s.UserId != userId);
+                if (otherUserSameTitle)
+                {
+                    ModelState.AddModelError("Title", "Tiêu đề này đã được sử dụng bởi tác giả khác!");
+                }
+
+                bool sameUserSameTitleSameIssue = await _db.Stories
+                    .AnyAsync(s => s.Id != id && s.Title.Trim().ToLower() == cleanTitle
+                                && s.UserId == userId
+                                && (s.IssueNumber ?? "None").Trim().ToLower() == cleanIssueNumber);
+                if (sameUserSameTitleSameIssue)
+                {
+                    ModelState.AddModelError("Title", "Bạn đã có bài viết cùng tiêu đề và số phát hành này!");
+                }
+            }
 
             if (!ModelState.IsValid)
             {
@@ -349,6 +425,28 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
 
             ModelState.Remove("ImageFile");
             ModelState.Remove("AudioFile");
+
+            // Kiểm tra trùng lặp tiêu đề Podcast (loại trừ chính podcast đang sửa)
+            if (!string.IsNullOrWhiteSpace(model.Title))
+            {
+                string cleanTitle = model.Title.Trim().ToLower();
+
+                bool otherUserSameTitle = await _db.PodCasts
+                    .AnyAsync(p => p.Id != id && p.Title.Trim().ToLower() == cleanTitle && p.UserId != userId);
+                if (otherUserSameTitle)
+                {
+                    ModelState.AddModelError("Title", "Tiêu đề này đã được sử dụng bởi người dẫn khác!");
+                }
+
+                bool sameUserSameTitleSameEpisode = await _db.PodCasts
+                    .AnyAsync(p => p.Id != id && p.Title.Trim().ToLower() == cleanTitle
+                                && p.UserId == userId
+                                && p.EpisodeNumber == model.EpisodeNumber);
+                if (sameUserSameTitleSameEpisode)
+                {
+                    ModelState.AddModelError("Title", "Bạn đã có podcast cùng tiêu đề và số tập này!");
+                }
+            }
 
             if (!ModelState.IsValid)
             {
