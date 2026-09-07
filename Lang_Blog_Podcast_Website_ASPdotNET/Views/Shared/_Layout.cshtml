@@ -60,7 +60,7 @@
                 <a asp-controller="Home" asp-action="About">VỀ LẶNG</a>
 
                 @* Kiểm tra bảo mật: Nếu Người dùng đã đăng nhập VÀ tài khoản thuộc nhóm quyền "Admin" thì mới hiển thị lối tắt *@
-                @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
                 {
                     <a asp-controller="Admin" asp-action="Index">BAN BIÊN TẬP</a>
                 }

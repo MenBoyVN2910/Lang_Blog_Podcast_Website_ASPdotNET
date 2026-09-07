@@ -7,14 +7,14 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
     {
         [Required(ErrorMessage = "Vui lòng nhập tiêu đề podcast.")]
         [StringLength(40, ErrorMessage = "Tiêu đề không được vượt quá 40 ký tự.")]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Vui lòng nhập tên tác giả.")]
         [StringLength(30, ErrorMessage = "Tên tác giả không được vượt quá 30 ký tự.")]
-        public string Author { get; set; }
+        public string Author { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Vui lòng viết mô tả cho podcast.")]
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
         [Range(1, int.MaxValue, ErrorMessage = "Vui lòng nhập số tập hợp lệ (từ 1 trở lên).")]
         public int? EpisodeNumber { get; set; }
@@ -23,10 +23,10 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
         public int CategoryId { get; set; }
 
         [Required(ErrorMessage = "Vui lòng chọn ảnh bìa cho podcast.")]
-        public IFormFile ImageFile { get; set; }
+        public IFormFile ImageFile { get; set; } = null!;
 
         [Required(ErrorMessage = "Vui lòng chọn file âm thanh cho podcast.")]
-        public IFormFile AudioFile { get; set; }
+        public IFormFile AudioFile { get; set; } = null!;
 
         public string? Duration { get; set; }
     }

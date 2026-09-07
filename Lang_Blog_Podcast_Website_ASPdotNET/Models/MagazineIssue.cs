@@ -13,24 +13,24 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
         [Required(ErrorMessage = "Số phát hành không được để trống")]
         [StringLength(10, ErrorMessage = "Số phát hành tối đa 10 ký tự")]
         [Display(Name = "Số phát hành (Ví dụ: V.01)")]
-        public string IssueNumber { get; set; }
+        public string IssueNumber { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Tên ấn phẩm không được để trống")]
         [StringLength(40, ErrorMessage = "Tên ấn phẩm tối đa 40 ký tự")]
         [Display(Name = "Tên ấn phẩm")]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         [StringLength(500, ErrorMessage = "Mô tả tối đa 500 ký tự")]
         [Display(Name = "Mô tả / Lời tựa")]
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
         [Display(Name = "Ảnh bìa")]
-        public string CoverImagePath { get; set; }
+        public string CoverImagePath { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Kỳ xuất bản không được để trống")]
         [StringLength(30, ErrorMessage = "Kỳ/Mùa tối đa 30 ký tự")]
         [Display(Name = "Kỳ / Mùa (Ví dụ: SUMMER 2026)")]
-        public string Season { get; set; }
+        public string Season { get; set; } = string.Empty;
 
         [Display(Name = "Trạng thái")]
         public StoryStatus Status { get; set; } = StoryStatus.Pending; // Sử dụng lại Enum Pending (Draft), Approved (Published)

@@ -7,7 +7,7 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
     {
         [Required(ErrorMessage = "Vui lòng nhập tiêu đề câu chuyện.")]
         [StringLength(50, ErrorMessage = "Tiêu đề không được vượt quá 50 ký tự.")]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
  
         [StringLength(10, ErrorMessage = "Số phát hành không được vượt quá 10 ký tự.")]
@@ -17,9 +17,9 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
         public int CategoryId { get; set; } 
 
         [Required(ErrorMessage = "Vui lòng viết lời tự sự của bạn.")]
-        public string Content { get; set; }
+        public string Content { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Vui lòng chọn một bức ảnh bìa thật thơ cho câu chuyện của bạn.")]
-        public IFormFile ImageFile { get; set; }
+        public IFormFile ImageFile { get; set; } = null!;
     }
 }

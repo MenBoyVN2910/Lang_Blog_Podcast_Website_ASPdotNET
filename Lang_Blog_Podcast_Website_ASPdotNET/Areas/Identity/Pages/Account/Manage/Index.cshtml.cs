@@ -23,13 +23,13 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Areas.Identity.Pages.Account.Manag
             _signInManager = signInManager;
         }
 
-        public string Username { get; set; }
+        public string? Username { get; set; }
 
         [TempData]
-        public string StatusMessage { get; set; }
+        public string? StatusMessage { get; set; }
 
         [BindProperty]
-        public InputModel Input { get; set; }
+        public InputModel Input { get; set; } = new();
 
         public bool HasAvatar { get; set; }
 

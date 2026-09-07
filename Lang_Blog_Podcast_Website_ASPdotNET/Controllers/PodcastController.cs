@@ -179,7 +179,7 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                         AudioPath = "/audio/Podcasts/" + audioFileName,
                         Status = StoryStatus.Pending,
                         CreatedAt = DateTime.Now,
-                        UserId = User.Identity.IsAuthenticated ? User.FindFirstValue(ClaimTypes.NameIdentifier) : null,
+                        UserId = (User.Identity?.IsAuthenticated == true) ? User.FindFirstValue(ClaimTypes.NameIdentifier) : null,
                         Duration = model.Duration
                     };
 

@@ -16,18 +16,18 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
         [Required(ErrorMessage = "Tiêu đề không được để trống")]
         [StringLength(40, ErrorMessage = "Tiêu đề tối đa 40 ký tự")]
         [Display(Name = "Tiêu đề bài viết")]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Nội dung không được để trống")]
         [Display(Name = "Nội dung")]
-        public string Content { get; set; }
+        public string Content { get; set; } = string.Empty;
 
         [Display(Name = "Ảnh minh họa")]
-        public string ImagePath { get; set; }
+        public string ImagePath { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Phải chọn kiểu lưới hiển thị")]
         [Display(Name = "Kiểu Layout (tall, wide, minimal, short, tall-offset)")]
-        public string LayoutType { get; set; }
+        public string LayoutType { get; set; } = string.Empty;
 
         public int ViewCount { get; set; } = 0;
 

@@ -7,9 +7,9 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
     public class ProfileViewModel
     {
         // Thông tin chung
-        public ApplicationUser User { get; set; }
+        public ApplicationUser User { get; set; } = null!;
         public bool IsOwner { get; set; }           // True nếu đang xem profile của chính mình
-        public string RoleBadge { get; set; }       // VD: "Admin ✦", "Nhà Sáng Tạo ✎", "Thành Viên"
+        public string RoleBadge { get; set; } = string.Empty;       // VD: "Admin ✦", "Nhà Sáng Tạo ✎", "Thành Viên"
         
         // Thống kê
         public int TotalStories { get; set; }
@@ -31,10 +31,10 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
 
     public class AchievementItem
     {
-        public string IconClass { get; set; } // Lớp icon FontAwesome, vd: fa-solid fa-microphone
-        public string IconColor { get; set; } // Màu sắc, vd: #f57c00
-        public string Title { get; set; }
-        public string Description { get; set; }
+        public string IconClass { get; set; } = string.Empty; // Lớp icon FontAwesome, vd: fa-solid fa-microphone
+        public string IconColor { get; set; } = string.Empty; // Màu sắc, vd: #f57c00
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         public bool IsUnlocked { get; set; }
     }
 }

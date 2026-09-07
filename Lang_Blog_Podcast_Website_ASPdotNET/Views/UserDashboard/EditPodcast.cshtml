@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Chỉnh sửa Podcast";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var categories = ViewBag.Categories as List<Lang_Blog_Podcast_Website_ASPdotNET.Models.Category>;
+    var categories = ViewBag.Categories as List<Lang_Blog_Podcast_Website_ASPdotNET.Models.Category> ?? new List<Lang_Blog_Podcast_Website_ASPdotNET.Models.Category>();
 }
 
 

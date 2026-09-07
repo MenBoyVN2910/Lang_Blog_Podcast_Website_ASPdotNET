@@ -26,17 +26,21 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index(string? username)
         {
-            ApplicationUser targetUser;
+            ApplicationUser? targetUser = null;
             bool isOwner = false;
 
             if (string.IsNullOrEmpty(username))
             {
                 // Truy cập trang cá nhân của chính mình
-                if (!User.Identity.IsAuthenticated)
+                if (User.Identity?.IsAuthenticated != true)
                 {
                     return RedirectToPage("/Account/Login", new { area = "Identity" });
                 }
                 targetUser = await _userManager.GetUserAsync(User);
+                if (targetUser == null)
+                {
+                    return RedirectToPage("/Account/Login", new { area = "Identity" });
+                }
                 isOwner = true;
             }
             else
@@ -48,7 +52,7 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                     return NotFound("Không tìm thấy người dùng này.");
                 }
 
-                if (User.Identity.IsAuthenticated)
+                if (User.Identity?.IsAuthenticated == true)
                 {
                     var currentUser = await _userManager.GetUserAsync(User);
                     if (currentUser != null && currentUser.Id == targetUser.Id)

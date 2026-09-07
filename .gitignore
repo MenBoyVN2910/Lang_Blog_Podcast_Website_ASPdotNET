@@ -361,3 +361,20 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains Rider & IntelliJ IDEA
+.idea/
+*.sln.iml
+
+# Temporary files & Scratch
+temp_*.txt
+*.scratch.*
+scratch/

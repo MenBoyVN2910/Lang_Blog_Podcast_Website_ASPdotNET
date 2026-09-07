@@ -36,7 +36,7 @@
                     {
                         string defaultImg = item.Type == "podcast" ? "/images/Logo/logo_website.png" : "/images/default-thumbnail.jpg";
                         string imgPath = string.IsNullOrEmpty(item.ImagePath) ? defaultImg : item.ImagePath;
-                        string url = item.Type == "podcast" ? Url.Action("Details", "Podcast", new { id = item.Id }) : Url.Action("Details", "Story", new { id = item.Id });
+                        string url = (item.Type == "podcast" ? Url.Action("Details", "Podcast", new { id = item.Id }) : Url.Action("Details", "Story", new { id = item.Id })) ?? "#";
                         
                         <div class="carousel-slide @(index == 0 ? "active" : "")" data-index="@index">
                             <a href="@url" class="image-aesthetic-wrapper">

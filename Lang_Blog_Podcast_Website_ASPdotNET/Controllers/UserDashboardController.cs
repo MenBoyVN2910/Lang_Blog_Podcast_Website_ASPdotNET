@@ -632,7 +632,7 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             return $"/{folderPath}/{uniqueFileName}";
         }
 
-        private void DeletePhysicalFile(string relativePath)
+        private void DeletePhysicalFile(string? relativePath)
         {
             if (string.IsNullOrEmpty(relativePath) || relativePath == "#") return;
             try

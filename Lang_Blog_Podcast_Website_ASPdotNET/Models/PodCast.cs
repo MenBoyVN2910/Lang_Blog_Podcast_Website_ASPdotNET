@@ -10,27 +10,27 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
 
         [Required(ErrorMessage = "Tiêu đề không được để trống")]
         [Display(Name = "Tiêu đề câu chuyện")]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
         [Display(Name = "Tác giả")]
-        public string Author { get; set; }
+        public string Author { get; set; } = string.Empty;
         public string? UserId { get; set; }
         public ApplicationUser? User { get; set; }
         [Required]
         [Display(Name = "Mô tả")]
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
         public int? EpisodeNumber { get; set; }
         [Display(Name = "Danh mục")]
         public int CategoryId { get; set; }
         public Category? Category { get; set; }
         [Display(Name = "Ảnh bìa")]
-        public string ImagePath { get; set; } 
+        public string ImagePath { get; set; } = string.Empty; 
         public StoryStatus Status { get; set; } = StoryStatus.Pending;
         [Display(Name = "Ngày gửi")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         [Display(Name = "Ngày xuất bản")]
         public DateTime? PublishDate { get; set; }
         [Display(Name = "File âm thanh")]
-        public string AudioPath { get; set; }
+        public string AudioPath { get; set; } = string.Empty;
         public int ViewCount { get; set; } = 0; 
         [Display(Name = "Thời lượng")]
         public string? Duration { get; set; }

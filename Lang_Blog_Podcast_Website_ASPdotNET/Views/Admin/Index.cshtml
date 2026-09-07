@@ -388,7 +388,8 @@
                                     }
                                     else
                                     {
-                                        <div class="avatar">@(string.IsNullOrEmpty(podcast.User?.FullName ?? podcast.Author) ? "?" : (podcast.User?.FullName ?? podcast.Author).Substring(0, 1).ToUpper())</div>
+                                        var authorName = podcast.User?.FullName ?? podcast.Author ?? "";
+                                        <div class="avatar">@(string.IsNullOrEmpty(authorName) ? "?" : authorName.Substring(0, 1).ToUpper())</div>
                                     }
                                     <div class="user-details">
                                         <strong>@(string.IsNullOrEmpty(podcast.User?.FullName) ? (string.IsNullOrEmpty(podcast.Author) ? "Ẩn danh" : podcast.Author) : podcast.User.FullName)</strong>

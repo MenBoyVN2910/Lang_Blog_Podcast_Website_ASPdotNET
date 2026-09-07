@@ -97,14 +97,14 @@
                 <button id="login-submit" type="submit" class="btn-submit">Xác thực</button>
             </form>
 
-            <div class="divider">
-                <span>Hoặc</span>
-            </div>
-
-            @* Vòng lặp cấu trúc Razor để quét và hiển thị các phương thức đăng nhập liên kết ngoài nếu có thiết lập cấu hình -- Chưa Được Triển Khai *@
+            @* Vòng lặp cấu trúc Razor để quét và hiển thị các phương thức đăng nhập liên kết ngoài nếu có thiết lập cấu hình *@
             @{
                 if ((Model.ExternalLogins?.Count ?? 0) > 0)
                 {
+                    <div class="divider">
+                        <span>Hoặc</span>
+                    </div>
+
                     <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
                         @foreach (var provider in Model.ExternalLogins!)
                         {
@@ -120,7 +120,7 @@
                             {
                                 // Render động icon liên kết cho các bên dịch vụ thứ 3 khác ngoài Google
                                 <button type="submit" class="btn-google" name="provider" value="@provider.Name">
-                                    <i class="fa-brands fa-@provider.Name.ToLower()"></i> TIẾP TỤC VỚI @provider.DisplayName.ToUpper()
+                                    <i class="fa-brands fa-@provider.Name.ToLower()"></i> TIẾP TỤC VỚI @(provider.DisplayName?.ToUpper() ?? provider.Name.ToUpper())
                                 </button>
                             }
                         }

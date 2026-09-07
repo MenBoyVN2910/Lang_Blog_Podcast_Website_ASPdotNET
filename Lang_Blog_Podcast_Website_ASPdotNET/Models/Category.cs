@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
@@ -10,7 +10,7 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
 
         [Required(ErrorMessage = "Tên danh mục không được để trống")]
         [StringLength(100)]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         // Mối quan hệ: Một danh mục có thể chứa nhiều Story (và tương lai là Podcast, Post)
         public ICollection<Story> Stories { get; set; } = new List<Story>();

@@ -58,9 +58,9 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                     p.ImagePath,
                     p.CreatedAt,
                     p.ViewCount,
-                    Author = p.Author ?? p.User.FullName,
-                    CategoryName = p.Category.Name,
-                    AudioPath = p.AudioPath
+                    Author = p.Author ?? (p.User != null ? p.User.FullName : "Tác giả"),
+                    CategoryName = p.Category != null ? p.Category.Name : "Khác",
+                    AudioPath = (string?)p.AudioPath
                 })
                 .ToListAsync();
 
@@ -74,13 +74,13 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                     Type = "story",
                     s.Id,
                     s.Title,
-                    Description = s.Content.Length > 120 ? s.Content.Substring(0, 120) + "..." : s.Content,
+                    Description = s.Content != null && s.Content.Length > 120 ? s.Content.Substring(0, 120) + "..." : (s.Content ?? ""),
                     s.ImagePath,
                     s.CreatedAt,
                     s.ViewCount,
-                    Author = s.User.FullName,
-                    CategoryName = s.Category.Name,
-                    AudioPath = (string)null
+                    Author = s.User != null ? s.User.FullName : "Tác giả",
+                    CategoryName = s.Category != null ? s.Category.Name : "Khác",
+                    AudioPath = (string?)null
                 })
                 .ToListAsync();
 

@@ -11,11 +11,11 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
 
         [Required(ErrorMessage = "Tiêu đề không được để trống")]
         [Display(Name = "Tiêu đề câu chuyện")]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Nội dung không được để trống")]
         [Display(Name = "Nội dung")]
-        public string Content { get; set; }
+        public string Content { get; set; } = string.Empty;
 
         // Liên kết với ApplicationUser (Người gửi bài)
         public string? UserId { get; set; }
@@ -29,7 +29,7 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
         public Category? Category { get; set; }
 
         [Display(Name = "Ảnh bìa")]
-        public string ImagePath { get; set; } // Đường dẫn lưu file ảnh trong wwwroot
+        public string ImagePath { get; set; } = string.Empty; // Đường dẫn lưu file ảnh trong wwwroot
 
         public StoryStatus Status { get; set; } = StoryStatus.Pending;
 

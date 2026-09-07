@@ -166,7 +166,7 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                     string uploadedFileName = "#";
                     if (model.ImageFile != null && model.ImageFile.Length > 0)
                     {
-                        uploadedFileName = UploadFile(model.ImageFile, "uploads/images");
+                        uploadedFileName = UploadFile(model.ImageFile, "uploads/images") ?? "#";
                     }
 
                     var newStory = new Story
@@ -236,7 +236,7 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
         /// <summary>
         /// Phương thức nội bộ hỗ trợ tải tệp tin (Ảnh) lên server vật lý.
         /// </summary>
-        private string UploadFile(IFormFile file, string folderPath)
+        private string? UploadFile(IFormFile? file, string folderPath)
         {
             if (file == null || file.Length == 0) return null;
 

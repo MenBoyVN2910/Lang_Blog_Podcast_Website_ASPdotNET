@@ -11,14 +11,14 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
 
         // Loại nội dung: "Story" hoặc "Podcast"
         [Required]
-        public string ContentType { get; set; }
+        public string ContentType { get; set; } = string.Empty;
 
         // ID của bài gốc (Story.Id hoặc PodCast.Id)
         public int OriginalPostId { get; set; }
 
         // Dữ liệu chỉnh sửa
         [Required(ErrorMessage = "Tiêu đề không được để trống")]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         public string? Content { get; set; }       // Cho Story
         public string? Description { get; set; }   // Cho Podcast

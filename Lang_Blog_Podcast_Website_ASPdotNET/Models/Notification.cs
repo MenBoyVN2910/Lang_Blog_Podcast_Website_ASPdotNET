@@ -11,18 +11,18 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Models
 
         // Người nhận thông báo
         [Required]
-        public string RecipientUserId { get; set; }
+        public string RecipientUserId { get; set; } = string.Empty;
         public ApplicationUser? RecipientUser { get; set; }
 
         // Nội dung thông báo
         [Required]
-        public string Title { get; set; }       // VD: "Bài viết đã được duyệt"
+        public string Title { get; set; } = string.Empty;       // VD: "Bài viết đã được duyệt"
         
         public string? Message { get; set; }    // Nội dung chi tiết nếu có
         
         // Phân loại thông báo: "Approved", "Rejected", "NewSubmission", "Welcome", v.v.
         [Required]
-        public string Type { get; set; }        
+        public string Type { get; set; } = string.Empty;        
         
         // Đường dẫn liên kết khi bấm vào thông báo (nếu có)
         public string? LinkUrl { get; set; }

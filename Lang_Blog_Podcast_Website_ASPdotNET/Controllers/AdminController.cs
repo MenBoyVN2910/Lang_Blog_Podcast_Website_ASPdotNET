@@ -99,8 +99,8 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             var userRolesViewModel = users.Select(user => new UserRoleViewModel
             {
                 UserId = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
+                UserName = user.UserName ?? user.Email ?? "",
+                Email = user.Email ?? "",
                 IsAdmin = adminIds.Contains(user.Id)
             }).ToList();
 
@@ -185,8 +185,8 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             var userRolesViewModel = users.Select(user => new UserRoleViewModel
             {
                 UserId = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
+                UserName = user.UserName ?? user.Email ?? "",
+                Email = user.Email ?? "",
                 IsAdmin = adminIds.Contains(user.Id) // Kiểm tra tốc độ O(1)
             }).ToList();
 
@@ -208,7 +208,7 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             }
 
             // BẢO MẬT: Không cho phép Admin tự hạ quyền của bản thân tránh khóa tài khoản Admin cuối cùng
-            string currentUserId = _userManager.GetUserId(User);
+            string? currentUserId = _userManager.GetUserId(User);
             if (userId == currentUserId)
             {
                 TempData["AdminError"] = "Bạn không thể tự gỡ quyền Admin của chính mình!";
@@ -303,7 +303,7 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
             }
 
             // Không cho phép tự xóa tài khoản của chính mình
-            string currentUserId = _userManager.GetUserId(User);
+            string? currentUserId = _userManager.GetUserId(User);
             if (userId == currentUserId)
             {
                 TempData["AdminError"] = "Bạn không thể tự xóa tài khoản của chính mình!";
@@ -463,11 +463,11 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 var story = await _db.Stories.FindAsync(revision.OriginalPostId);
                 if (story != null)
                 {
-                    if (revision.ImagePath != story.ImagePath) DeletePhysicalFile(story.ImagePath);
+                    if (!string.IsNullOrEmpty(story.ImagePath) && revision.ImagePath != story.ImagePath) DeletePhysicalFile(story.ImagePath);
                     story.Title = revision.Title;
-                    story.Content = revision.Content;
+                    story.Content = revision.Content ?? "";
                     story.CategoryId = revision.CategoryId;
-                    story.ImagePath = revision.ImagePath;
+                    story.ImagePath = revision.ImagePath ?? "";
                     story.Status = StoryStatus.Approved;
                 }
             }
@@ -476,13 +476,13 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
                 var podcast = await _db.PodCasts.FindAsync(revision.OriginalPostId);
                 if (podcast != null)
                 {
-                    if (revision.ImagePath != podcast.ImagePath) DeletePhysicalFile(podcast.ImagePath);
-                    if (revision.AudioPath != podcast.AudioPath) DeletePhysicalFile(podcast.AudioPath);
+                    if (!string.IsNullOrEmpty(podcast.ImagePath) && revision.ImagePath != podcast.ImagePath) DeletePhysicalFile(podcast.ImagePath);
+                    if (!string.IsNullOrEmpty(podcast.AudioPath) && revision.AudioPath != podcast.AudioPath) DeletePhysicalFile(podcast.AudioPath);
                     podcast.Title = revision.Title;
-                    podcast.Description = revision.Description;
+                    podcast.Description = revision.Description ?? "";
                     podcast.CategoryId = revision.CategoryId;
-                    podcast.ImagePath = revision.ImagePath;
-                    podcast.AudioPath = revision.AudioPath;
+                    podcast.ImagePath = revision.ImagePath ?? "";
+                    podcast.AudioPath = revision.AudioPath ?? "";
                     podcast.Status = StoryStatus.Approved;
                 }
             }
@@ -886,7 +886,7 @@ namespace Lang_Blog_Podcast_Website_ASPdotNET.Controllers
         /// <summary>
         /// Hàm hỗ trợ xóa các tệp tin vật lý trong thư mục wwwroot để tránh rác server.
         /// </summary>
-        private void DeletePhysicalFile(string relativePath)
+        private void DeletePhysicalFile(string? relativePath)
         {
             if (string.IsNullOrEmpty(relativePath)) return;
 

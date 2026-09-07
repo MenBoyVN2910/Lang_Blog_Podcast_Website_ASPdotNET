@@ -93,5 +93,8 @@ app.MapControllerRoute(
 // Ánh xạ các Razor Pages (cần thiết để các trang Login/Register của Identity hoạt động)
 app.MapRazorPages();
 
+// Khởi tạo các vai trò và dữ liệu danh mục ban đầu (nếu chưa có)
+await DbInitializer.SeedAsync(app.Services);
+
 // Khởi chạy ứng dụng web và lắng nghe các request tới
 app.Run();

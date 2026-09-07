@@ -97,14 +97,14 @@
                 <button id="registerSubmit" type="submit" class="btn-submit">Đăng ký tài khoản</button>
             </form>
 
-            <div class="divider">
-                <span>Hoặc</span>
-            </div>
-
-            @* Xử lý đăng nhập bằng tài khoản liên kết (Google, v.v.) -- Chưa Được Triển Khai *@
+            @* Xử lý đăng nhập bằng tài khoản liên kết (Google, v.v.) *@
             @{
                 if ((Model.ExternalLogins?.Count ?? 0) > 0)
                 {
+                    <div class="divider">
+                        <span>Hoặc</span>
+                    </div>
+
                     <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
                         @foreach (var provider in Model.ExternalLogins!)
                         {
@@ -118,7 +118,7 @@
                             else
                             {
                                 <button type="submit" class="btn-google" name="provider" value="@provider.Name">
-                                    <i class="fa-brands fa-@provider.Name.ToLower()"></i> TIẾP TỤC VỚI @provider.DisplayName.ToUpper()
+                                    <i class="fa-brands fa-@provider.Name.ToLower()"></i> TIẾP TỤC VỚI @(provider.DisplayName?.ToUpper() ?? provider.Name.ToUpper())
                                 </button>
                             }
                         }
